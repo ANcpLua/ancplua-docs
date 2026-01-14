@@ -1,0 +1,50 @@
+---
+title: ANcpLua.Analyzers
+description: Custom Roslyn analyzers and code fixes for C# code quality
+icon: "shield-check"
+---
+
+# ANcpLua.Analyzers
+
+Custom Roslyn analyzers and code fixes
+
+## Rules
+
+|Id|Category|Description|Severity|Enabled|Code Fix|
+|--|--------|-----------|:------:|:-----:|:------:|
+|[AL0001](/analyzers/rules/AL0001)|Design|Prohibit reassignment of primary constructor parameters|Error|Yes|No|
+|[AL0002](/analyzers/rules/AL0002)|Design|Don't repeat negated patterns|Warning|Yes|Yes|
+|[AL0003](/analyzers/rules/AL0003)|Reliability|Don't divide by constant zero|Error|Yes|No|
+|[AL0004](/analyzers/rules/AL0004)|Usage|Use pattern matching when comparing Span with constants|Warning|Yes|Yes|
+|[AL0005](/analyzers/rules/AL0005)|Usage|Use SequenceEqual when comparing Span with non-constants|Warning|Yes|Yes|
+|[AL0006](/analyzers/rules/AL0006)|Design|Field name conflicts with primary constructor parameter|Warning|Yes|No|
+|[AL0007](/analyzers/rules/AL0007)|Usage|GetSchema should be explicitly implemented|Error|Yes|No|
+|[AL0008](/analyzers/rules/AL0008)|Usage|GetSchema must return null and not be abstract|Error|Yes|Yes|
+|[AL0009](/analyzers/rules/AL0009)|Usage|Don't call IXmlSerializable.GetSchema|Error|Yes|No|
+|[AL0010](/analyzers/rules/AL0010)|Design|Type should be partial|Info|No|Yes|
+|[AL0011](/analyzers/rules/AL0011)|Threading|Avoid lock keyword on non-Lock types|Warning|Yes|No|
+|[AL0012](/analyzers/rules/AL0012)|OpenTelemetry|Deprecated semantic convention attribute|Warning|Yes|Yes|
+|[AL0013](/analyzers/rules/AL0013)|OpenTelemetry|Missing telemetry schema URL|Info|Yes|No|
+|[AL0014](/analyzers/rules/AL0014)|Style|Prefer pattern matching for null and zero comparisons|Info|Yes|Yes|
+|[AL0015](/analyzers/rules/AL0015)|Style|Normalize null-guard style|Info|Yes|Yes|
+|[AL0016](/analyzers/rules/AL0016)|Style|Combine declaration with subsequent null-check|Info|Yes|Yes|
+|[AL0017](/analyzers/rules/AL0017)|VersionManagement|Hardcoded package version detected|Warning|Yes|No|
+|[AL0020](/analyzers/rules/AL0020)|ASP.NET Core|IFormCollection requires explicit attribute|Error|Yes|No|
+|[AL0021](/analyzers/rules/AL0021)|ASP.NET Core|Multiple structured form sources|Error|Yes|No|
+|[AL0022](/analyzers/rules/AL0022)|ASP.NET Core|Mixed form collection and DTO|Error|Yes|No|
+|[AL0023](/analyzers/rules/AL0023)|ASP.NET Core|Unsupported form type|Error|Yes|No|
+|[AL0024](/analyzers/rules/AL0024)|ASP.NET Core|Form and body conflict|Error|Yes|No|
+|[AL0025](/analyzers/rules/AL0025)|Usage|Anonymous function can be made static|Info|Yes|Yes|
+
+
+## Refactorings
+
+|Id|Description|
+|--|-----------|
+|[AR0001](/analyzers/rules/AR0001)|Snake Case To Pascal Case|
+|[AR0002](/analyzers/rules/AR0002)|Make Static Lambda|
+
+
+## Configuration
+
+See [Configuration](/analyzers/configuration) for .editorconfig settings.

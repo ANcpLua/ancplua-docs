@@ -1,33 +1,124 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'QYL Observability API'
+description: 'Comprehensive REST API for observability data - traces, logs, metrics, sessions, errors, and deployments'
 ---
 
+The QYL Observability API provides 44 endpoints for querying and managing observability data across your distributed systems. The API follows REST conventions with JSON request/response bodies and cursor-based pagination for list operations.
+
+## API Categories
+
+<CardGroup cols={3}>
+  <Card title="Health" icon="heart-pulse">
+    3 endpoints for health checks, liveness, and readiness probes
+  </Card>
+  <Card title="Traces" icon="route">
+    4 endpoints for distributed trace queries and span retrieval
+  </Card>
+  <Card title="Logs" icon="scroll">
+    5 endpoints for log search, aggregation, and pattern detection
+  </Card>
+  <Card title="Metrics" icon="chart-line">
+    3 endpoints for metrics queries and metadata
+  </Card>
+  <Card title="Sessions" icon="user-clock">
+    4 endpoints for user session tracking and analysis
+  </Card>
+  <Card title="Errors" icon="bug">
+    5 endpoints for error group management and correlation
+  </Card>
+  <Card title="Exceptions" icon="triangle-exclamation">
+    2 endpoints for exception tracking and statistics
+  </Card>
+  <Card title="Deployments" icon="rocket">
+    5 endpoints for deployment tracking and DORA metrics
+  </Card>
+  <Card title="CI/CD Pipelines" icon="code-branch">
+    2 endpoints for CI/CD pipeline monitoring
+  </Card>
+  <Card title="Streaming" icon="broadcast-tower">
+    7 SSE endpoints for real-time event streams
+  </Card>
+  <Card title="Services" icon="cubes">
+    4 endpoints for service registry and dependency mapping
+  </Card>
+</CardGroup>
+
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  Browse the endpoints in the sidebar navigation. Each endpoint is auto-generated from the OpenAPI specification with interactive request/response examples.
 </Note>
-
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+The QYL API currently does not require authentication. All endpoints are accessible without API keys or bearer tokens.
+
+<Note>
+  Authentication may be added in future versions. Check the OpenAPI specification for the latest security requirements.
+</Note>
+
+## Base URLs
+
+<Tabs>
+  <Tab title="Production">
+    ```
+    https://api.qyl.sh
+    ```
+  </Tab>
+  <Tab title="Staging">
+    ```
+    https://staging-api.qyl.sh
+    ```
+  </Tab>
+</Tabs>
+
+## Common Response Headers
+
+All responses include correlation headers for debugging:
+
+| Header | Description |
+|--------|-------------|
+| `X-Trace-Id` | Trace ID for distributed tracing correlation |
+| `X-Request-Id` | Unique request ID for support inquiries |
+
+## Pagination
+
+List endpoints use cursor-based pagination with the following parameters:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `limit` | integer | Page size (1-1000, default: 100) |
+| `cursor` | string | Cursor token for next/previous page |
+
+Responses include:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
+{
+  "items": [...],
+  "has_more": true,
+  "next_cursor": "abc123",
+  "prev_cursor": null
+}
+```
+
+## Error Responses
+
+The API uses standard HTTP status codes:
+
+| Code | Description |
+|------|-------------|
+| `200` | Success |
+| `400` | Validation error - check request parameters |
+| `404` | Resource not found |
+| `500` | Internal server error |
+| `503` | Service unavailable (health endpoints) |
+
+Error responses follow a consistent format:
+
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "Human-readable error description",
+  "details": {
+    "field": "Additional context"
   }
-]
+}
 ```

@@ -1,0 +1,27 @@
+---
+title: "AL0021 - Multiple structured form sources"
+sidebarTitle: "AL0021"
+description: An endpoint can only have one structured form source
+icon: "shield-check"
+---
+
+# AL0021 - Multiple structured form sources
+
+Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0020ToAL0024FormBindingAnalyzer.cs)
+
+## Description
+
+An endpoint can only have one structured form source. Multiple [FromForm] DTOs or IFormCollections create ambiguity about which parameter receives the form data.
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0021.severity = warning
+```

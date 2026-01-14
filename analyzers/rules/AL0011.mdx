@@ -1,0 +1,27 @@
+---
+title: "AL0011 - Avoid lock keyword on non-Lock types"
+sidebarTitle: "AL0011"
+description: The lock keyword on object/non-Lock types should be replaced with the Lock class
+icon: "shield-check"
+---
+
+# AL0011 - Avoid lock keyword on non-Lock types
+
+Source: [AL0011LockKeywordAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0011LockKeywordAnalyzer.cs)
+
+## Description
+
+The lock keyword on object/non-Lock types should be replaced with the Lock class from System.Threading.
+
+## Properties
+
+- **Category**: Threading
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0011.severity = warning
+```

@@ -1,0 +1,27 @@
+---
+title: "AL0009 - Don't call IXmlSerializable.GetSchema"
+sidebarTitle: "AL0009"
+description: Calling GetSchema is not supported as it should always return null
+icon: "shield-check"
+---
+
+# AL0009 - Don't call IXmlSerializable.GetSchema
+
+Source: [AL0007ToAL0009IXmlSerializableAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0007ToAL0009IXmlSerializableAnalyzer.cs)
+
+## Description
+
+Calling GetSchema is not supported; it should always return null and isn't intended to be invoked.
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0009.severity = warning
+```

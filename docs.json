@@ -1,122 +1,164 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "ANcpLua Framework",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0891B2",
+    "light": "#06B6D4",
+    "dark": "#0E7490"
   },
   "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "api": {
+    "playground": {
+      "mode": "show"
+    },
+    "baseUrl": [
+      "https://api.qyl.dev",
+      "https://api.staging.qyl.dev"
+    ]
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
+              "quickstart"
             ]
           },
           {
-            "group": "Customization",
+            "group": "ANcpLua.NET.Sdk",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "sdk/overview",
+              "sdk/variants",
+              "sdk/msbuild-properties",
+              "sdk/service-defaults",
+              "sdk/polyfills",
+              "sdk/extensions",
+              "sdk/shared-utilities",
+              "sdk/banned-apis",
+              "sdk/configuration-files",
+              "sdk/testing"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "ANcpLua.Analyzers",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "analyzers/overview",
+              "analyzers/configuration",
+              {
+                "group": "Rules",
+                "pages": [
+                  "analyzers/rules/AL0001",
+                  "analyzers/rules/AL0002",
+                  "analyzers/rules/AL0003",
+                  "analyzers/rules/AL0004",
+                  "analyzers/rules/AL0005",
+                  "analyzers/rules/AL0006",
+                  "analyzers/rules/AL0007",
+                  "analyzers/rules/AL0008",
+                  "analyzers/rules/AL0009",
+                  "analyzers/rules/AL0010",
+                  "analyzers/rules/AL0011",
+                  "analyzers/rules/AL0012",
+                  "analyzers/rules/AL0013",
+                  "analyzers/rules/AL0014",
+                  "analyzers/rules/AL0015",
+                  "analyzers/rules/AL0016",
+                  "analyzers/rules/AL0017",
+                  "analyzers/rules/AL0020",
+                  "analyzers/rules/AL0021",
+                  "analyzers/rules/AL0022",
+                  "analyzers/rules/AL0023",
+                  "analyzers/rules/AL0024",
+                  "analyzers/rules/AL0025",
+                  "analyzers/rules/AR0001",
+                  "analyzers/rules/AR0002"
+                ]
+              }
             ]
           },
           {
-            "group": "AI tools",
+            "group": "ANcpLua.Roslyn.Utilities",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "utilities/overview",
+              "utilities/diagnostic-flow",
+              "utilities/pipeline",
+              "utilities/contexts",
+              "utilities/patterns",
+              "utilities/operations",
+              "utilities/symbols",
+              "utilities/codegen",
+              "utilities/semantic-guard",
+              "utilities/msbuild-properties",
+              "utilities/msbuild-testing",
+              "utilities/testing"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "qyl API",
             "pages": [
               "api-reference/introduction"
             ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
           }
-        ]
+        ],
+        "openapi": "/api-reference/openapi.yaml"
       }
     ],
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "NuGet",
+          "href": "https://www.nuget.org/profiles/ANcpLua",
+          "icon": "box"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "GitHub",
+          "href": "https://github.com/ANcpLua",
+          "icon": "github"
         }
       ]
     }
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "NuGet",
+        "href": "https://www.nuget.org/profiles/ANcpLua"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/ANcpLua"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
+    ]
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/ANcpLua"
     }
   }
 }

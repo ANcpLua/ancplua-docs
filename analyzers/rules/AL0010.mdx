@@ -1,0 +1,27 @@
+---
+title: "AL0010 - Type should be partial"
+sidebarTitle: "AL0010"
+description: Types that are targets for source generators should be marked as partial
+icon: "shield-check"
+---
+
+# AL0010 - Type should be partial
+
+Source: [AL0010PartialTypeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0010PartialTypeAnalyzer.cs)
+
+## Description
+
+Types that are targets for source generators should be marked as partial.
+
+## Properties
+
+- **Category**: Design
+- **Severity**: Info
+- **Enabled by default**: False
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0010.severity = warning
+```

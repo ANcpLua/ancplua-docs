@@ -1,0 +1,27 @@
+---
+title: "AL0017 - Hardcoded package version detected"
+sidebarTitle: "AL0017"
+description: Package versions should use MSBuild variables from Version.props for centralized version management
+icon: "shield-check"
+---
+
+# AL0017 - Hardcoded package version detected
+
+Source: [AL0017HardcodedPackageVersionAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0017HardcodedPackageVersionAnalyzer.cs)
+
+## Description
+
+Package versions should use MSBuild variables from Version.props for centralized version management. This ensures consistency across all projects and simplifies version updates.
+
+## Properties
+
+- **Category**: VersionManagement
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0017.severity = warning
+```

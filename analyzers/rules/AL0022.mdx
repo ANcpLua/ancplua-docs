@@ -1,0 +1,27 @@
+---
+title: "AL0022 - Mixed form collection and DTO"
+sidebarTitle: "AL0022"
+description: Mixing IFormCollection with a [FromForm] DTO is not supported
+icon: "shield-check"
+---
+
+# AL0022 - Mixed form collection and DTO
+
+Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0020ToAL0024FormBindingAnalyzer.cs)
+
+## Description
+
+Mixing IFormCollection with a [FromForm] DTO is not supported. Choose one approach: use IFormCollection for dynamic form access or a typed DTO for structured binding.
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0022.severity = warning
+```

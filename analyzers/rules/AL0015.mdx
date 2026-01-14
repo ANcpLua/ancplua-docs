@@ -1,0 +1,27 @@
+---
+title: "AL0015 - Normalize null-guard style"
+sidebarTitle: "AL0015"
+description: Null-guards should be normalized to the preferred project style
+icon: "shield-check"
+---
+
+# AL0015 - Normalize null-guard style
+
+Source: [AL0015NormalizeNullGuardStyleAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0015NormalizeNullGuardStyleAnalyzer.cs)
+
+## Description
+
+Null-guards should be normalized to the preferred project style (Throw, BCL, or Portable).
+
+## Properties
+
+- **Category**: Style
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0015.severity = warning
+```

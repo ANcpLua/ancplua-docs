@@ -1,0 +1,27 @@
+---
+title: "AL0020 - IFormCollection requires explicit attribute"
+sidebarTitle: "AL0020"
+description: IFormCollection parameters must have an explicit [FromForm] attribute
+icon: "shield-check"
+---
+
+# AL0020 - IFormCollection requires explicit attribute
+
+Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0020ToAL0024FormBindingAnalyzer.cs)
+
+## Description
+
+IFormCollection parameters must have an explicit [FromForm] attribute. Unlike IFormFile which auto-binds, IFormCollection requires explicit attribution for clarity and safety.
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0020.severity = warning
+```

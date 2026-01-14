@@ -1,0 +1,27 @@
+---
+title: "AL0004 - Use pattern matching when comparing Span with constants"
+sidebarTitle: "AL0004"
+description: Use pattern matching instead of equality operators for Span constant comparisons
+icon: "shield-check"
+---
+
+# AL0004 - Use pattern matching when comparing Span with constants
+
+Source: [AL0004ToAL0005SpanComparisonAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0004ToAL0005SpanComparisonAnalyzer.cs)
+
+## Description
+
+When comparing Span and a constant, use pattern matching instead of equality operators, unless you want to compare addresses.
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0004.severity = warning
+```

@@ -1,0 +1,27 @@
+---
+title: "AL0014 - Prefer pattern matching for null and zero comparisons"
+sidebarTitle: "AL0014"
+description: Pattern matching syntax (is/is not) is more expressive and idiomatic
+icon: "shield-check"
+---
+
+# AL0014 - Prefer pattern matching for null and zero comparisons
+
+Source: [AL0014PreferPatternMatchingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0014PreferPatternMatchingAnalyzer.cs)
+
+## Description
+
+Pattern matching syntax (is/is not) is more expressive and idiomatic. For null checks, it also bypasses overloaded equality operators.
+
+## Properties
+
+- **Category**: Style
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0014.severity = warning
+```

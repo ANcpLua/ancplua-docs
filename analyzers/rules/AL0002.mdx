@@ -1,0 +1,27 @@
+---
+title: "AL0002 - Don't repeat negated patterns"
+sidebarTitle: "AL0002"
+description: The negated pattern should not be repeated multiple times
+icon: "shield-check"
+---
+
+# AL0002 - Don't repeat negated patterns
+
+Source: [AL0002DontRepeatNegatedPatternAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0002DontRepeatNegatedPatternAnalyzer.cs)
+
+## Description
+
+The negated pattern should not be repeated multiple times.
+
+## Properties
+
+- **Category**: Design
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0002.severity = warning
+```

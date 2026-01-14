@@ -1,0 +1,27 @@
+---
+title: "AL0023 - Unsupported form type"
+sidebarTitle: "AL0023"
+description: "[FromForm] can only bind primitives, primitive collections, or DTOs with specific constructor requirements"
+icon: "shield-check"
+---
+
+# AL0023 - Unsupported form type
+
+Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0020ToAL0024FormBindingAnalyzer.cs)
+
+## Description
+
+[FromForm] can only bind primitives, primitive collections, or DTOs with a parameterless constructor or primary constructor with all-primitive parameters.
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0023.severity = warning
+```

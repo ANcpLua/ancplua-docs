@@ -1,0 +1,45 @@
+name: Deploy to Mintlify
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: mintlify-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate before deploy
+        run: npx mintlify@latest broken-links
+
+      - name: Deploy notification
+        run: |
+          echo "Mintlify auto-deploys on push to main"
+          echo "Environment: ${{ github.event.inputs.environment || 'staging' }}"
+          echo "Commit: ${{ github.sha }}"
+          echo ""
+          echo "View deployment at: https://technikumwiengmbh.mintlify.app"
+
+      # Mintlify GitHub App handles actual deployment
+      # This workflow is for validation and tracking

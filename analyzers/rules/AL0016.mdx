@@ -1,0 +1,25 @@
+---
+title: "AL0016 - Combine declaration with subsequent null-check"
+sidebarTitle: "AL0016"
+description: Combines a variable declaration and an immediate null-check into a single pattern match
+icon: "shield-check"
+---
+
+# AL0016 - Combine declaration with subsequent null-check
+
+## Description
+
+Combines a variable declaration and an immediate null-check into a single pattern match.
+
+## Properties
+
+- **Category**: Style
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0016.severity = warning
+```

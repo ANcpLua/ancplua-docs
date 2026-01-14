@@ -1,0 +1,27 @@
+---
+title: "AL0008 - GetSchema must return null and not be abstract"
+sidebarTitle: "AL0008"
+description: GetSchema should return null according to IXmlSerializable guidance
+icon: "shield-check"
+---
+
+# AL0008 - GetSchema must return null and not be abstract
+
+Source: [AL0007ToAL0009IXmlSerializableAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0007ToAL0009IXmlSerializableAnalyzer.cs)
+
+## Description
+
+GetSchema should return null according to IXmlSerializable guidance and should not be abstract.
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0008.severity = warning
+```

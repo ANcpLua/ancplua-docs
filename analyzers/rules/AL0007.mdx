@@ -1,0 +1,27 @@
+---
+title: "AL0007 - GetSchema should be explicitly implemented"
+sidebarTitle: "AL0007"
+description: Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API
+icon: "shield-check"
+---
+
+# AL0007 - GetSchema should be explicitly implemented
+
+Source: [AL0007ToAL0009IXmlSerializableAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0007ToAL0009IXmlSerializableAnalyzer.cs)
+
+## Description
+
+Implement IXmlSerializable.GetSchema explicitly to avoid exposing it as part of the public API.
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0007.severity = warning
+```

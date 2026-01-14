@@ -1,0 +1,27 @@
+---
+title: "AL0024 - Form and body conflict"
+sidebarTitle: "AL0024"
+description: Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported
+icon: "shield-check"
+---
+
+# AL0024 - Form and body conflict
+
+Source: [AL0020ToAL0024FormBindingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0020ToAL0024FormBindingAnalyzer.cs)
+
+## Description
+
+An HTTP request body can only be consumed once. Mixing [FromForm] and [FromBody] parameters in the same endpoint is not supported.
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0024.severity = warning
+```

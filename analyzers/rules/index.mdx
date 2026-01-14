@@ -1,0 +1,110 @@
+---
+title: Analyzer Rules
+description: Complete reference for all ANcpLua.Analyzers diagnostic rules
+icon: "shield-check"
+---
+
+# Analyzer Rules
+
+ANcpLua.Analyzers provides 24 diagnostic rules and 2 refactorings for C# code quality, organized by category.
+
+## Design Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| [AL0001](/analyzers/rules/AL0001) | Error | Prohibit reassignment of primary constructor params |
+| [AL0002](/analyzers/rules/AL0002) | Warning | Don't repeat negated patterns |
+| [AL0006](/analyzers/rules/AL0006) | Warning | Field name conflicts with primary constructor parameter |
+| [AL0010](/analyzers/rules/AL0010) | Info | Type should be partial for source generator support |
+
+## Reliability Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| [AL0003](/analyzers/rules/AL0003) | Error | Don't divide by constant zero |
+
+## Usage Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| [AL0004](/analyzers/rules/AL0004) | Warning | Use pattern matching for Span constant comparison |
+| [AL0005](/analyzers/rules/AL0005) | Warning | Use SequenceEqual for Span non-constant comparison |
+| [AL0007](/analyzers/rules/AL0007) | Warning | GetSchema should be explicitly implemented |
+| [AL0008](/analyzers/rules/AL0008) | Warning | GetSchema must return null and not be abstract |
+| [AL0009](/analyzers/rules/AL0009) | Warning | Don't call IXmlSerializable.GetSchema |
+| [AL0025](/analyzers/rules/AL0025) | Info | Anonymous function can be made static |
+
+## Threading Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| [AL0011](/analyzers/rules/AL0011) | Warning | Avoid lock keyword on non-Lock types (.NET 9+) |
+
+## OpenTelemetry Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| [AL0012](/analyzers/rules/AL0012) | Warning | Deprecated OTel semantic convention attribute |
+| [AL0013](/analyzers/rules/AL0013) | Info | Missing telemetry schema URL |
+
+## Style Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| [AL0014](/analyzers/rules/AL0014) | Info | Prefer pattern matching for null/zero comparisons |
+| [AL0015](/analyzers/rules/AL0015) | Info | Normalize null-guard style |
+| [AL0016](/analyzers/rules/AL0016) | Info | Combine declaration with subsequent null-check |
+
+## Version Management Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| [AL0017](/analyzers/rules/AL0017) | Warning | Hardcoded package version in Directory.Packages.props |
+
+## ASP.NET Core Rules
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| [AL0020](/analyzers/rules/AL0020) | Error | IFormCollection requires explicit [FromForm] attribute |
+| [AL0021](/analyzers/rules/AL0021) | Error | Multiple structured form sources conflict |
+| [AL0022](/analyzers/rules/AL0022) | Error | Mixed IFormCollection and DTO form binding unsupported |
+| [AL0023](/analyzers/rules/AL0023) | Error | Type cannot be form-bound (abstract, interface, no constructor) |
+| [AL0024](/analyzers/rules/AL0024) | Error | [FromForm] and [FromBody] conflict on same method |
+
+## Refactorings
+
+| Rule | Description |
+|------|-------------|
+| [AR0001](/analyzers/rules/AR0001) | Snake Case To Pascal Case |
+| [AR0002](/analyzers/rules/AR0002) | Make Static Lambda |
+
+## Configuration
+
+All rules can be configured via `.editorconfig`:
+
+```ini
+[*.cs]
+# Disable a rule
+dotnet_diagnostic.AL0001.severity = none
+
+# Change severity
+dotnet_diagnostic.AL0014.severity = warning
+
+# Enable OpenTelemetry rules as errors in production code
+[src/**/*.cs]
+dotnet_diagnostic.AL0012.severity = error
+dotnet_diagnostic.AL0013.severity = warning
+
+# Relax ASP.NET Core rules in test projects
+[tests/**/*.cs]
+dotnet_diagnostic.AL0020.severity = none
+```
+
+## Rule Severity Levels
+
+| Severity | Build Behavior | Use For |
+|----------|----------------|---------|
+| Error | Breaks build | Critical issues, runtime exceptions |
+| Warning | Shows in build output | Important issues to address |
+| Info | IDE only by default | Suggestions and improvements |
+| None | Disabled | Rules not applicable to project |

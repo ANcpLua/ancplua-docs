@@ -1,0 +1,27 @@
+---
+title: "AL0006 - Field name conflicts with primary constructor parameter"
+sidebarTitle: "AL0006"
+description: Field names should not conflict with primary constructor parameters
+icon: "shield-check"
+---
+
+# AL0006 - Field name conflicts with primary constructor parameter
+
+Source: [AL0006FieldNameConflictWithPrimaryConstructorAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0006FieldNameConflictWithPrimaryConstructorAnalyzer.cs)
+
+## Description
+
+Field names should not conflict with primary constructor parameters to avoid shadowing and confusion.
+
+## Properties
+
+- **Category**: Design
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0006.severity = warning
+```
