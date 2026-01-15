@@ -1,58 +1,56 @@
 ---
-title: "ANcpLua.NET.Sdk Overview"
-description: "Complete guide to ANcpLua.NET.Sdk features including SDK variants, polyfills, banned API enforcement, and OpenTelemetry integration for .NET projects."
+title: "SDK Overview"
+description: "ANcpLua.NET.Sdk features and configuration options."
 icon: "cube"
 ---
 
-[![NuGet](https://img.shields.io/nuget/v/ANcpLua.NET.Sdk?label=NuGet&color=0891B2)](https://www.nuget.org/packages/ANcpLua.NET.Sdk/)
-[![.NET 10](https://img.shields.io/badge/.NET-10.0-7C3AED)](https://dotnet.microsoft.com/download/dotnet/10.0)
+The SDK configures sensible defaults and includes tooling for .NET 10 projects.
 
-Opinionated MSBuild SDK for .NET projects.
+## Variants
 
-## Quick Start
+Choose the SDK variant that matches your project type:
 
-```json title="global.json"
-{
-  "msbuild-sdks": {
-    "ANcpLua.NET.Sdk": "1.3.31"
-  }
-}
-```
+| SDK | Project Type |
+|-----|--------------|
+| `ANcpLua.NET.Sdk` | Class libraries, Console apps, Workers |
+| `ANcpLua.NET.Sdk.Web` | ASP.NET Core APIs |
+| `ANcpLua.NET.Sdk.Test` | xUnit v3 test projects |
 
-```xml
-<Project Sdk="ANcpLua.NET.Sdk"></Project>
-```
-
-## SDK Variants
-
-| SDK | Use Case |
-|-----|----------|
-| `ANcpLua.NET.Sdk` | Libraries, Console, Workers |
-| `ANcpLua.NET.Sdk.Web` | ASP.NET Core |
-| `ANcpLua.NET.Sdk.Test` | xUnit v3 + MTP |
+See [Variants](/sdk/variants) for detailed configuration per variant.
 
 ## Base Features
 
-- Banned API enforcement
-- [ANcpLua.Analyzers](/analyzers/overview) + Meziantou.Analyzer
-- `Throw.IfNull()` guard clauses
-- LangVersion `latest`, nullable enabled
-- Polyfills for netstandard2.0/net472
+All variants include:
 
-## Web SDK Additions
+| Feature | Description |
+|---------|-------------|
+| [Banned APIs](/sdk/banned-apis) | Prevents legacy API usage |
+| [Analyzers](/analyzers/overview) | Code quality rules |
+| Guard clauses | `Throw.IfNull()` and similar |
+| [Polyfills](/sdk/polyfills) | Modern syntax for netstandard2.0 |
+| Nullable | Enabled by default |
+| LangVersion | `latest` |
 
-- OpenTelemetry (logging, metrics, tracing)
-- Health endpoints (`/health`, `/alive`)
-- HTTP resilience (Polly)
-- DevLogs (browser → server logs)
+## Web Variant Additions
 
-## Test SDK Additions
+| Feature | Description |
+|---------|-------------|
+| OpenTelemetry | Logging, metrics, tracing |
+| Health endpoints | `/health`, `/alive` |
+| HTTP resilience | Polly integration |
+| DevLogs | Browser → server logging |
 
-- xUnit v3 with MTP
-- Coverage tooling
-- FakeLogger (opt-in)
+## Test Variant Additions
 
-## Opt-in Features
+| Feature | Description |
+|---------|-------------|
+| xUnit v3 | With [Microsoft Testing Platform](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-overview) |
+| Coverage | Built-in collection |
+| FakeLogger | Opt-in test logger |
+
+## Opt-in Properties
+
+Enable additional features:
 
 ```xml
 <PropertyGroup>
@@ -63,7 +61,9 @@ Opinionated MSBuild SDK for .NET projects.
 </PropertyGroup>
 ```
 
-## Opt-out
+## Opt-out Properties
+
+Disable defaults:
 
 ```xml
 <PropertyGroup>
@@ -74,26 +74,4 @@ Opinionated MSBuild SDK for .NET projects.
 </PropertyGroup>
 ```
 
-## DevLogs (Web SDK)
-
-Browser console → server logs:
-
-```html
-<script src="/dev-logs.js"></script>
-```
-
-Output: `[BROWSER] console.log message`
-
-## Requirements
-
-Central Package Management:
-
-```xml title="Directory.Packages.props"
-<PropertyGroup>
-  <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-</PropertyGroup>
-```
-
----
-
-*Architecture inspired by [Meziantou.NET.Sdk](https://github.com/meziantou/Meziantou.NET.Sdk).*
+See [MSBuild Properties](/sdk/msbuild-properties) for the complete list.

@@ -1,87 +1,74 @@
 ---
 title: "Quickstart"
-description: "Install ANcpLua.NET.Sdk in minutes. Configure your .NET project with analyzers, polyfills, and opinionated defaults using global.json and MSBuild."
+description: "Install ANcpLua.NET.Sdk in your .NET 10 project."
 ---
 
 ## Prerequisites
 
-<Check>**.NET SDK 8.0+** installed</Check>
-<Check>**Central Package Management** enabled in your repository</Check>
-
-```xml title="Directory.Packages.props"
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-</Project>
-```
+<Check>[.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) installed</Check>
+<Check>[Central Package Management](/index#requirements) enabled</Check>
 
 ## Installation
 
 <Steps>
   <Step title="Add SDK reference">
-    Add the SDK to your `global.json` file:
+    Add to your `global.json` (create if it doesn't exist):
 
     ```json title="global.json"
     {
       "msbuild-sdks": {
-        "ANcpLua.NET.Sdk": "1.3.31"
+        "ANcpLua.NET.Sdk": "*"
       }
     }
     ```
   </Step>
   <Step title="Update project file">
-    Replace your project's `Sdk` attribute with the appropriate SDK:
+    Set the `Sdk` attribute to the variant you need:
 
-    <Tabs>
-      <Tab title="Library/Console">
-    ```xml
+    ```xml title="Library or Console"
     <Project Sdk="ANcpLua.NET.Sdk">
       <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
       </PropertyGroup>
     </Project>
     ```
-      </Tab>
-      <Tab title="Web API">
-    ```xml
+
+    ```xml title="ASP.NET Core API"
     <Project Sdk="ANcpLua.NET.Sdk.Web">
       <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
       </PropertyGroup>
     </Project>
     ```
-      </Tab>
-      <Tab title="Tests">
-    ```xml
+
+    ```xml title="xUnit v3 Tests"
     <Project Sdk="ANcpLua.NET.Sdk.Test">
       <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
       </PropertyGroup>
     </Project>
     ```
-      </Tab>
-    </Tabs>
   </Step>
   <Step title="Build">
-    Build your project to verify the SDK is configured correctly:
-
     ```bash
     dotnet build
     ```
   </Step>
 </Steps>
 
-## Auto-Configured
+## What's configured
 
-The SDK enables:
-- Nullable reference types
+After installation, you automatically get:
+
+- Nullable reference types enabled
 - LangVersion `latest`
 - Deterministic builds
-- ANcpLua.Analyzers + Meziantou.Analyzer
+- Roslyn analyzers
 - Banned API enforcement
 
-## Multi-Targeting
+## Multi-targeting
+
+To support older frameworks alongside .NET 10:
 
 ```xml
 <Project Sdk="ANcpLua.NET.Sdk">
@@ -91,9 +78,4 @@ The SDK enables:
 </Project>
 ```
 
-Polyfills auto-injected for `netstandard2.0`/`net472`:
-- Index/Range (`^1`, `..`)
-- `IsExternalInit`
-- String extensions
-
-See [Polyfills](/sdk/polyfills) for details.
+Polyfills are auto-injected for `netstandard2.0` targets. See [Polyfills](/sdk/polyfills).
