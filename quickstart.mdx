@@ -1,20 +1,14 @@
 ---
 title: "Quickstart"
-description: "How to add ANcpLua.NET.Sdk to your .NET project in 5 minutes"
+description: "Add ANcpLua.NET.Sdk to your project"
 ---
 
+## Prerequisites
 
-This guide walks you through adding ANcpLua.NET.Sdk to your .NET projects.
-
-## What Do I Need Before Starting?
-
-**Prerequisites:**
-- .NET SDK 8.0 or later
+- .NET SDK 8.0+
 - Central Package Management enabled
 
-If you do not have Central Package Management, create a `Directory.Packages.props` file in your repository root:
-
-```xml
+```xml title="Directory.Packages.props"
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -22,13 +16,11 @@ If you do not have Central Package Management, create a `Directory.Packages.prop
 </Project>
 ```
 
-## How Do I Install the SDK?
+## Installation
 
-### Step 1: Add SDK to global.json
+**1. Add SDK reference:**
 
-Create or update your `global.json` file in the repository root. Check [NuGet](https://www.nuget.org/packages/ANcpLua.NET.Sdk/) for the latest version.
-
-```json
+```json title="global.json"
 {
   "msbuild-sdks": {
     "ANcpLua.NET.Sdk": "1.3.31"
@@ -36,78 +28,19 @@ Create or update your `global.json` file in the repository root. Check [NuGet](h
 }
 ```
 
-<Tip>
-Use [Dependabot](https://docs.github.com/en/code-security/dependabot) or [Renovate](https://docs.renovatebot.com/) to automatically update SDK versions.
-</Tip>
-
-### Step 2: Update Your Project File
-
-Replace the SDK attribute in your `.csproj` file:
+**2. Update project file:**
 
 <Tabs>
-  <Tab title="Library / Console">
-    ```xml
-    <Project Sdk="ANcpLua.NET.Sdk">
-      <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-      </PropertyGroup>
-    </Project>
-    ```
-  </Tab>
-  <Tab title="Web API">
-    ```xml
-    <Project Sdk="ANcpLua.NET.Sdk.Web">
-      <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-      </PropertyGroup>
-    </Project>
-    ```
-  </Tab>
-  <Tab title="Test Project">
-    ```xml
-    <Project Sdk="ANcpLua.NET.Sdk.Test">
-      <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-      </PropertyGroup>
-    </Project>
-    ```
-  </Tab>
-</Tabs>
-
-### Step 3: Build
-
-Run `dotnet build` to verify the SDK is working:
-
-```bash
-dotnet build
-```
-
-## What Does the SDK Configure Automatically?
-
-The SDK will automatically:
-
-- Enable nullable reference types
-- Set LangVersion to `latest`
-- Add ANcpLua.Analyzers for code quality enforcement
-- Configure banned API analyzers
-- Enable deterministic builds
-
-## What Does Each SDK Variant Look Like?
-
-### Class Library
-
+  <Tab title="Library/Console">
 ```xml
 <Project Sdk="ANcpLua.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <IsPackable>true</IsPackable>
-    <PackageId>MyCompany.MyLibrary</PackageId>
   </PropertyGroup>
 </Project>
 ```
-
-### ASP.NET Core Web API
-
+  </Tab>
+  <Tab title="Web API">
 ```xml
 <Project Sdk="ANcpLua.NET.Sdk.Web">
   <PropertyGroup>
@@ -115,16 +48,8 @@ The SDK will automatically:
   </PropertyGroup>
 </Project>
 ```
-
-The Web SDK adds:
-
-- OpenTelemetry integration with OTLP export
-- Health check endpoints at `/health` and `/alive`
-- HTTP client resilience (retries, circuit breakers)
-- DevLogs for browser console capture
-
-### xUnit Test Project
-
+  </Tab>
+  <Tab title="Tests">
 ```xml
 <Project Sdk="ANcpLua.NET.Sdk.Test">
   <PropertyGroup>
@@ -132,16 +57,25 @@ The Web SDK adds:
   </PropertyGroup>
 </Project>
 ```
+  </Tab>
+</Tabs>
 
-The Test SDK adds:
+**3. Build:**
 
-- xUnit v3 with MTP (Microsoft Testing Platform)
-- Test coverage tooling
-- FakeLogger extensions (opt-in)
+```bash
+dotnet build
+```
 
-## How Do I Target Legacy Frameworks?
+## Auto-Configured
 
-For libraries targeting older frameworks like `netstandard2.0`, the SDK automatically provides polyfills:
+The SDK enables:
+- Nullable reference types
+- LangVersion `latest`
+- Deterministic builds
+- ANcpLua.Analyzers + Meziantou.Analyzer
+- Banned API enforcement
+
+## Multi-Targeting
 
 ```xml
 <Project Sdk="ANcpLua.NET.Sdk">
@@ -151,55 +85,9 @@ For libraries targeting older frameworks like `netstandard2.0`, the SDK automati
 </Project>
 ```
 
-Automatic polyfills include:
+Polyfills auto-injected for `netstandard2.0`/`net472`:
+- Index/Range (`^1`, `..`)
+- `IsExternalInit`
+- String extensions
 
-- Index and Range operators (`^1`, `..`)
-- `IsExternalInit` for init-only setters
-- String extensions (`Contains(char)`, `ReplaceLineEndings()`)
-
-See [Polyfills](/sdk/polyfills) for the complete list.
-
-## Frequently Asked Questions
-
-<AccordionGroup>
-  <Accordion title="Can I use the SDK without Central Package Management?">
-    No, the SDK requires Central Package Management (CPM) to be enabled. CPM ensures consistent package versions across your solution. Create a `Directory.Packages.props` file in your repository root with `<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>`.
-  </Accordion>
-
-  <Accordion title="How do I update the SDK version?">
-    Update the version in your `global.json` file. We recommend using [Dependabot](https://docs.github.com/en/code-security/dependabot) or [Renovate](https://docs.renovatebot.com/) to automatically create PRs when new versions are released.
-  </Accordion>
-
-  <Accordion title="Which SDK variant should I use for a Worker Service?">
-    Use the base `ANcpLua.NET.Sdk`. The Web SDK (`ANcpLua.NET.Sdk.Web`) is specifically for ASP.NET Core projects that need HTTP endpoints.
-  </Accordion>
-
-  <Accordion title="Do I need to manually add analyzers?">
-    No. The SDK automatically includes [ANcpLua.Analyzers](/analyzers/overview) and Meziantou.Analyzer. You can disable them via MSBuild properties if needed.
-  </Accordion>
-
-  <Accordion title="Can I disable specific SDK features?">
-    Yes. See [MSBuild Properties](/sdk/msbuild-properties) for all configuration options. For example, set `<InjectSharedThrow>false</InjectSharedThrow>` to disable guard clauses.
-  </Accordion>
-
-  <Accordion title="What .NET versions are supported?">
-    The SDK supports .NET 8.0 and later. For multi-targeting, you can target netstandard2.0 and net472 with automatic polyfill support.
-  </Accordion>
-</AccordionGroup>
-
-## Next Steps
-
-<CardGroup cols={2}>
-  <Card title="SDK Overview" icon="cube" href="/sdk/overview">
-    Learn about all SDK features and configuration options.
-  </Card>
-  <Card title="MSBuild Properties" icon="gear" href="/sdk/msbuild-properties">
-    Configure SDK behavior with MSBuild properties.
-  </Card>
-  <Card title="Polyfills" icon="puzzle-piece" href="/sdk/polyfills">
-    Understand the polyfill system for legacy frameworks.
-  </Card>
-  <Card title="Banned APIs" icon="ban" href="/sdk/banned-apis">
-    Learn about enforced API restrictions.
-  </Card>
-</CardGroup>
+See [Polyfills](/sdk/polyfills) for details.

@@ -1,124 +1,74 @@
 ---
-title: 'QYL Observability API'
-description: 'Comprehensive REST API for observability data - traces, logs, metrics, sessions, errors, and deployments'
+title: 'QYL API'
+description: 'REST API for observability data'
 ---
 
-The QYL Observability API provides 44 endpoints for querying and managing observability data across your distributed systems. The API follows REST conventions with JSON request/response bodies and cursor-based pagination for list operations.
-
-## API Categories
-
-<CardGroup cols={3}>
-  <Card title="Health" icon="heart-pulse">
-    3 endpoints for health checks, liveness, and readiness probes
-  </Card>
-  <Card title="Traces" icon="route">
-    4 endpoints for distributed trace queries and span retrieval
-  </Card>
-  <Card title="Logs" icon="scroll">
-    5 endpoints for log search, aggregation, and pattern detection
-  </Card>
-  <Card title="Metrics" icon="chart-line">
-    3 endpoints for metrics queries and metadata
-  </Card>
-  <Card title="Sessions" icon="user-clock">
-    4 endpoints for user session tracking and analysis
-  </Card>
-  <Card title="Errors" icon="bug">
-    5 endpoints for error group management and correlation
-  </Card>
-  <Card title="Exceptions" icon="triangle-exclamation">
-    2 endpoints for exception tracking and statistics
-  </Card>
-  <Card title="Deployments" icon="rocket">
-    5 endpoints for deployment tracking and DORA metrics
-  </Card>
-  <Card title="CI/CD Pipelines" icon="code-branch">
-    2 endpoints for CI/CD pipeline monitoring
-  </Card>
-  <Card title="Streaming" icon="broadcast-tower">
-    7 SSE endpoints for real-time event streams
-  </Card>
-  <Card title="Services" icon="cubes">
-    4 endpoints for service registry and dependency mapping
-  </Card>
-</CardGroup>
-
-<Note>
-  Browse the endpoints in the sidebar navigation. Each endpoint is auto-generated from the OpenAPI specification with interactive request/response examples.
-</Note>
-
-## Authentication
-
-The QYL API currently does not require authentication. All endpoints are accessible without API keys or bearer tokens.
-
-<Note>
-  Authentication may be added in future versions. Check the OpenAPI specification for the latest security requirements.
-</Note>
+44 endpoints for traces, logs, metrics, sessions, errors, and deployments.
 
 ## Base URLs
 
-<Tabs>
-  <Tab title="Production">
-    ```
-    https://api.qyl.dev
-    ```
-  </Tab>
-  <Tab title="Staging">
-    ```
-    https://api.staging.qyl.dev
-    ```
-  </Tab>
-</Tabs>
+| Environment | URL |
+|-------------|-----|
+| Production | `https://api.qyl.dev` |
+| Staging | `https://api.staging.qyl.dev` |
 
-## Common Response Headers
+## Authentication
 
-All responses include correlation headers for debugging:
+None required. All endpoints are public.
 
-| Header | Description |
-|--------|-------------|
-| `X-Trace-Id` | Trace ID for distributed tracing correlation |
-| `X-Request-Id` | Unique request ID for support inquiries |
+## Endpoints
+
+| Category | Count | Description |
+|----------|-------|-------------|
+| Health | 3 | Liveness, readiness probes |
+| Traces | 4 | Distributed trace queries |
+| Logs | 5 | Log search, aggregation |
+| Metrics | 3 | Metrics queries |
+| Sessions | 4 | User session tracking |
+| Errors | 5 | Error group management |
+| Exceptions | 2 | Exception statistics |
+| Deployments | 5 | DORA metrics |
+| CI/CD | 2 | Pipeline monitoring |
+| Streaming | 7 | SSE real-time events |
+| Services | 4 | Service registry |
 
 ## Pagination
 
-List endpoints use cursor-based pagination with the following parameters:
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `limit` | integer | Page size (1-1000, default: 100) |
-| `cursor` | string | Cursor token for next/previous page |
-
-Responses include:
+Cursor-based pagination:
 
 ```json
 {
   "items": [...],
   "has_more": true,
-  "next_cursor": "abc123",
-  "prev_cursor": null
+  "next_cursor": "abc123"
 }
 ```
 
-## Error Responses
+| Parameter | Type | Default |
+|-----------|------|---------|
+| `limit` | int | 100 (max: 1000) |
+| `cursor` | string | - |
 
-The API uses standard HTTP status codes:
+## Response Headers
 
-| Code | Description |
-|------|-------------|
-| `200` | Success |
-| `400` | Validation error - check request parameters |
-| `404` | Resource not found |
-| `500` | Internal server error |
-| `503` | Service unavailable (health endpoints) |
+| Header | Purpose |
+|--------|---------|
+| `X-Trace-Id` | Distributed tracing |
+| `X-Request-Id` | Support reference |
 
-Error responses follow a consistent format:
+## Error Format
 
 ```json
 {
   "code": "VALIDATION_ERROR",
-  "message": "Human-readable error description",
-  "details": {
-    "field": "Additional context"
-  }
+  "message": "Description",
+  "details": {}
 }
 ```
+
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 400 | Validation error |
+| 404 | Not found |
+| 500 | Server error |

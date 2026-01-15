@@ -1,29 +1,17 @@
 ---
 title: ANcpLua.NET.Sdk
-description: "What is ANcpLua.NET.Sdk? An opinionated MSBuild SDK with polyfills, analyzers, and best practices for .NET projects"
+description: "MSBuild SDK with polyfills, analyzers, and opinionated defaults"
 icon: "cube"
 ---
 
 [![NuGet](https://img.shields.io/nuget/v/ANcpLua.NET.Sdk?label=NuGet&color=0891B2)](https://www.nuget.org/packages/ANcpLua.NET.Sdk/)
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-7C3AED)](https://dotnet.microsoft.com/download/dotnet/10.0)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+Opinionated MSBuild SDK for .NET projects.
 
-ANcpLua.NET.Sdk is an opinionated MSBuild SDK that provides automatic configuration, code quality enforcement, and polyfills for .NET projects. It eliminates boilerplate by pre-configuring analyzers, enabling modern C# features, and enforcing best practices out of the box.
+## Quick Start
 
-## Which SDK Variant Should I Use?
-
-| SDK Variant | Project Type | What It Adds |
-|-------------|--------------|--------------|
-| `ANcpLua.NET.Sdk` | Libraries, Console Apps, Workers | Analyzers, Polyfills, Banned APIs, Guard Clauses, Deterministic Builds |
-| `ANcpLua.NET.Sdk.Web` | ASP.NET Core Web APIs | All Base features + OpenTelemetry, Health Checks, HTTP Resilience, DevLogs |
-| `ANcpLua.NET.Sdk.Test` | xUnit Test Projects | All Base features + xUnit v3 with MTP, Test Coverage, FakeLogger |
-
-## How Do I Get Started?
-
-Add to `global.json` (check [NuGet](https://www.nuget.org/packages/ANcpLua.NET.Sdk/) for latest version):
-
-```json
+```json title="global.json"
 {
   "msbuild-sdks": {
     "ANcpLua.NET.Sdk": "1.3.31"
@@ -31,130 +19,81 @@ Add to `global.json` (check [NuGet](https://www.nuget.org/packages/ANcpLua.NET.S
 }
 ```
 
-> **Tip:** Use [Dependabot](https://docs.github.com/en/code-security/dependabot)
-> or [Renovate](https://docs.renovatebot.com/) to auto-update SDK versions.
-
 ```xml
-<!-- Library/Console/Worker -->
 <Project Sdk="ANcpLua.NET.Sdk"></Project>
-
-<!-- Web API -->
-<Project Sdk="ANcpLua.NET.Sdk.Web"></Project>
 ```
 
-## What Does the Base SDK Provide?
+## SDK Variants
 
-| Feature | Description | Learn More |
-|---------|-------------|------------|
-| **Banned API Enforcement** | Prevents use of legacy APIs (use `TimeProvider` instead of static time) | [Banned APIs](/sdk/banned-apis) |
-| **Custom Analyzers** | Pre-configured code quality rules | [ANcpLua.Analyzers](/analyzers/overview) |
-| **Guard Clauses** | `Throw.IfNull()` for clean argument validation | [MSBuild Properties](/sdk/msbuild-properties) |
-| **Polyfills** | Index/Range, IsExternalInit for legacy TFMs | [Polyfills](/sdk/polyfills) |
-| **CLAUDE.md Generation** | Auto-generated context for AI assistants | - |
-| **Modern C# Defaults** | LangVersion `latest`, nullable enabled | - |
+| SDK | Use Case |
+|-----|----------|
+| `ANcpLua.NET.Sdk` | Libraries, Console, Workers |
+| `ANcpLua.NET.Sdk.Web` | ASP.NET Core |
+| `ANcpLua.NET.Sdk.Test` | xUnit v3 + MTP |
 
-## What Does the Web SDK Add?
+## Base Features
 
-| Feature | Description |
-|---------|-------------|
-| **OpenTelemetry** | Logging, metrics, tracing with OTLP export |
-| **Health Endpoints** | `/health` (detailed) and `/alive` (liveness) |
-| **HTTP Resilience** | Retries and circuit breakers via Polly |
-| **DevLogs** | Browser console to server logs (`[BROWSER]` prefix) |
+- Banned API enforcement
+- [ANcpLua.Analyzers](/analyzers/overview) + Meziantou.Analyzer
+- `Throw.IfNull()` guard clauses
+- LangVersion `latest`, nullable enabled
+- Polyfills for netstandard2.0/net472
 
-## What Does the Test SDK Add?
+## Web SDK Additions
 
-| Feature | Description |
-|---------|-------------|
-| **xUnit v3** | Latest xUnit with Microsoft Testing Platform (MTP) |
-| **Test Coverage** | Pre-configured coverage tooling |
-| **FakeLogger** | Opt-in extensions for testing logging |
+- OpenTelemetry (logging, metrics, tracing)
+- Health endpoints (`/health`, `/alive`)
+- HTTP resilience (Polly)
+- DevLogs (browser → server logs)
 
-## How Do I Enable Optional Features?
+## Test SDK Additions
+
+- xUnit v3 with MTP
+- Coverage tooling
+- FakeLogger (opt-in)
+
+## Opt-in Features
 
 ```xml
 <PropertyGroup>
-  <!-- Roslyn source generator utilities -->
   <InjectSourceGenHelpers>true</InjectSourceGenHelpers>
-
-  <!-- FakeLogger test extensions -->
   <InjectFakeLogger>true</InjectFakeLogger>
-
-  <!-- Legacy TFM polyfills -->
   <InjectLockPolyfill>true</InjectLockPolyfill>
   <InjectTimeProviderPolyfill>true</InjectTimeProviderPolyfill>
 </PropertyGroup>
 ```
 
-## How Do I Disable SDK Features?
+## Opt-out
 
 ```xml
 <PropertyGroup>
-  <!-- Disable service defaults for Web SDK -->
   <AutoRegisterServiceDefaults>false</AutoRegisterServiceDefaults>
-
-  <!-- Disable specific features -->
   <GenerateClaudeMd>false</GenerateClaudeMd>
   <InjectSharedThrow>false</InjectSharedThrow>
   <IncludeDefaultBannedSymbols>false</IncludeDefaultBannedSymbols>
 </PropertyGroup>
 ```
 
-See [MSBuild Properties](/sdk/msbuild-properties) for the complete list of configuration options.
+## DevLogs (Web SDK)
 
-## How Do I Use DevLogs? (Web SDK)
-
-DevLogs captures browser console messages and sends them to your server logs. Add the script to your HTML:
+Browser console → server logs:
 
 ```html
 <script src="/dev-logs.js"></script>
 ```
 
-All frontend logs appear in server output with `[BROWSER]` prefix, making it easy to correlate client and server-side events.
+Output: `[BROWSER] console.log message`
 
-## What Are the Requirements?
+## Requirements
 
-Central Package Management must be enabled in `Directory.Packages.props`:
+Central Package Management:
 
-```xml
+```xml title="Directory.Packages.props"
 <PropertyGroup>
   <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 </PropertyGroup>
 ```
 
-## Common Questions
-
-<AccordionGroup>
-  <Accordion title="What is the difference between ANcpLua.NET.Sdk and ANcpLua.NET.Sdk.Web?">
-    The base SDK (`ANcpLua.NET.Sdk`) provides analyzers, polyfills, banned API enforcement, and guard clauses. The Web SDK (`ANcpLua.NET.Sdk.Web`) includes all base features plus OpenTelemetry integration, health check endpoints, HTTP resilience, and DevLogs. Use the Web SDK only for ASP.NET Core projects.
-  </Accordion>
-
-  <Accordion title="How do polyfills work for legacy frameworks?">
-    When you target `netstandard2.0` or `net472`, the SDK automatically injects source files that provide modern C# features like Index/Range operators and `IsExternalInit`. These are conditionally compiled only for frameworks that need them. See [Polyfills](/sdk/polyfills) for details.
-  </Accordion>
-
-  <Accordion title="Can I use the SDK with existing analyzers?">
-    Yes. The SDK's analyzers work alongside any existing analyzers in your project. If you have conflicting rules, you can configure them via `.editorconfig` or disable specific SDK analyzers via MSBuild properties.
-  </Accordion>
-
-  <Accordion title="Why is Central Package Management required?">
-    CPM ensures consistent package versions across your entire solution. The SDK relies on this to properly inject analyzer packages and manage dependencies without version conflicts.
-  </Accordion>
-
-  <Accordion title="How do I migrate an existing project to the SDK?">
-    1. Enable Central Package Management if not already enabled
-    2. Add the SDK version to `global.json`
-    3. Change the `Sdk` attribute in your `.csproj` file
-    4. Run `dotnet build` and fix any analyzer warnings
-
-    See the [Quickstart](/quickstart) for detailed steps.
-  </Accordion>
-
-  <Accordion title="Does the SDK work with .NET Aspire?">
-    Yes. The Web SDK includes service defaults that integrate with .NET Aspire's orchestration. The OpenTelemetry configuration exports to OTLP, which Aspire's dashboard can consume.
-  </Accordion>
-</AccordionGroup>
-
 ---
 
-*Initial architecture inspired by [Meziantou.NET.Sdk](https://github.com/meziantou/Meziantou.NET.Sdk).*
+*Architecture inspired by [Meziantou.NET.Sdk](https://github.com/meziantou/Meziantou.NET.Sdk).*
