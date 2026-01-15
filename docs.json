@@ -146,23 +146,9 @@
   },
   "contextual": {
     "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
       "mcp",
       "cursor",
       "vscode"
-    ]
-  },
-  "assistant": {
-    "enabled": true,
-    "model": "gpt-4o-mini",
-    "defaultPrompts": [
-      "How do I get started with ANcpLua.NET.Sdk?",
-      "What analyzers are included?",
-      "How do I use polyfills?"
     ]
   },
   "footer": {
