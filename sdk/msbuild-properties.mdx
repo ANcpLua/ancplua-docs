@@ -4,5 +4,204 @@ description: Complete reference of all MSBuild properties available in ANcpLua.N
 icon: "cube"
 ---
 
-
 Complete reference of all MSBuild properties available in ANcpLua.NET.Sdk.
+
+## Build Configuration
+
+<ResponseField name="LangVersion" type="string" default="latest">
+  C# language version. SDK enforces `latest` by default.
+</ResponseField>
+
+<ResponseField name="Nullable" type="enable|disable|warnings|annotations" default="enable">
+  Nullable reference types. Enabled by default.
+</ResponseField>
+
+<ResponseField name="ImplicitUsings" type="enable|disable" default="enable">
+  Enable implicit global usings.
+</ResponseField>
+
+<ResponseField name="Deterministic" type="bool" default="true">
+  Produce reproducible builds with identical binary output.
+</ResponseField>
+
+<ResponseField name="TreatWarningsAsErrors" type="bool" default="true (CI/Release)">
+  Treat all warnings as errors in CI or Release builds.
+</ResponseField>
+
+<ResponseField name="EnforceCodeStyleInBuild" type="bool" default="true (CI/Release)">
+  Enforce code style rules during build in CI or Release.
+</ResponseField>
+
+## Source Control & SourceLink
+
+<ResponseField name="EnableSourceLink" type="bool" default="true">
+  Enable SourceLink for debugging into source. Requires git repository.
+</ResponseField>
+
+<ResponseField name="PublishRepositoryUrl" type="bool" default="true">
+  Include repository URL in NuGet package metadata.
+</ResponseField>
+
+<ResponseField name="EmbedUntrackedSources" type="bool" default="true">
+  Embed source files not tracked by git in the PDB.
+</ResponseField>
+
+<ResponseField name="IncludeSourceRevisionInInformationalVersion" type="bool" default="true">
+  Include git commit hash in assembly informational version.
+</ResponseField>
+
+## Package Management
+
+<ResponseField name="ManagePackageVersionsCentrally" type="bool" default="true">
+  Enable Central Package Management (CPM).
+</ResponseField>
+
+<ResponseField name="CentralPackageTransitivePinningEnabled" type="bool" default="true">
+  Pin transitive package versions centrally.
+</ResponseField>
+
+<ResponseField name="EnablePackageValidation" type="bool" default="true">
+  Validate NuGet packages during build.
+</ResponseField>
+
+## NuGet Audit
+
+<ResponseField name="NuGetAudit" type="bool" default="true">
+  Enable security vulnerability auditing for packages.
+</ResponseField>
+
+<ResponseField name="NuGetAuditMode" type="direct|all" default="all">
+  Audit mode: `direct` for direct dependencies only, `all` for transitive too.
+</ResponseField>
+
+<ResponseField name="NuGetAuditLevel" type="low|moderate|high|critical" default="low">
+  Minimum vulnerability severity to report.
+</ResponseField>
+
+## Code Injection
+
+### Shared Code
+
+<ResponseField name="InjectSharedThrow" type="bool" default="true">
+  Inject `Throw` guard clause utilities. Provides `Throw.IfNull()`, `Throw.IfNullOrEmpty()`, etc.
+</ResponseField>
+
+<ResponseField name="GenerateClaudeMd" type="bool" default="true">
+  Auto-generate `CLAUDE.md` files for AI assistant context.
+</ResponseField>
+
+### Polyfills (Legacy TFM Support)
+
+All polyfills default to `false` and are opt-in. Set to `true` to inject.
+
+<ResponseField name="InjectAllPolyfillsOnLegacy" type="bool" default="false">
+  **Bundle**: Inject all applicable polyfills based on target framework.
+</ResponseField>
+
+<ResponseField name="InjectIndexRangeOnLegacy" type="bool" default="false">
+  Index/Range structs for `netstandard2.0` and older TFMs (enables `array[^1]` syntax).
+</ResponseField>
+
+<ResponseField name="InjectIsExternalInitOnLegacy" type="bool" default="false">
+  `IsExternalInit` for init-only properties and records (pre-.NET 5).
+</ResponseField>
+
+<ResponseField name="InjectRequiredMemberOnLegacy" type="bool" default="false">
+  `required` keyword support (pre-.NET 7).
+</ResponseField>
+
+<ResponseField name="InjectNullabilityAttributesOnLegacy" type="bool" default="false">
+  Nullable reference type attributes (pre-.NET Core 3.1).
+</ResponseField>
+
+<ResponseField name="InjectCallerAttributesOnLegacy" type="bool" default="false">
+  `CallerArgumentExpression` attribute (pre-.NET 6).
+</ResponseField>
+
+<ResponseField name="InjectUnreachableExceptionOnLegacy" type="bool" default="false">
+  `UnreachableException` type (pre-.NET 7).
+</ResponseField>
+
+<ResponseField name="InjectExperimentalAttributeOnLegacy" type="bool" default="false">
+  `ExperimentalAttribute` (pre-.NET 8).
+</ResponseField>
+
+<ResponseField name="InjectTrimAttributesOnLegacy" type="bool" default="false">
+  Trimmer/AOT attributes (pre-.NET 5).
+</ResponseField>
+
+<ResponseField name="InjectStringExtensionsPolyfill" type="bool" default="false">
+  String methods with `StringComparison` parameter (fixes CA1307/CA2249 on netstandard2.0).
+</ResponseField>
+
+<ResponseField name="InjectTimeProviderPolyfill" type="bool" default="false">
+  `TimeProvider` abstraction for testable time operations.
+</ResponseField>
+
+<ResponseField name="InjectLockPolyfill" type="bool" default="false">
+  `System.Threading.Lock` type polyfill.
+</ResponseField>
+
+### Extensions
+
+<ResponseField name="InjectSourceGenHelpers" type="bool" default="false">
+  Source generator helpers: `EquatableArray`, `DiagnosticInfo`, `LocationInfo`.
+</ResponseField>
+
+<ResponseField name="InjectCommonComparers" type="bool" default="false">
+  Common comparers including `StringOrdinalComparer`.
+</ResponseField>
+
+<ResponseField name="InjectFakeLogger" type="bool" default="false">
+  `FakeLogger` for testing logging in unit tests.
+</ResponseField>
+
+## Analyzer Configuration
+
+<ResponseField name="EnableNETAnalyzers" type="bool" default="true">
+  Enable built-in .NET analyzers.
+</ResponseField>
+
+<ResponseField name="AnalysisLevel" type="string" default="latest-all">
+  Analysis level: `latest-all` enables all latest analyzers.
+</ResponseField>
+
+<ResponseField name="ReportAnalyzer" type="bool" default="true">
+  Report analyzer execution time in build output.
+</ResponseField>
+
+## Usage Examples
+
+### Enable All Polyfills for netstandard2.0
+
+```xml
+<PropertyGroup>
+  <TargetFramework>netstandard2.0</TargetFramework>
+  <InjectAllPolyfillsOnLegacy>true</InjectAllPolyfillsOnLegacy>
+</PropertyGroup>
+```
+
+### Enable Specific Polyfills
+
+```xml
+<PropertyGroup>
+  <InjectIndexRangeOnLegacy>true</InjectIndexRangeOnLegacy>
+  <InjectIsExternalInitOnLegacy>true</InjectIsExternalInitOnLegacy>
+</PropertyGroup>
+```
+
+### Disable CLAUDE.md Generation
+
+```xml
+<PropertyGroup>
+  <GenerateClaudeMd>false</GenerateClaudeMd>
+</PropertyGroup>
+```
+
+### Disable Source Guard Injection
+
+```xml
+<PropertyGroup>
+  <InjectSharedThrow>false</InjectSharedThrow>
+</PropertyGroup>
+```
