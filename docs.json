@@ -154,6 +154,9 @@
       "github": "https://github.com/ANcpLua"
     }
   },
+  "contextual": {
+    "options": ["copy", "view", "claude", "chatgpt", "mcp", "cursor", "vscode"]
+  },
   "feedback": {
     "thumbsRating": true,
     "suggestEdit": true,

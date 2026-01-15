@@ -1,0 +1,35 @@
+name: Auto-bump SDK version
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Daily at 6 AM UTC
+  workflow_dispatch:
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get latest NuGet version
+        id: nuget
+        run: |
+          VERSION=$(curl -s 'https://api.nuget.org/v3-flatcontainer/ancplua.net.sdk/index.json' | jq -r '.versions[-1]')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update docs if version changed
+        run: |
+          CURRENT=$(grep -oP '"ANcpLua\.NET\.Sdk": "\K[^"]+' index.mdx || echo "")
+          if [ "$CURRENT" != "${{ steps.nuget.outputs.version }}" ] && [ -n "${{ steps.nuget.outputs.version }}" ]; then
+            sed -i 's/"ANcpLua\.NET\.Sdk": "[^"]*"/"ANcpLua.NET.Sdk": "${{ steps.nuget.outputs.version }}"/' index.mdx
+            echo "UPDATED=true" >> $GITHUB_ENV
+          fi
+
+      - name: Commit and push
+        if: env.UPDATED == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.mdx
+          git commit -m "chore: bump SDK version to ${{ steps.nuget.outputs.version }}"
+          git push
