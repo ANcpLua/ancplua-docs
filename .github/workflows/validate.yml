@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   repository_dispatch:
-    types: [sdk-release]
+    types: [sdk-release, docs-update]
 
 permissions:
   contents: write

@@ -337,8 +337,12 @@ Configure in `docs.json`:
 ```json
 {
   "integrations": {
-    "posthog": { "apiKey": "phc_xxx" },
-    "ga4": { "measurementId": "G-xxx" }
+    "posthog": {
+      "apiKey": "phc_xxx"
+    },
+    "ga4": {
+      "measurementId": "G-xxx"
+    }
   }
 }
 ```

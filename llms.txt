@@ -73,5 +73,5 @@
 - https://github.com/ANcpLua/ANcpLua.Analyzers
 - https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities
 - https://github.com/ANcpLua/ErrorOrX
-- https://github.com/ANcpLua/mintlify-docs
+- https://github.com/ANcpLua/ancplua-docs
 - https://github.com/ANcpLua/ancplua-claude-plugins

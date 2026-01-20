@@ -27,6 +27,7 @@ All variants include:
 Extends the base SDK with:
 
 - OpenTelemetry (logging, metrics, tracing)
+- Auto-instrumentation for GenAI and database calls
 - Health endpoints (`/health`, `/alive`)
 - HTTP resilience via Polly
 - DevLogs (browser → server logging)
@@ -41,3 +42,9 @@ Extends the base SDK with:
 - AwesomeAssertions
 - WebApplicationFactory base classes
 - Analyzer testing packages
+
+<Note>
+  The SDK auto-detects `xunit.v3.mtp-v2` and sets `OutputType=Exe`
+  automatically. See [Testing](/sdk/testing) for MTP CLI syntax and
+  troubleshooting.
+</Note>

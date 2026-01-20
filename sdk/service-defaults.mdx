@@ -8,17 +8,112 @@ Opinionated service defaults for ASP.NET Core applications, inspired by .NET Asp
 
 ## Features
 
-| Feature                | Description                                                              |
-| ---------------------- | ------------------------------------------------------------------------ |
-| **OpenTelemetry**      | Logging, metrics (ASP.NET Core, HTTP, Runtime), tracing with OTLP export |
-| **Health Checks**      | `/health` (readiness) and `/alive` (liveness) endpoints                  |
-| **Service Discovery**  | Microsoft.Extensions.ServiceDiscovery enabled                            |
-| **HTTP Resilience**    | Standard resilience handlers with retries and circuit breakers           |
-| **JSON Configuration** | CamelCase naming, enum converters, nullable annotations                  |
-| **Security**           | Forwarded headers, HTTPS redirect, HSTS, antiforgery                     |
-| **Static Assets**      | Static file serving with proper caching                                  |
-| **OpenAPI**            | Optional OpenAPI/Swagger documentation                                   |
-| **DevLogs**            | Frontend console log bridge for unified debugging (Development only)     |
+| Feature                  | Description                                                              |
+| ------------------------ | ------------------------------------------------------------------------ |
+| **OpenTelemetry**        | Logging, metrics (ASP.NET Core, HTTP, Runtime), tracing with OTLP export |
+| **Auto-Instrumentation** | Zero-config OTel spans for GenAI and database calls                      |
+| **Health Checks**        | `/health` (readiness) and `/alive` (liveness) endpoints                  |
+| **Service Discovery**    | Microsoft.Extensions.ServiceDiscovery enabled                            |
+| **HTTP Resilience**      | Standard resilience handlers with retries and circuit breakers           |
+| **JSON Configuration**   | CamelCase naming, enum converters, nullable annotations                  |
+| **Security**             | Forwarded headers, HTTPS redirect, HSTS, antiforgery                     |
+| **Static Assets**        | Static file serving with proper caching                                  |
+| **OpenAPI**              | Optional OpenAPI/Swagger documentation                                   |
+| **DevLogs**              | Frontend console log bridge for unified debugging (Development only)     |
+
+## Auto-Instrumentation
+
+<Warning>
+  **Preview Feature** — Auto-instrumentation is implemented but pending
+  end-to-end validation. Report issues at
+  [ANcpLua.NET.Sdk](https://github.com/ancplua/ANcpLua.NET.Sdk).
+</Warning>
+
+The SDK automatically instruments GenAI and database calls with OpenTelemetry spans via C# interceptors. No manual instrumentation code required.
+
+### GenAI Providers
+
+Supported AI SDK calls are automatically wrapped with spans:
+
+| Provider     | Package           | Instrumented Methods                    |
+| ------------ | ----------------- | --------------------------------------- |
+| OpenAI       | `OpenAI`          | `CompleteChat*`, `GenerateEmbeddings*`  |
+| Anthropic    | `Anthropic.SDK`   | `CreateMessage`, `CreateMessageAsync`   |
+| Azure OpenAI | `Azure.AI.OpenAI` | `GetChatCompletions*`, `GetEmbeddings*` |
+| Ollama       | `OllamaSharp`     | `ChatAsync`, `GenerateEmbeddingsAsync`  |
+
+**Emitted span attributes:**
+
+- `gen_ai.system` — Provider name (openai, anthropic, etc.)
+- `gen_ai.operation.name` — Operation type (chat, embeddings)
+- `gen_ai.request.model` — Model name
+- `gen_ai.usage.input_tokens` — Input token count
+- `gen_ai.usage.output_tokens` — Output token count
+
+### Database Providers
+
+ADO.NET `DbCommand.Execute*` calls are automatically instrumented:
+
+| Provider   | Package                           |
+| ---------- | --------------------------------- |
+| DuckDB     | `DuckDB.NET.Data`                 |
+| SQLite     | `Microsoft.Data.Sqlite`           |
+| PostgreSQL | `Npgsql`                          |
+| MySQL      | `MySqlConnector`                  |
+| SQL Server | `Microsoft.Data.SqlClient`        |
+| Oracle     | `Oracle.ManagedDataAccess`        |
+| Firebird   | `FirebirdSql.Data.FirebirdClient` |
+
+**Emitted span attributes:**
+
+- `db.system.name` — Database system (postgresql, mysql, etc.)
+- `db.operation.name` — Operation type (ExecuteReader, ExecuteNonQuery)
+- `db.query.text` — SQL command text
+- `db.namespace` — Database name
+
+### ActivitySources
+
+The instrumentation uses these ActivitySource names:
+
+| Source          | Description               |
+| --------------- | ------------------------- |
+| `ANcpSdk.GenAi` | GenAI SDK instrumentation |
+| `ANcpSdk.Db`    | Database instrumentation  |
+
+Subscribe to custom sources via configuration:
+
+```csharp
+builder.UseANcpSdkConventions(options =>
+{
+    options.OpenTelemetry.ConfigureTracing = tracing =>
+        tracing.AddSource("ANcpSdk.*", "MyApp");
+});
+```
+
+## [OTel] Attribute
+
+Mark record properties for automatic `Activity.SetTag()` generation:
+
+```csharp
+using ANcpSdk.AspNetCore.ServiceDefaults.Instrumentation;
+
+public record ChatRequest(
+    [OTel("gen_ai.request.model")] string Model,
+    [OTel("gen_ai.request.max_tokens")] int? MaxTokens,
+    [OTel("gen_ai.request.temperature", SkipIfNull = false)] double? Temperature);
+```
+
+The source generator creates extension methods:
+
+```csharp
+// Generated - call this to set all tags at once
+activity.SetTagsFromChatRequest(request);
+```
+
+| Property     | Type   | Default | Description                  |
+| ------------ | ------ | ------- | ---------------------------- |
+| `Name`       | string | —       | OTel semantic convention tag |
+| `SkipIfNull` | bool   | `true`  | Skip tag if value is null    |
 
 ## Usage
 

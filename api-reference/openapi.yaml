@@ -10,6 +10,8 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
 servers:
+  - url: http://localhost:5100
+    description: Local Development
   - url: https://api.qyl.dev
     description: Production
   - url: https://api.staging.qyl.dev
@@ -30,6 +32,7 @@ paths:
   /health:
     get:
       operationId: HealthApi_check
+      summary: Health Check
       description: Health check endpoint
       parameters: []
       responses:
@@ -44,6 +47,7 @@ paths:
   /health/live:
     get:
       operationId: HealthApi_live
+      summary: Liveness Probe
       description: Liveness probe
       parameters: []
       responses:
@@ -56,6 +60,7 @@ paths:
   /health/ready:
     get:
       operationId: HealthApi_ready
+      summary: Readiness Probe
       description: Readiness probe
       parameters: []
       responses:
@@ -68,6 +73,7 @@ paths:
   /v1/deployments:
     get:
       operationId: DeploymentsApi_list
+      summary: List Deployments
       description: List deployments
       parameters:
         - name: serviceName
@@ -189,6 +195,7 @@ paths:
         - Deployments
     post:
       operationId: DeploymentsApi_create
+      summary: Create Deployment
       description: Record new deployment
       parameters: []
       responses:
@@ -243,6 +250,7 @@ paths:
   /v1/deployments/metrics/dora:
     get:
       operationId: DeploymentsApi_getDoraMetrics
+      summary: DORA Metrics
       description: Get DORA metrics
       parameters:
         - name: serviceName
@@ -304,6 +312,7 @@ paths:
   /v1/deployments/{deploymentId}:
     get:
       operationId: DeploymentsApi_get
+      summary: Get Deployment
       description: Get deployment by ID
       parameters:
         - name: deploymentId
@@ -356,6 +365,7 @@ paths:
         - Deployments
     patch:
       operationId: DeploymentsApi_update
+      summary: Update Deployment
       description: Update deployment status
       parameters:
         - name: deploymentId
@@ -432,6 +442,7 @@ paths:
   /v1/errors:
     get:
       operationId: ErrorsApi_list
+      summary: List Errors
       description: List error groups
       parameters:
         - name: serviceName
@@ -554,6 +565,7 @@ paths:
   /v1/errors/stats:
     get:
       operationId: ErrorsApi_getStats
+      summary: Error Statistics
       description: Get error statistics
       parameters:
         - name: serviceName
@@ -608,6 +620,7 @@ paths:
   /v1/errors/{errorId}:
     get:
       operationId: ErrorsApi_get
+      summary: Get Error
       description: Get error by ID
       parameters:
         - name: errorId
@@ -660,6 +673,7 @@ paths:
         - Errors
     patch:
       operationId: ErrorsApi_update
+      summary: Update Error
       description: Update error status
       parameters:
         - name: errorId
@@ -736,6 +750,7 @@ paths:
   /v1/errors/{errorId}/correlations:
     get:
       operationId: ErrorsApi_getCorrelations
+      summary: Error Correlations
       description: Get error correlations
       parameters:
         - name: errorId
@@ -789,6 +804,7 @@ paths:
   /v1/exceptions:
     get:
       operationId: ExceptionsApi_list
+      summary: List Exceptions
       description: List exceptions
       parameters:
         - name: serviceName
@@ -911,6 +927,7 @@ paths:
   /v1/exceptions/stats:
     get:
       operationId: ExceptionsApi_getStats
+      summary: Exception Statistics
       description: Get exception statistics
       parameters:
         - name: serviceName
@@ -965,6 +982,7 @@ paths:
   /v1/logs:
     get:
       operationId: LogsApi_list
+      summary: List Logs
       description: Query logs with filtering and pagination
       parameters:
         - name: serviceName
@@ -1108,6 +1126,7 @@ paths:
   /v1/logs/aggregate:
     post:
       operationId: LogsApi_aggregate
+      summary: Aggregate Logs
       description: Aggregate logs
       parameters: []
       responses:
@@ -1162,6 +1181,7 @@ paths:
   /v1/logs/patterns:
     get:
       operationId: LogsApi_getPatterns
+      summary: Log Patterns
       description: Get log patterns
       parameters:
         - name: serviceName
@@ -1226,6 +1246,7 @@ paths:
   /v1/logs/search:
     post:
       operationId: LogsApi_search
+      summary: Search Logs
       description: Search logs with complex query
       parameters: []
       responses:
@@ -1299,6 +1320,7 @@ paths:
   /v1/logs/stats:
     get:
       operationId: LogsApi_getStats
+      summary: Log Statistics
       description: Get log statistics
       parameters:
         - name: serviceName
@@ -1353,6 +1375,7 @@ paths:
   /v1/metrics:
     get:
       operationId: MetricsApi_list
+      summary: List Metrics
       description: List available metrics
       parameters:
         - name: serviceName
@@ -1435,6 +1458,7 @@ paths:
   /v1/metrics/query:
     post:
       operationId: MetricsApi_query
+      summary: Query Metrics
       description: Query metric data points
       parameters: []
       responses:
@@ -1489,6 +1513,7 @@ paths:
   /v1/metrics/{metricName}:
     get:
       operationId: MetricsApi_getMetadata
+      summary: Metric Metadata
       description: Get metric metadata
       parameters:
         - name: metricName
@@ -1542,6 +1567,7 @@ paths:
   /v1/pipelines:
     get:
       operationId: PipelinesApi_list
+      summary: List Pipelines
       description: List pipeline runs
       parameters:
         - name: pipelineName
@@ -1664,6 +1690,7 @@ paths:
   /v1/pipelines/stats:
     get:
       operationId: PipelinesApi_getStats
+      summary: Pipeline Statistics
       description: Get pipeline statistics
       parameters:
         - name: pipelineName
@@ -1718,6 +1745,7 @@ paths:
   /v1/services:
     get:
       operationId: ServicesApi_list
+      summary: List Services
       description: List discovered services
       parameters:
         - name: namespaceName
@@ -1793,6 +1821,7 @@ paths:
   /v1/services/{serviceName}:
     get:
       operationId: ServicesApi_get
+      summary: Get Service
       description: Get service details
       parameters:
         - name: serviceName
@@ -1846,6 +1875,7 @@ paths:
   /v1/services/{serviceName}/dependencies:
     get:
       operationId: ServicesApi_getDependencies
+      summary: Service Dependencies
       description: Get service dependencies
       parameters:
         - name: serviceName
@@ -1901,6 +1931,7 @@ paths:
   /v1/services/{serviceName}/operations:
     get:
       operationId: ServicesApi_getOperations
+      summary: Service Operations
       description: Get service operations
       parameters:
         - name: serviceName
@@ -1989,6 +2020,7 @@ paths:
   /v1/sessions:
     get:
       operationId: SessionsApi_list
+      summary: List Sessions
       description: List sessions
       parameters:
         - name: userId
@@ -2104,6 +2136,7 @@ paths:
   /v1/sessions/stats:
     get:
       operationId: SessionsApi_getStats
+      summary: Session Statistics
       description: Get session statistics
       parameters:
         - name: startTime
@@ -2151,6 +2184,7 @@ paths:
   /v1/sessions/{sessionId}:
     get:
       operationId: SessionsApi_get
+      summary: Get Session
       description: Get session by ID
       parameters:
         - name: sessionId
@@ -2204,6 +2238,7 @@ paths:
   /v1/sessions/{sessionId}/traces:
     get:
       operationId: SessionsApi_getTraces
+      summary: Session Traces
       description: Get session traces
       parameters:
         - name: sessionId
@@ -2292,6 +2327,7 @@ paths:
   /v1/stream/deployments:
     get:
       operationId: StreamingApi_streamDeployments
+      summary: Stream Deployments
       description: Stream deployment events
       parameters:
         - name: serviceName
@@ -2320,6 +2356,7 @@ paths:
   /v1/stream/events:
     get:
       operationId: StreamingApi_streamEvents
+      summary: Stream All Events
       description: Stream all telemetry events (SSE)
       parameters:
         - name: types
@@ -2358,6 +2395,7 @@ paths:
   /v1/stream/exceptions:
     get:
       operationId: StreamingApi_streamExceptions
+      summary: Stream Exceptions
       description: Stream exceptions in real-time
       parameters:
         - name: serviceName
@@ -2386,6 +2424,7 @@ paths:
   /v1/stream/logs:
     get:
       operationId: StreamingApi_streamLogs
+      summary: Stream Logs
       description: Stream logs in real-time
       parameters:
         - name: serviceName
@@ -2422,6 +2461,7 @@ paths:
   /v1/stream/metrics:
     get:
       operationId: StreamingApi_streamMetrics
+      summary: Stream Metrics
       description: Stream metrics in real-time
       parameters:
         - name: metricName
@@ -2450,6 +2490,7 @@ paths:
   /v1/stream/traces:
     get:
       operationId: StreamingApi_streamTraces
+      summary: Stream Traces
       description: Stream traces in real-time
       parameters:
         - name: serviceName
@@ -2479,6 +2520,7 @@ paths:
   /v1/stream/traces/{traceId}/spans:
     get:
       operationId: StreamingApi_streamTraceSpans
+      summary: Stream Trace Spans
       description: Stream spans for a specific trace
       parameters:
         - name: traceId
@@ -2498,6 +2540,7 @@ paths:
   /v1/traces:
     get:
       operationId: TracesApi_list
+      summary: List Traces
       description: List traces with pagination
       parameters:
         - name: serviceName
@@ -2646,6 +2689,7 @@ paths:
   /v1/traces/search:
     post:
       operationId: TracesApi_search
+      summary: Search Traces
       description: Search traces
       parameters: []
       responses:
@@ -2719,6 +2763,7 @@ paths:
   /v1/traces/{traceId}:
     get:
       operationId: TracesApi_get
+      summary: Get Trace
       description: Get a specific trace by ID
       parameters:
         - name: traceId
@@ -2772,6 +2817,7 @@ paths:
   /v1/traces/{traceId}/spans:
     get:
       operationId: TracesApi_getSpans
+      summary: Get Trace Spans
       description: Get spans for a trace
       parameters:
         - name: traceId

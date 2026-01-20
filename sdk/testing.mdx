@@ -1,10 +1,59 @@
 ---
 title: 'Testing'
-description: 'Base classes for integration and Kestrel tests.'
+description: 'xUnit v3 with Microsoft Testing Platform and integration test base classes.'
 icon: 'flask'
 ---
 
-The Test SDK (`ANcpLua.NET.Sdk.Test`) injects base classes for integration testing.
+The Test SDK (`ANcpLua.NET.Sdk.Test`) provides xUnit v3 with Microsoft Testing Platform and injects base classes for integration testing.
+
+## Microsoft Testing Platform (MTP)
+
+The SDK uses [xUnit v3](https://xunit.net/docs/getting-started/v3/cmdline) with [Microsoft Testing Platform](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-overview) instead of VSTest.
+
+### Auto-Configuration
+
+MTP requires test projects to output executables. **The SDK handles this automatically** when you reference `xunit.v3.mtp-v2`:
+
+```xml
+<!-- SDK auto-detects this and sets OutputType=Exe -->
+<PackageReference Include="xunit.v3.mtp-v2" />
+```
+
+### CLI Syntax
+
+MTP uses different command syntax than VSTest:
+
+<CodeGroup>
+    ```bash MTP (correct)
+    # Run all tests
+    dotnet run
+
+    # Run with filter
+    dotnet run -- --filter "FullyQualifiedName~MyTest"
+
+    # List tests
+    dotnet run -- --list-tests
+    ```
+
+    ```bash VSTest (does NOT work)
+    # These commands don't work with MTP
+    dotnet test --filter "FullyQualifiedName~MyTest"
+    ```
+
+</CodeGroup>
+
+<Warning>
+  The `--` separator is required to pass arguments to the test executable.
+  Without it, arguments go to `dotnet run` instead.
+</Warning>
+
+### Troubleshooting
+
+| Exit Code | Cause                 | Fix                                                           |
+| --------- | --------------------- | ------------------------------------------------------------- |
+| 5         | Unknown CLI option    | Use MTP syntax (`dotnet run --`), not VSTest                  |
+| 8         | Zero tests discovered | Check filter syntax; ensure test methods are public           |
+| N/A       | Tests not found       | Verify `xunit.v3.mtp-v2` reference; SDK sets `OutputType=Exe` |
 
 ## IntegrationTestBase
 

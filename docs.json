@@ -29,7 +29,7 @@
     "playground": {
       "mode": "show"
     },
-    "baseUrl": ["https://api.qyl.dev", "https://api.staging.qyl.dev"]
+    "baseUrl": ["http://localhost:5100", "https://api.qyl.dev"]
   },
   "navigation": {
     "tabs": [
