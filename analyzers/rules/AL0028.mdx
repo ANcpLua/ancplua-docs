@@ -1,0 +1,64 @@
+---
+title: 'AL0028 - Use IsEqualTo extension'
+sidebarTitle: 'AL0028'
+description: Replace SymbolEqualityComparer.Default.Equals calls with the cleaner IsEqualTo extension method
+icon: 'shield-check'
+---
+
+Source: [AL0028UseIsEqualToAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0028UseIsEqualToAnalyzer.cs)
+
+## Description
+
+The `SymbolEqualityComparer.Default.Equals(a, b)` pattern is verbose and harder to read. ANcpLua.Roslyn.Utilities provides the `IsEqualTo()` extension method for cleaner symbol equality comparisons.
+
+## Bad Code
+
+```csharp
+using Microsoft.CodeAnalysis;
+
+// Verbose equality comparison
+if (SymbolEqualityComparer.Default.Equals(symbol1, symbol2))
+{
+    // ...
+}
+
+// Also flagged
+var areEqual = SymbolEqualityComparer.Default.Equals(left, right);
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean extension method
+if (symbol1.IsEqualTo(symbol2))
+{
+    // ...
+}
+
+// Also works with nullable symbols
+var areEqual = left.IsEqualTo(right);
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0028.severity = suggestion
+```
+
+## Notes
+
+The `IsEqualTo()` extension method:
+
+- Handles null checks automatically
+- Uses `SymbolEqualityComparer.Default` internally
+- Works with any `ISymbol` types
+- Improves code readability in Roslyn analyzers

@@ -89,6 +89,10 @@
                   "analyzers/rules/AL0025",
                   "analyzers/rules/AL0026",
                   "analyzers/rules/AL0027",
+                  "analyzers/rules/AL0028",
+                  "analyzers/rules/AL0029",
+                  "analyzers/rules/AL0030",
+                  "analyzers/rules/AL0031",
                   "analyzers/rules/AR0001",
                   "analyzers/rules/AR0002"
                 ]
@@ -105,6 +109,7 @@
               "utilities/patterns",
               "utilities/operations",
               "utilities/symbols",
+              "utilities/string-extensions",
               "utilities/codegen",
               "utilities/semantic-guard",
               "utilities/msbuild-properties",

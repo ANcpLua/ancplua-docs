@@ -1,0 +1,71 @@
+---
+title: 'AL0031 - Use operation extensions'
+sidebarTitle: 'AL0031'
+description: Replace manual operation property checks with IsMethodNamed() and TryGetConstantValue() extensions
+icon: 'shield-check'
+---
+
+Source: [AL0031UseOperationExtensionsAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0031UseOperationExtensionsAnalyzer.cs)
+
+## Description
+
+Manual checks on `IOperation` properties like `TargetMethod.Name ==` and `ConstantValue.HasValue &&` are verbose. ANcpLua.Roslyn.Utilities provides extension methods for cleaner operation analysis.
+
+## Bad Code
+
+```csharp
+using Microsoft.CodeAnalysis.Operations;
+
+// Manual method name check
+if (invocation.TargetMethod.Name == "ToString")
+{
+    // ...
+}
+
+// Manual constant value extraction - verbose null handling
+if (operation.ConstantValue.HasValue &&
+    operation.ConstantValue.Value is int value)
+{
+    // Use value
+}
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean method name check
+if (invocation.IsMethodNamed("ToString"))
+{
+    // ...
+}
+
+// Clean constant value extraction
+if (operation.TryGetConstantValue<int>(out var value))
+{
+    // Use value
+}
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0031.severity = suggestion
+```
+
+## Notes
+
+The operation extension methods:
+
+- `IsMethodNamed()` - cleaner alternative to `TargetMethod.Name ==` comparisons
+- `TryGetConstantValue<T>()` - type-safe constant extraction with null handling
+- Both reduce boilerplate in Roslyn analyzer implementations
+- Work with `IInvocationOperation` and `IOperation` respectively

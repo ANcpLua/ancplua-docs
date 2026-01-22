@@ -1,0 +1,216 @@
+---
+title: String Extensions
+description: String manipulation utilities for source generators and code analysis
+icon: 'text'
+---
+
+Extension methods for string manipulation commonly needed in source generators.
+
+## Line Splitting
+
+Zero-allocation line enumeration using ref structs:
+
+```csharp
+// Iterate lines without allocating string arrays
+foreach (var entry in text.SplitLines())
+{
+    ReadOnlySpan<char> line = entry.Line;
+    ReadOnlySpan<char> separator = entry.Separator;
+    // Process line
+}
+
+// Also works with spans
+ReadOnlySpan<char> span = text.AsSpan();
+foreach (var line in span.SplitLines())
+{
+    // Process line
+}
+```
+
+<Note>
+  `LineSplitEnumerator` is a ref struct that handles `\n`, `\r`, and `\r\n` line
+  endings correctly without heap allocations.
+</Note>
+
+## Casing Transformations
+
+Convert between naming conventions with C# keyword handling:
+
+```csharp
+// PascalCase (for property names)
+"firstName".ToPropertyName()    // "FirstName"
+"lastName".ToPropertyName()     // "LastName"
+
+// camelCase (for parameter names) - escapes keywords
+"FirstName".ToParameterName()   // "firstName"
+"Class".ToParameterName()       // "@class"
+"Object".ToParameterName()      // "@object"
+"Int".ToParameterName()         // "@int"
+```
+
+All C# reserved keywords are automatically prefixed with `@` to ensure valid identifiers.
+
+## Whitespace Normalization
+
+Clean up generated code whitespace:
+
+```csharp
+// Remove lines containing only whitespace (preserves empty lines)
+text.TrimBlankLines()
+
+// Normalize all line endings to \n (or custom)
+text.NormalizeLineEndings()
+text.NormalizeLineEndings("\r\n")
+
+// Comprehensive cleanup for generated code
+text.CleanWhiteSpace()
+// - Strips trailing whitespace from lines
+// - Collapses 3+ empty lines to 2
+// - Removes empty line after { or ]
+// - Removes empty line before }
+
+// Collapse all whitespace to single spaces
+text.NormalizeWhitespace()
+```
+
+## Identifier Sanitization
+
+Create valid C# identifiers:
+
+```csharp
+// Replace non-alphanumeric with underscores
+"my-api.endpoint".SanitizeIdentifier()  // "my_api_endpoint"
+"namespace.class".SanitizeIdentifier()  // "namespace_class"
+
+// Escape for string literals
+"Hello \"World\"".EscapeCSharpString()  // "Hello \\\"World\\\""
+```
+
+## Type Name Utilities
+
+Work with fully-qualified type names:
+
+```csharp
+// Strip global:: prefix
+"global::System.String".StripGlobalPrefix()  // "System.String"
+
+// Full normalization (removes global:: and trailing ?)
+"global::System.String?".NormalizeTypeName()  // "System.String"
+
+// Unwrap nullable types
+"int?".UnwrapNullable()                       // "int"
+"System.Nullable<int>".UnwrapNullable()       // "int"
+"global::System.Nullable<System.Int32>".UnwrapNullable()  // "System.Int32"
+
+// Conditional unwrap
+typeFqn.UnwrapNullable(isOptional)  // Only unwraps if isOptional is true
+
+// Extract short type name
+"global::System.Collections.Generic.List".ExtractShortTypeName()  // "List"
+"int[]".ExtractShortTypeName()  // "int[]"
+```
+
+## C# Keyword Aliases
+
+Map between BCL type names and C# keywords:
+
+```csharp
+// Get keyword alias
+"System.Int32".GetCSharpKeyword()   // "int"
+"Int32".GetCSharpKeyword()          // "int"
+"System.String".GetCSharpKeyword()  // "string"
+"MyType".GetCSharpKeyword()         // null (no keyword)
+
+// Compare type names (handles aliases)
+"System.Int32".TypeNamesEqual("int")           // true
+"global::System.String".TypeNamesEqual("string")  // true
+"int".TypeNamesEqual("Int32")                  // true
+```
+
+Supported keywords: `int`, `long`, `short`, `byte`, `sbyte`, `uint`, `ulong`, `ushort`, `float`, `double`, `decimal`, `bool`, `string`, `char`, `object`, `void`
+
+## Type Classification
+
+Quick type checks:
+
+```csharp
+// Check for string type
+typeFqn.IsStringType()  // true for "string", "String", "System.String"
+
+// Check for primitive JSON types (no explicit serializer registration needed)
+typeFqn.IsPrimitiveJsonType()
+// true for: string, int, long, bool, double, decimal
+```
+
+## Prefix/Suffix Stripping
+
+Remove prefixes or suffixes from strings:
+
+```csharp
+// Strip suffix if present
+"UserEndpoints".StripSuffix("Endpoints")  // "User"
+"User".StripSuffix("Endpoints")           // "User" (unchanged)
+
+// Strip prefix if present
+"I_Interface".StripPrefix("I_")  // "Interface"
+"Interface".StripPrefix("I_")    // "Interface" (unchanged)
+```
+
+## Examples
+
+### Generate Property from Field
+
+```csharp
+public static void GenerateProperty(IndentedStringBuilder sb, string fieldName, string typeName)
+{
+    var propertyName = fieldName.StripPrefix("_").ToPropertyName();
+    var paramName = propertyName.ToParameterName();
+
+    sb.AppendLine($"public {typeName} {propertyName}");
+    using (sb.BeginBlock())
+    {
+        sb.AppendLine($"get => {fieldName};");
+        sb.AppendLine($"set => {fieldName} = value;");
+    }
+}
+```
+
+### Clean Generated Output
+
+```csharp
+var generatedCode = builder.ToString()
+    .NormalizeLineEndings()
+    .CleanWhiteSpace()
+    .TrimBlankLines();
+
+context.AddSource("Generated.g.cs", generatedCode);
+```
+
+### Route Parameter Type Matching
+
+```csharp
+// In a route parameter validator
+var actualType = parameterType.ToDisplayString();
+var expectedType = constraintType.NormalizeTypeName();
+
+if (actualType.TypeNamesEqual(expectedType))
+{
+    // Types match (handles int vs System.Int32 vs global::System.Int32)
+}
+```
+
+### Process Code Line-by-Line
+
+```csharp
+var lineCount = 0;
+foreach (var entry in sourceCode.SplitLines())
+{
+    lineCount++;
+    var trimmed = entry.Line.Trim();
+
+    if (trimmed.StartsWith("//".AsSpan()))
+    {
+        // Comment line
+    }
+}
+```

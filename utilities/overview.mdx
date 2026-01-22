@@ -7,6 +7,15 @@ icon: 'code'
 
 ANcpLua.Roslyn.Utilities provides utilities for building Roslyn analyzers and source generators.
 
+## What's New in v1.15.0
+
+**Null-safety improvements** - Comprehensive nullability annotations throughout the library:
+
+- `[MemberNotNullWhen]` on `DiagnosticFlow.IsSuccess` for flow-dependent null state
+- `[MaybeNullWhen(false)]` for `TryGet` patterns
+- `[return: MaybeNull]` for `GetOrInsertDefault`
+- Null-forgiving operators reduced from 13 to 1
+
 ## Install
 
 ```shell

@@ -1,0 +1,87 @@
+---
+title: 'AL0030 - Use type hierarchy extensions'
+sidebarTitle: 'AL0030'
+description: Replace manual type hierarchy traversal with Implements() and InheritsFrom() extension methods
+icon: 'shield-check'
+---
+
+Source: [AL0030UseTypeHierarchyAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0030UseTypeHierarchyAnalyzer.cs)
+
+## Description
+
+Manual traversal of `AllInterfaces` and `BaseType` chains is error-prone and verbose. ANcpLua.Roslyn.Utilities provides `Implements()` and `InheritsFrom()` extension methods for cleaner type hierarchy checks.
+
+## Bad Code
+
+```csharp
+using Microsoft.CodeAnalysis;
+
+// Manual interface check - verbose and error-prone
+foreach (var iface in typeSymbol.AllInterfaces)
+{
+    if (iface.Name == "IDisposable")
+    {
+        // ...
+        break;
+    }
+}
+
+// Manual base type traversal - easy to forget null check
+var current = typeSymbol.BaseType;
+while (current != null)
+{
+    if (current.Name == "Exception")
+    {
+        // ...
+        break;
+    }
+    current = current.BaseType;
+}
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean interface check
+if (typeSymbol.Implements("IDisposable"))
+{
+    // ...
+}
+
+// Clean base type check
+if (typeSymbol.InheritsFrom("Exception"))
+{
+    // ...
+}
+
+// Or with full type names
+if (typeSymbol.Implements("System.IDisposable"))
+{
+    // ...
+}
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0030.severity = suggestion
+```
+
+## Notes
+
+The type hierarchy extension methods:
+
+- `Implements()` - checks `AllInterfaces` for interface implementation
+- `InheritsFrom()` - traverses `BaseType` chain for inheritance
+- Both handle null checks automatically
+- Support simple names or fully qualified type names
+- More readable and less error-prone than manual loops

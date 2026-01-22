@@ -1,0 +1,75 @@
+---
+title: 'AL0029 - Use HasAttribute extension'
+sidebarTitle: 'AL0029'
+description: Replace GetAttributes().Any() patterns with the cleaner HasAttribute extension method
+icon: 'shield-check'
+---
+
+Source: [AL0029UseHasAttributeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0029UseHasAttributeAnalyzer.cs)
+
+## Description
+
+The `GetAttributes().Any(a => ...)` pattern and `foreach` loops over `GetAttributes()` are verbose. ANcpLua.Roslyn.Utilities provides the `HasAttribute()` extension method for cleaner attribute checks.
+
+## Bad Code
+
+```csharp
+using Microsoft.CodeAnalysis;
+
+// LINQ pattern - verbose
+if (symbol.GetAttributes().Any(a =>
+    a.AttributeClass?.Name == "ObsoleteAttribute"))
+{
+    // ...
+}
+
+// foreach pattern - even more verbose
+foreach (var attr in symbol.GetAttributes())
+{
+    if (attr.AttributeClass?.Name == "SerializableAttribute")
+    {
+        // ...
+        break;
+    }
+}
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean extension method
+if (symbol.HasAttribute("ObsoleteAttribute"))
+{
+    // ...
+}
+
+// Or with full type name
+if (symbol.HasAttribute("System.SerializableAttribute"))
+{
+    // ...
+}
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0029.severity = suggestion
+```
+
+## Notes
+
+The `HasAttribute()` extension method:
+
+- Accepts attribute name with or without "Attribute" suffix
+- Supports fully qualified type names
+- More efficient than LINQ with `Any()`
+- Works with any `ISymbol` that can have attributes

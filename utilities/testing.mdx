@@ -6,16 +6,23 @@ icon: 'flask-vial'
 
 `ANcpLua.Roslyn.Utilities.Testing` provides fluent base classes for testing Roslyn components:
 
-| Base Class                         | Purpose                         |
-| ---------------------------------- | ------------------------------- |
-| `AnalyzerTest<TAnalyzer>`          | Test diagnostic analyzers       |
-| `CodeFixTest<TAnalyzer, TCodeFix>` | Test code fix providers         |
-| `RefactoringTest<TRefactoring>`    | Test code refactoring providers |
+| Base Class                         | Purpose                            |
+| ---------------------------------- | ---------------------------------- |
+| `AnalyzerTest<TAnalyzer>`          | Test diagnostic analyzers          |
+| `CodeFixTest<TAnalyzer, TCodeFix>` | Test code fix providers            |
+| `RefactoringTest<TRefactoring>`    | Test code refactoring providers    |
+| `Test<TGenerator>`                 | Test incremental source generators |
+
+<Note>
+  These base classes work with xUnit v3's ambient `TestContext`. Use
+  `TestContext.Current.TestOutputHelper` for diagnostic output without
+  constructor injection.
+</Note>
 
 ## Installation
 
 ```xml
-<PackageReference Include="ANcpLua.Roslyn.Utilities.Testing" Version="1.14.0" />
+<PackageReference Include="ANcpLua.Roslyn.Utilities.Testing" Version="1.15.0" />
 ```
 
 ## AnalyzerTest
@@ -48,7 +55,7 @@ public class MyAnalyzerTests : AnalyzerTest<MyAnalyzer>
 ```
 
 <Note>
-Use diagnostic markup `{|DIAGNOSTIC_ID:code|}` to mark expected diagnostic locations.
+    Use diagnostic markup `{|DIAGNOSTIC_ID:code|}` to mark expected diagnostic locations.
 </Note>
 
 ### Testing with Additional Files
@@ -201,6 +208,235 @@ public Task ShouldNotOfferWhenCapturing() => VerifyNoRefactoringAsync("""
     """);
 ```
 
+## GeneratorTest
+
+Fluent API for testing Roslyn incremental source generators with built-in caching validation.
+
+### Basic Usage
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing;
+
+public class MyGeneratorTests
+{
+    [Fact]
+    public async Task ShouldGenerateExpectedOutput()
+    {
+        const string source = """
+            [GenerateDto]
+            public partial class User
+            {
+                public string Name { get; set; }
+            }
+            """;
+
+        using var result = await Test<MyGenerator>.Run(source);
+        result
+            .Produces("User.g.cs", """
+                public partial class User
+                {
+                    public UserDto ToDto() => new(Name);
+                }
+                """)
+            .IsCached()
+            .IsClean();
+    }
+}
+```
+
+<Note>
+    The `Test<TGenerator>` static class automatically runs your generator twice to validate incremental caching
+    behavior.
+</Note>
+
+### Custom Configuration
+
+For complex scenarios, use the configuration overload:
+
+```csharp
+[Fact]
+public async Task ShouldHandleAdditionalText()
+{
+using var result = await Test < MyGenerator >.Run(engine => engine
+    .WithSource("""
+public partial class Config {
+}
+""")
+    .WithAdditionalText("config.json", """{"setting": "value"}""")
+.WithLanguageVersion(LanguageVersion.CSharp12)
+    .WithStepTracking(true))
+
+result.Produces("Config.g.cs").IsCached();
+}
+```
+
+### GeneratorTestEngine Methods
+
+| Method                                | Description                                       |
+| ------------------------------------- | ------------------------------------------------- |
+| `WithSource(string)`                  | Add C# source code to the compilation             |
+| `WithAdditionalText(path, text)`      | Add an additional file (JSON, XML, etc.)          |
+| `WithReference(MetadataReference)`    | Add a metadata reference                          |
+| `WithLanguageVersion(version)`        | Set C# language version (default: latest)         |
+| `WithReferenceAssemblies(assemblies)` | Set reference assemblies package                  |
+| `WithAnalyzerConfigOptions(provider)` | Set MSBuild property access                       |
+| `WithStepTracking(bool)`              | Enable/disable step tracking for caching analysis |
+
+## GeneratorResult Assertions
+
+The `GeneratorResult` class provides a fluent API for verifying generator output.
+
+### Output Verification
+
+```csharp
+result
+.Produces("Output.g.cs")                        // File exists
+.Produces("Output.g.cs", expectedContent)       // Exact content match
+.Produces("Output.g.cs", "partial class", exactMatch: false); // Contains
+```
+
+### Compilation Verification
+
+```csharp
+result
+.IsClean()      // No diagnostics of any severity
+.Compiles();    // No errors (warnings allowed)
+```
+
+### Diagnostic Assertions
+
+```csharp
+result
+.HasDiagnostic("GEN001")                        // Diagnostic exists
+.HasDiagnostic("GEN001", DiagnosticSeverity.Warning)  // With severity
+.HasNoDiagnostic("GEN002");                     // Diagnostic absent
+```
+
+### Custom File Assertions
+
+```csharp
+result.File("Output.g.cs", content =>
+{
+Assert.Contains("public partial class", content);
+Assert.DoesNotContain("private", content);
+});
+```
+
+<Tip>
+  `GeneratorResult` implements `IDisposable` and calls `Verify()` on dispose.
+  Use `using var result = ...` to automatically throw on assertion failures.
+</Tip>
+
+## Caching Validation
+
+Incremental generators must cache their outputs properly to avoid recomputation during IDE typing scenarios. The testing framework validates caching behavior automatically.
+
+### Basic Caching Check
+
+```csharp
+result.IsCached();  // All pipeline steps must be cached
+```
+
+### Checking Specific Steps
+
+```csharp
+result.IsCached("TransformStep", "CombineStep");  // Only check named steps
+```
+
+### Understanding the Caching Report
+
+```csharp
+var report = result.CachingReport;
+
+Console.WriteLine($"Generator: {report.GeneratorName}");
+Console.WriteLine($"Produced output: {report.ProducedOutput}");
+
+foreach (var step in report.ObservableSteps)
+{
+Console.WriteLine($"Step: {step.StepName}")
+Console.WriteLine($"  Cached: {step.Cached}")
+Console.WriteLine($"  Unchanged: {step.Unchanged}")
+Console.WriteLine($"  Modified: {step.Modified}")
+Console.WriteLine($"  New: {step.New}")
+Console.WriteLine($"  Removed: {step.Removed}")
+Console.WriteLine($"  Success: {step.IsCachedSuccessfully}")
+}
+```
+
+### Forbidden Types
+
+Certain Roslyn types must never be cached because they prevent proper incremental caching:
+
+| Forbidden Type  | Reason                                      |
+| --------------- | ------------------------------------------- |
+| `ISymbol`       | Not value-equal across compilations         |
+| `Compilation`   | Contains mutable state                      |
+| `SemanticModel` | Tied to specific compilation                |
+| `SyntaxNode`    | Reference identity, not structural equality |
+| `SyntaxTree`    | Reference identity, not structural equality |
+| `IOperation`    | Compilation-specific                        |
+
+```csharp
+// Validates no forbidden types in any step
+result.HasNoForbiddenTypes();
+
+// IsCached() automatically checks for forbidden types
+result.IsCached();  // Fails if ISymbol, Compilation, etc. are cached
+```
+
+<Warning>
+  Caching forbidden types causes memory leaks and IDE performance degradation.
+  Extract primitive data (strings, booleans, etc.) from Roslyn types before
+  caching.
+</Warning>
+
+## Step Tracking
+
+Enable step tracking to analyze which pipeline steps were executed and their caching states.
+
+### How Step Tracking Works
+
+1. The test engine runs your generator twice with identical input
+2. The first run populates the cache
+3. The second run reveals caching behavior
+
+### Step States
+
+| State       | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `Cached`    | Output reused from previous run (optimal)            |
+| `Unchanged` | Recomputed but produced same value (equality worked) |
+| `Modified`  | Value changed between runs (cache miss)              |
+| `New`       | Additional item produced                             |
+| `Removed`   | Item no longer produced                              |
+
+A successfully cached step produces only `Cached` or `Unchanged` outputs.
+
+### Named Step Tracking
+
+Use `WithTrackingName` in your generator to enable fine-grained analysis:
+
+```csharp
+public void Initialize(IncrementalGeneratorInitializationContext context)
+{
+var provider = context.SyntaxProvider
+    .CreateSyntaxProvider(...)
+    .WithTrackingName("ParseStep");  // Named for testing
+
+var combined = provider
+    .Combine(context.CompilationProvider)
+    .WithTrackingName("CombineStep");
+
+context.RegisterSourceOutput(combined, ...);
+}
+```
+
+Then verify specific steps:
+
+```csharp
+result.IsCached("ParseStep", "CombineStep");
+```
+
 ## Method Reference
 
 ### AnalyzerTest&lt;TAnalyzer&gt;
@@ -223,6 +459,52 @@ public Task ShouldNotOfferWhenCapturing() => VerifyNoRefactoringAsync("""
 | `VerifyAsync(source, fixedSource)` | Verify refactoring transforms source to expected output |
 | `VerifyNoRefactoringAsync(source)` | Verify no refactoring is offered at the marked span     |
 
+### Test&lt;TGenerator&gt;
+
+| Method           | Description                                 |
+| ---------------- | ------------------------------------------- |
+| `Run(source)`    | Run generator with source and return result |
+| `Run(configure)` | Run generator with custom configuration     |
+
+### GeneratorResult
+
+| Method                               | Description                               |
+| ------------------------------------ | ----------------------------------------- |
+| `Produces(hintName)`                 | Assert file exists                        |
+| `Produces(hintName, content)`        | Assert file exists with exact content     |
+| `Produces(hintName, content, false)` | Assert file contains content              |
+| `IsClean()`                          | Assert no diagnostics                     |
+| `Compiles()`                         | Assert no errors (warnings allowed)       |
+| `IsCached()`                         | Assert all steps are cached               |
+| `IsCached(stepNames)`                | Assert specific steps are cached          |
+| `HasDiagnostic(id)`                  | Assert diagnostic exists                  |
+| `HasDiagnostic(id, severity)`        | Assert diagnostic exists with severity    |
+| `HasNoDiagnostic(id)`                | Assert diagnostic does not exist          |
+| `HasNoForbiddenTypes()`              | Assert no ISymbol/Compilation/etc. cached |
+| `File(hintName, action)`             | Execute custom assertion on file content  |
+
+### GeneratorCachingReport
+
+| Property                  | Description                             |
+| ------------------------- | --------------------------------------- |
+| `GeneratorName`           | Name of the generator being tested      |
+| `ProducedOutput`          | Whether generator produced any files    |
+| `ObservableSteps`         | List of user-defined pipeline steps     |
+| `ForbiddenTypeViolations` | List of cached forbidden types detected |
+
+### GeneratorStepAnalysis
+
+| Property               | Description                                |
+| ---------------------- | ------------------------------------------ |
+| `StepName`             | Name of the pipeline step                  |
+| `Cached`               | Count of cached outputs                    |
+| `Unchanged`            | Count of unchanged outputs                 |
+| `Modified`             | Count of modified outputs                  |
+| `New`                  | Count of new outputs                       |
+| `Removed`              | Count of removed outputs                   |
+| `HasForbiddenTypes`    | Whether step has forbidden type violations |
+| `IsCachedSuccessfully` | True if no Modified/New/Removed outputs    |
+
 ## Integration Testing
 
 For testing that requires real MSBuild execution (SDK features, package behavior, build-time code generation), see [MSBuild Testing](/utilities/msbuild-testing).
@@ -231,11 +513,12 @@ For testing that requires real MSBuild execution (SDK features, package behavior
 
 If you encounter ambiguous reference errors between `Microsoft.CodeAnalysis.Testing.AnalyzerTest` and `ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest`, use a type alias:
 
-```csharp
+````csharp
 using AnalyzerTestBase = ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest<MyAnalyzer>;
 
-public class MyTests : AnalyzerTestBase
-{
-    // ...
-}
-```
+    public class MyTests : AnalyzerTestBase
+    {
+        // ...
+    }
+    ```
+````

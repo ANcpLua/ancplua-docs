@@ -24,36 +24,117 @@ MTP requires test projects to output executables. **The SDK handles this automat
 MTP uses different command syntax than VSTest:
 
 <CodeGroup>
-    ```bash MTP (correct)
+    ```bash .NET 10+ (MTP native)
     # Run all tests
-    dotnet run
+    dotnet test
 
-    # Run with filter
-    dotnet run -- --filter "FullyQualifiedName~MyTest"
+    # Run with filter (no -- separator needed)
+    dotnet test --filter-method "*MyTest*"
 
     # List tests
-    dotnet run -- --list-tests
+    dotnet test --list-tests
+
+    # Generate TRX report
+    dotnet test --report-trx
     ```
 
-    ```bash VSTest (does NOT work)
-    # These commands don't work with MTP
+    ```bash .NET 8/9 (MTP opt-in)
+    # Requires -- separator to pass args to test executable
+    dotnet test -- --filter-method "*MyTest*"
+    dotnet test -- --list-tests
+    ```
+
+    ```bash VSTest syntax (BANNED)
+    # These do NOT work with MTP - exit code 5
     dotnet test --filter "FullyQualifiedName~MyTest"
+    dotnet test --logger trx
     ```
 
 </CodeGroup>
 
 <Warning>
-  The `--` separator is required to pass arguments to the test executable.
-  Without it, arguments go to `dotnet run` instead.
+  **VSTest syntax causes exit code 5 with MTP.** Use `--filter-method` instead
+  of `--filter "FQN~"` and `--report-trx` instead of `--logger trx`.
 </Warning>
+
+<Note>
+  .NET 10 includes native MTP support via `global.json`. The `--` separator is
+  only needed for .NET 8/9 with explicit MTP opt-in.
+</Note>
 
 ### Troubleshooting
 
-| Exit Code | Cause                 | Fix                                                           |
-| --------- | --------------------- | ------------------------------------------------------------- |
-| 5         | Unknown CLI option    | Use MTP syntax (`dotnet run --`), not VSTest                  |
-| 8         | Zero tests discovered | Check filter syntax; ensure test methods are public           |
-| N/A       | Tests not found       | Verify `xunit.v3.mtp-v2` reference; SDK sets `OutputType=Exe` |
+| Exit Code | Cause                 | Fix                                                                |
+| --------- | --------------------- | ------------------------------------------------------------------ |
+| 5         | Unknown CLI option    | Use MTP syntax (`--filter-method`), not VSTest (`--filter "FQN~"`) |
+| 8         | Zero tests discovered | Check filter pattern; ensure test methods are public               |
+| N/A       | Tests not found       | Verify `xunit.v3.mtp-v2` reference; SDK sets `OutputType=Exe`      |
+
+## xUnit v3 TestContext
+
+xUnit v3 replaces constructor-injected `ITestOutputHelper` with ambient `TestContext`. Access test output anywhere without passing it through constructor chains.
+
+### Before vs After
+
+| Aspect                     | xUnit v2 (Before)         | xUnit v3 (After)              |
+| -------------------------- | ------------------------- | ----------------------------- |
+| Test constructor params    | fixture, testOutputHelper | fixture                       |
+| Fields to store            | 2                         | 1                             |
+| Builder constructor params | 4                         | 3                             |
+| Boilerplate per test class | ~3 lines                  | 0                             |
+| How output is accessed     | Passed through chain      | Ambient `TestContext.Current` |
+
+### Migration Example
+
+<CodeGroup>
+```csharp xUnit v2 (before)
+public class MyApiTests : IntegrationTestBase<Program>
+{
+    private readonly ITestOutputHelper _output;
+    private readonly MyFixture _fixture;
+
+    public MyApiTests(MyFixture fixture, ITestOutputHelper output)
+    {
+        _fixture = fixture;
+        _output = output;
+    }
+
+    [Fact]
+    public async Task Get_ReturnsSuccess()
+    {
+        _output.WriteLine("Starting test...");
+        var response = await Client.GetAsync("/api/items");
+        response.EnsureSuccessStatusCode();
+    }
+
+}
+
+````
+
+```csharp xUnit v3 (after)
+public class MyApiTests : IntegrationTestBase<Program>
+{
+    private readonly MyFixture _fixture;
+
+    public MyApiTests(MyFixture fixture) => _fixture = fixture;
+
+    [Fact]
+    public async Task Get_ReturnsSuccess()
+    {
+        TestContext.Current.TestOutputHelper.WriteLine("Starting test...");
+        var response = await Client.GetAsync("/api/items");
+        response.EnsureSuccessStatusCode();
+    }
+}
+````
+
+</CodeGroup>
+
+<Tip>
+  `TestContext.Current` is available anywhere during test execution - in test
+  methods, helper classes, or builder patterns - without explicit parameter
+  passing.
+</Tip>
 
 ## IntegrationTestBase
 

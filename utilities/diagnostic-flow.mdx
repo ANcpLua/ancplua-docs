@@ -136,3 +136,29 @@ context.RegisterSourceOutput(pipeline, (ctx, code) =>
 | `HasErrors`   | True if any error-severity diagnostic |
 | `Value`       | The wrapped value (throws if failed)  |
 | `Diagnostics` | All accumulated diagnostics           |
+
+## Null-Safety
+
+`DiagnosticFlow<T>` uses `[MemberNotNullWhen]` to enable flow-dependent null analysis:
+
+```csharp
+var flow = symbol.ToFlow(nullDiag);
+
+// Compiler knows Value is non-null when IsSuccess is true
+if (flow.IsSuccess)
+{
+    var name = flow.Value.Name;  // No null warning
+}
+
+// Pattern matching also works
+if (flow is { IsSuccess: true, Value: var value })
+{
+    var name = value.Name;  // No null warning
+}
+```
+
+<Tip>
+  The `[MemberNotNullWhen(true, nameof(Value))]` attribute on `IsSuccess` tells
+  the compiler that `Value` is guaranteed non-null when `IsSuccess` returns
+  `true`.
+</Tip>

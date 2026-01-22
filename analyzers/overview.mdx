@@ -9,16 +9,16 @@ ANcpLua.Analyzers enforces code quality and prevents common bugs. Included autom
 
 ## Categories
 
-| Category          | Rules | Examples                                                           |
-| ----------------- | ----- | ------------------------------------------------------------------ |
-| Design            | 4     | Primary constructor patterns, type partialness                     |
-| Usage             | 8     | Span comparisons, IXmlSerializable, static lambdas, DateTime, JSON |
-| Style             | 3     | Pattern matching, null-guard normalization                         |
-| ASP.NET Core      | 5     | Form binding, parameter validation                                 |
-| OpenTelemetry     | 2     | Semantic conventions, schema URLs                                  |
-| Threading         | 1     | Lock statement best practices                                      |
-| Reliability       | 1     | Division by zero prevention                                        |
-| VersionManagement | 2     | Hardcoded version, Version.props import                            |
+| Category          | Rules | Examples                                                         |
+| ----------------- | ----- | ---------------------------------------------------------------- |
+| Design            | 4     | Primary constructor patterns, type partialness                   |
+| Usage             | 12    | Span comparisons, IXmlSerializable, static lambdas, Roslyn utils |
+| Style             | 3     | Pattern matching, null-guard normalization                       |
+| ASP.NET Core      | 5     | Form binding, parameter validation                               |
+| OpenTelemetry     | 2     | Semantic conventions, schema URLs                                |
+| Threading         | 1     | Lock statement best practices                                    |
+| Reliability       | 1     | Division by zero prevention                                      |
+| VersionManagement | 2     | Hardcoded version, Version.props import                          |
 
 ## Rules
 
@@ -50,6 +50,10 @@ ANcpLua.Analyzers enforces code quality and prevents common bugs. Included autom
 | [AL0025](/analyzers/rules/AL0025) | Usage             | Anonymous function can be static                        | Warning  | Yes |
 | [AL0026](/analyzers/rules/AL0026) | Usage             | Avoid DateTime.Now/UtcNow, use TimeProvider             | Warning  |  -  |
 | [AL0027](/analyzers/rules/AL0027) | Usage             | Avoid Newtonsoft.Json, use System.Text.Json             | Warning  |  -  |
+| [AL0028](/analyzers/rules/AL0028) | Usage             | Use IsEqualTo() for symbol comparison                   |   Info   |  -  |
+| [AL0029](/analyzers/rules/AL0029) | Usage             | Use HasAttribute() for attribute checks                 |   Info   |  -  |
+| [AL0030](/analyzers/rules/AL0030) | Usage             | Use type hierarchy extensions                           |   Info   |  -  |
+| [AL0031](/analyzers/rules/AL0031) | Usage             | Use operation extensions                                |   Info   |  -  |
 
 ## Refactorings
 

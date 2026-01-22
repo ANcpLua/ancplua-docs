@@ -44,32 +44,16 @@ All endpoints use the `/v1/` prefix. Breaking changes introduce new versions whi
 
 ## Endpoints
 
-<CardGroup cols={2}>
-  <Card title="Traces" icon="route" href="/api-reference/traces">
-    Query distributed traces and spans across your services
-  </Card>
-  <Card title="Logs" icon="scroll" href="/api-reference/logs">
-    Search, filter, and aggregate log records
-  </Card>
-  <Card title="Metrics" icon="chart-line" href="/api-reference/metrics">
-    Query time-series metrics with flexible aggregations
-  </Card>
-  <Card title="Sessions" icon="user-clock" href="/api-reference/sessions">
-    Track user sessions and their associated traces
-  </Card>
-  <Card title="Errors" icon="circle-exclamation" href="/api-reference/errors">
-    Manage error groups with status tracking
-  </Card>
-  <Card title="Deployments" icon="rocket" href="/api-reference/deployments">
-    Track deployments and calculate DORA metrics
-  </Card>
-  <Card title="Services" icon="sitemap" href="/api-reference/services">
-    Discover services and their dependencies
-  </Card>
-  <Card title="Streaming" icon="bolt" href="/api-reference/streaming">
-    Real-time telemetry via Server-Sent Events
-  </Card>
-</CardGroup>
+| Category    | Description                                  |
+| ----------- | -------------------------------------------- |
+| Traces      | Query distributed traces and spans           |
+| Logs        | Search, filter, and aggregate log records    |
+| Metrics     | Query time-series metrics with aggregations  |
+| Sessions    | Track user sessions and their traces         |
+| Errors      | Manage error groups with status tracking     |
+| Deployments | Track deployments and calculate DORA metrics |
+| Services    | Discover services and their dependencies     |
+| Streaming   | Real-time telemetry via Server-Sent Events   |
 
 ### Endpoint Summary
 
@@ -234,14 +218,8 @@ nuke Generate --force-generate
 
 ## SDK & Tools
 
-<CardGroup cols={3}>
-  <Card title="MCP Server" icon="plug" href="/architecture/mcp">
-    Connect AI agents to qyl telemetry
-  </Card>
-  <Card title="Dashboard" icon="gauge" href="/architecture/dashboard">
-    Visual exploration of telemetry data
-  </Card>
-  <Card title="Collector" icon="database" href="/architecture/collector">
-    Ingest OTLP telemetry data
-  </Card>
-</CardGroup>
+| Tool      | Description                          |
+| --------- | ------------------------------------ |
+| MCP       | Connect AI agents to qyl telemetry   |
+| Dashboard | Visual exploration of telemetry data |
+| Collector | Ingest OTLP telemetry data           |
