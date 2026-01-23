@@ -552,32 +552,49 @@ namespace MyGenerator.Tests;
 
 public abstract class GeneratorTestBase
 {
-    protected static readonly Type[] RequiredTypes =
+protected static readonly Type[] RequiredTypes =
     [
-        typeof(HttpContext),
+        typeof (HttpContext),
         // Add types your generator needs
     ];
 
-    protected static async Task<GeneratorResult> RunAsync(string source)
-    {
-        using var scope = TestConfiguration.WithAdditionalReferences(RequiredTypes);
-        return await Test<MyGenerator>.Run(source, TestContext.Current.CancellationToken);
-    }
+protected static async Task < GeneratorResult > RunAsync(string source)
+{
+    using
+    var scope = TestConfiguration.WithAdditionalReferences(RequiredTypes);
+    return await Test < MyGenerator >
+.
+    Run(source, TestContext.Current.CancellationToken);
+}
 
-    protected static async Task VerifyAsync(string source)
-    {
-        using var result = await RunAsync(source);
+protected static async Task VerifyAsync(string source)
+{
+    using
+    var result = await RunAsync(source);
 
-        await Verify(new
-        {
-            GeneratedSources = result.Files
-                .Select(static f => new { f.HintName, Source = f.Content })
-                .OrderBy(static s => s.HintName),
-            Diagnostics = result.Diagnostics
-                .Select(static d => new { d.Id, Severity = d.Severity.ToString(), Message = d.GetMessage() })
-                .OrderBy(static d => d.Id)
-        }).UseDirectory("Snapshots");
-    }
+
+    await Verify(new
+    {
+        GeneratedSources = result.Files
+            .Select(static f
+=>
+    new {f.HintName, Source = f.Content}
+)
+.
+    OrderBy(static
+    s => s.HintName
+),
+    Diagnostics = result.Diagnostics
+        .Select(static
+    d => new {d.Id, Severity = d.Severity.ToString(), Message = d.GetMessage()}
+)
+.
+    OrderBy(static
+    d => d.Id
+)
+}).
+    UseDirectory("Snapshots");
+}
 }
 ```
 
@@ -592,41 +609,46 @@ namespace MyGenerator.Tests;
 
 public static class ModuleInitializer
 {
-    [ModuleInitializer]
-    public static void Initialize()
-    {
-        VerifySourceGenerators.Initialize();
-        VerifierSettings.AddExtraSettings(static settings =>
-            settings.Converters.Add(new EquatableArrayJsonConverter()));
-    }
+[ModuleInitializer]
+public static void Initialize()
+{
+    VerifySourceGenerators.Initialize();
+    VerifierSettings.AddExtraSettings(static
+    settings =>
+        settings.Converters.Add(new EquatableArrayJsonConverter())
+)
+}
 }
 
 file sealed class EquatableArrayJsonConverter : WriteOnlyJsonConverter
 {
-    public override void Write(VerifyJsonWriter writer, object value)
-    {
-        var type = value.GetType();
-        if (!type.IsGenericType || type.GetGenericTypeDefinition().Name != "EquatableArray`1")
-        {
-            writer.Serialize(value);
-            return;
-        }
-
-        var itemsProperty = type.GetProperty("Items");
-        var items = itemsProperty?.GetValue(value);
-        if (items is null)
-        {
-            writer.WriteStartArray();
-            writer.WriteEndArray();
-            return;
-        }
-
-        var toArrayMethod = items.GetType().GetMethod("ToArray");
-        writer.Serialize(toArrayMethod?.Invoke(items, null) ?? Array.Empty<object>());
+public override void Write(VerifyJsonWriter writer, object value)
+{
+    var type = value.GetType();
+    if (!type.IsGenericType || type.GetGenericTypeDefinition().Name != "EquatableArray`1") {
+        writer.Serialize(value);
+        return;
     }
 
-    public override bool CanConvert(Type type) =>
-        type.IsGenericType && type.GetGenericTypeDefinition().Name == "EquatableArray`1";
+
+    var itemsProperty = type.GetProperty("Items");
+    var items = itemsProperty?.GetValue(value);
+    if (items is
+    null
+)
+    {
+        writer.WriteStartArray();
+        writer.WriteEndArray();
+        return;
+    }
+
+
+    var toArrayMethod = items.GetType().GetMethod("ToArray");
+    writer.Serialize(toArrayMethod?.Invoke(items, null) ?? Array.Empty < object > ());
+}
+
+public override bool CanConvert(Type type) =>
+type.IsGenericType && type.GetGenericTypeDefinition().Name == "EquatableArray`1";
 }
 ```
 
@@ -639,7 +661,7 @@ tests/MyGenerator.Tests/
 ├── GeneratorOutputTests.cs   # Output verification
 ├── AnalyzerDiagnosticTests.cs
 └── Snapshots/                # Verify snapshot files
-    └── *.verified.txt
+└── *.verified.txt
 ```
 
 <Tip>
@@ -655,7 +677,7 @@ For testing that requires real MSBuild execution (SDK features, package behavior
 
 If you encounter ambiguous reference errors between `Microsoft.CodeAnalysis.Testing.AnalyzerTest` and `ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest`, use a type alias:
 
-````csharp
+`````csharp
 using AnalyzerTestBase = ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest<MyAnalyzer>;
 
     public class MyTests : AnalyzerTestBase
@@ -663,4 +685,5 @@ using AnalyzerTestBase = ANcpLua.Roslyn.Utilities.Testing.AnalyzerTest<MyAnalyze
         // ...
     }
     ```
-````
+    ````
+`````

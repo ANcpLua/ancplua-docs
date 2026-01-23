@@ -95,17 +95,16 @@ guard
 
 ## Pattern Matching Integration
 
-Combine with `SymbolPattern`:
+Combine with `Match.*`:
 
 ```csharp
-var asyncHandler = SymbolPattern.Method()
+var asyncHandler = Match.Method()
     .Async()
-    .ReturnsTask()
-    .WithCancellationToken()
-    .Build();
+    .ReturningTask()
+    .WithCancellationToken();
 
 SemanticGuard.ForMethod(method)
-    .MustMatch(asyncHandler, handlerPatternViolated)
+    .Must(m => asyncHandler.Matches(m), handlerPatternViolated)
     .ToFlow();
 ```
 

@@ -7,14 +7,14 @@ icon: 'code'
 
 ANcpLua.Roslyn.Utilities provides utilities for building Roslyn analyzers and source generators.
 
-## What's New in v1.15.0
+## What's New in v1.18
 
-**Null-safety improvements** - Comprehensive nullability annotations throughout the library:
+**API cleanup** - Tightened public surface, renamed methods for clarity:
 
-- `[MemberNotNullWhen]` on `DiagnosticFlow.IsSuccess` for flow-dependent null state
-- `[MaybeNullWhen(false)]` for `TryGet` patterns
-- `[return: MaybeNull]` for `GetOrInsertDefault`
-- Null-forgiving operators reduced from 13 to 1
+- `Guard.NotNullOr*` renamed to `Guard.NotNullOrElse*` with new lazy `Func<T>` overloads
+- `IndentedStringBuilder.Indent()`/`Outdent()` made private (use `BeginBlock()`)
+- Helper extensions reorganized: `NullableExtensions`, `ObjectExtensions`, `TryExtensions`
+- Redundant nullability attributes and operators removed
 
 ## Install
 
@@ -41,7 +41,7 @@ dotnet add package ANcpLua.Roslyn.Utilities.Testing
 | Category          | APIs                                          | Docs                                         |
 | ----------------- | --------------------------------------------- | -------------------------------------------- |
 | Flow Control      | `DiagnosticFlow<T>`, `ReportAndContinue()`    | [DiagnosticFlow](/utilities/diagnostic-flow) |
-| Pattern Matching  | `SymbolPattern.*`, `Match.*`, `Invoke.*`      | [Patterns](/utilities/patterns)              |
+| Pattern Matching  | `Match.*` (symbols), `Invoke.*` (operations)  | [Patterns](/utilities/patterns)              |
 | Validation        | `SemanticGuard<T>`, `MustBeAsync()`           | [SemanticGuard](/utilities/semantic-guard)   |
 | Domain Contexts   | `AwaitableContext`, `AspNetContext`           | [Contexts](/utilities/contexts)              |
 | Operations        | `OperationExtensions`, `InvocationExtensions` | [Operations](/utilities/operations)          |
@@ -62,11 +62,9 @@ symbol.ToFlow(nullDiag)
     .ReportAndContinue(context);
 
 // Pattern matching - replace 50-line if-statements
-var asyncTask = SymbolPattern.Method()
+Match.Method()
     .Async()
-    .ReturnsTask()
+    .ReturningTask()
     .WithCancellationToken()
-    .Build();
-
-if (asyncTask.Matches(method)) { ... }
+    .Matches(method);
 ```

@@ -53,17 +53,17 @@ public MyClass(ILogger? logger, IConfig? config)
 }
 ```
 
-### NotNullOr
+### NotNullOrElse
 
 Returns value or default (no exception):
 
 ```csharp
 // Reference types
-var name = Guard.NotNullOr(user?.Name, "Anonymous");
-var service = Guard.NotNullOr(optionalService, DefaultService.Instance);
+var name = Guard.NotNullOrElse(user?.Name, "Anonymous");
+var service = Guard.NotNullOrElse(optionalService, DefaultService.Instance);
 
 // Value types
-int count = Guard.NotNullOr(maybeCount, 0);
+int count = Guard.NotNullOrElse(maybeCount, 0);
 ```
 
 ## String Validation
@@ -97,10 +97,13 @@ public void SetDescription(string? description)
 
 ```csharp
 // Return default if null/empty
-var displayName = Guard.NotNullOrEmptyOr(user.DisplayName, user.Username);
+var displayName = Guard.NotNullOrEmptyOrElse(user.DisplayName, user.Username);
 
 // Return default if null/empty/whitespace
-var title = Guard.NotNullOrWhiteSpaceOr(article.Title, "Untitled");
+var title = Guard.NotNullOrWhiteSpaceOrElse(article.Title, "Untitled");
+
+// Lazy evaluation for expensive defaults
+var config = Guard.NotNullOrElse(optionalConfig, () => LoadDefaultConfig());
 ```
 
 ## Collection Validation
@@ -239,19 +242,22 @@ public class ServerConfig
 
 ## API Reference
 
-| Method                                    | Throws                                       | Description                   |
-| ----------------------------------------- | -------------------------------------------- | ----------------------------- |
-| `NotNull<T>(value)`                       | `ArgumentNullException`                      | Validates non-null            |
-| `NotNullOr<T>(value, default)`            | -                                            | Returns value or default      |
-| `NotNullOrEmpty(string)`                  | `ArgumentNullException`, `ArgumentException` | Validates non-null, non-empty |
-| `NotNullOrWhiteSpace(string)`             | `ArgumentNullException`, `ArgumentException` | Validates has content         |
-| `NotNullOrEmptyOr(string, default)`       | -                                            | Returns value or default      |
-| `NotNullOrWhiteSpaceOr(string, default)`  | -                                            | Returns value or default      |
-| `NotNullOrEmpty<T>(collection)`           | `ArgumentNullException`, `ArgumentException` | Validates collection          |
-| `InRange<T>(value, min, max)`             | `ArgumentOutOfRangeException`                | Validates within bounds       |
-| `ValidIndex(index, count)`                | `ArgumentOutOfRangeException`                | Validates array index         |
-| `That(condition, message)`                | `ArgumentException`                          | Validates condition           |
-| `Satisfies<T>(value, predicate, message)` | `ArgumentException`                          | Validates with predicate      |
+| Method                                            | Throws                                       | Description                   |
+| ------------------------------------------------- | -------------------------------------------- | ----------------------------- |
+| `NotNull<T>(value)`                               | `ArgumentNullException`                      | Validates non-null            |
+| `NotNullOrElse<T>(value, default)`                | -                                            | Returns value or default      |
+| `NotNullOrElse<T>(value, Func<T>)`                | -                                            | Lazy default evaluation       |
+| `NotNullOrEmpty(string)`                          | `ArgumentNullException`, `ArgumentException` | Validates non-null, non-empty |
+| `NotNullOrWhiteSpace(string)`                     | `ArgumentNullException`, `ArgumentException` | Validates has content         |
+| `NotNullOrEmptyOrElse(string, default)`           | -                                            | Returns value or default      |
+| `NotNullOrEmptyOrElse(string, Func<string>)`      | -                                            | Lazy default evaluation       |
+| `NotNullOrWhiteSpaceOrElse(string, default)`      | -                                            | Returns value or default      |
+| `NotNullOrWhiteSpaceOrElse(string, Func<string>)` | -                                            | Lazy default evaluation       |
+| `NotNullOrEmpty<T>(collection)`                   | `ArgumentNullException`, `ArgumentException` | Validates collection          |
+| `InRange<T>(value, min, max)`                     | `ArgumentOutOfRangeException`                | Validates within bounds       |
+| `ValidIndex(index, count)`                        | `ArgumentOutOfRangeException`                | Validates array index         |
+| `That(condition, message)`                        | `ArgumentException`                          | Validates condition           |
+| `Satisfies<T>(value, predicate, message)`         | `ArgumentException`                          | Validates with predicate      |
 
 <Note>
   All validation methods use `CallerArgumentExpressionAttribute` to

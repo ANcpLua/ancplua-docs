@@ -22,14 +22,14 @@ This section documents **ANcpLua.Roslyn.Utilities** - a standalone NuGet package
 
 ### Key APIs
 
-| Category         | APIs                                       |
-| ---------------- | ------------------------------------------ |
-| Flow Control     | `DiagnosticFlow<T>`, `ReportAndContinue()` |
-| Pattern Matching | `SymbolPattern.*`, `Match.*`, `Invoke.*`   |
-| Validation       | `SemanticGuard<T>`                         |
-| Domain Contexts  | `AwaitableContext`, `AspNetContext`        |
-| Code Generation  | `IndentedStringBuilder`                    |
-| Pipeline         | `GroupBy()`, `Batch()`, `Distinct()`       |
+| Category         | APIs                                         |
+| ---------------- | -------------------------------------------- |
+| Flow Control     | `DiagnosticFlow<T>`, `ReportAndContinue()`   |
+| Pattern Matching | `Match.*` (symbols), `Invoke.*` (operations) |
+| Validation       | `SemanticGuard<T>`                           |
+| Domain Contexts  | `AwaitableContext`, `AspNetContext`          |
+| Code Generation  | `IndentedStringBuilder`                      |
+| Pipeline         | `GroupBy()`, `Batch()`, `Distinct()`         |
 
 ### Page Structure
 

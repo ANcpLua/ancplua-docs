@@ -1,130 +1,110 @@
 ---
 title: Pattern Matching
-description: Composable patterns for matching Roslyn symbols
+description: Fluent DSL for matching Roslyn symbols and invocations
 icon: 'code'
 ---
 
-Composable patterns for matching Roslyn symbols. Replace verbose if-statements with declarative patterns.
+Replace verbose if-statements with composable matchers for symbols and invocations.
 
-## SymbolPattern
+## Match.\* (Symbol Matching)
 
-Base pattern type with composition operators:
-
-```csharp
-// Build patterns
-var asyncTask = SymbolPattern.Method()
-    .Async()
-    .ReturnsTask()
-    .WithCancellationToken()
-    .Public()
-    .Build();
-
-// Compose with operators
-var combined = pattern1 & pattern2;  // AND
-var either = pattern1 | pattern2;    // OR
-var inverted = !pattern1;            // NOT
-
-// Match
-if (asyncTask.Matches(method))
-{
-    // Handle async task method
-}
-```
-
-## Method Patterns
-
-```csharp
-SymbolPattern.Method()
-    .Named("Execute")           // Exact name
-    .NameStartsWith("Get")      // Name prefix
-    .NameEndsWith("Async")      // Name suffix
-    .Async()                    // Is async
-    .NotAsync()                 // Not async
-    .ReturnsTask()              // Returns Task/Task<T>/ValueTask
-    .ReturnsVoid()              // Returns void
-    .Returns(typeSymbol)        // Returns specific type
-    .ParameterCount(2)          // Exact parameter count
-    .ParameterCountAtLeast(1)   // Minimum parameters
-    .WithCancellationToken()    // Has CancellationToken param
-    .Public()                   // Public accessibility
-    .Private()                  // Private accessibility
-    .Static()                   // Is static
-    .Instance()                 // Not static
-    .Virtual()                  // Is virtual
-    .Override()                 // Is override
-    .Abstract()                 // Is abstract
-    .IsConstructor()            // Is constructor
-    .IsOperator()               // Is operator
-    .ImplementsInterface()      // Implements interface member
-    .HasAttribute("Attr")       // Has attribute
-    .Build();
-```
-
-## Type Patterns
-
-```csharp
-SymbolPattern.Type()
-    .IsClass()                  // Is class
-    .IsStruct()                 // Is struct
-    .IsInterface()              // Is interface
-    .IsRecord()                 // Is record
-    .IsEnum()                   // Is enum
-    .IsDelegate()               // Is delegate
-    .HasMultipleDeclarations()  // Has multiple partial declarations
-    .Public()                   // Public accessibility
-    .Sealed()                   // Is sealed
-    .Abstract()                 // Is abstract
-    .Static()                   // Is static
-    .IsGeneric()                // Has type parameters
-    .IsNotGeneric()             // No type parameters
-    .TypeParameterCount(2)      // Exact type parameter count
-    .Implements("IDisposable")  // Implements interface
-    .InheritsFrom("BaseClass")  // Inherits from
-    .InNamespace("MyNs")        // In exact namespace
-    .InNamespaceStartsWith("My") // Namespace prefix
-    .HasMethod("Dispose")       // Has method with name
-    .HasProperty("Id")          // Has property with name
-    .IsNested()                 // Is nested type
-    .IsTopLevel()               // Is top-level type
-    .IsDisposable()             // Implements IDisposable
-    .HasAttribute("Attr")       // Has attribute
-    .Build();
-```
-
-## Match.\* DSL
-
-Fluent matching without building:
+Fluent matching for `ISymbol` types:
 
 ```csharp
 // Method matching
-if (Match.Method()
+Match.Method()
     .Named("Execute")
     .Async()
-    .ParameterCount(2)
-    .Matches(method))
-{
-    // Handle
-}
+    .ReturningTask()
+    .WithCancellationToken()
+    .Public()
+    .Matches(method);
+
+// Match multiple attributes (any match)
+Match.Method()
+    .WithAttribute("Xunit.FactAttribute", "Xunit.TheoryAttribute", "NUnit.Framework.TestAttribute")
+    .Public()
+    .Matches(method);
+
+// Finalizer matching
+Match.Method().Finalizer().Matches(method);
 
 // Type matching
-if (Match.Type()
-    .IsClass()
+Match.Type()
+    .Class()
     .Public()
     .Implements("IDisposable")
-    .HasParameterlessConstructor()  // Available via Match.Type()
-    .Matches(type))
-{
-    // Handle
-}
+    .HasParameterlessConstructor()
+    .Matches(type);
 
-// Property/Field matching
+// Property/Field/Parameter matching
 Match.Property().ReadOnly().Required().Matches(prop);
 Match.Field().Const().Public().Matches(field);
+Match.Parameter().CancellationToken().Matches(param);
 ```
 
-## Invoke.\* (Operation Matching)
+<Warning>
+  Matchers mutate `this` when chaining. Create new matchers for each distinct
+  pattern.
+</Warning>
 
-Match method invocations:
+### Factory Pattern
+
+For reusable base matchers:
+
+```csharp
+static MethodMatcher PublicInstance() => Match.Method().Public().NotStatic();
+
+var asyncApi = PublicInstance().Async().ReturningTask();
+var syncApi = PublicInstance().NotAsync().ReturningVoid();
+```
+
+## Method Matcher
+
+```csharp
+Match.Method()
+    .Named("name")              // Exact name
+    .NameStartsWith("Get")      // Name prefix
+    .NameEndsWith("Async")      // Name suffix
+    .Async()                    // async keyword
+    .NotAsync()                 // Not async
+    .ReturningTask()            // Returns Task/ValueTask
+    .ReturningVoid()            // Returns void
+    .WithParameters(2)          // Exact parameter count
+    .WithCancellationToken()    // Has CancellationToken param
+    .Public() / .Private() / .Internal() / .Protected()
+    .Static() / .NotStatic()
+    .Virtual() / .Override() / .Abstract()
+    .Constructor()              // Is constructor
+    .Finalizer()                // Is finalizer (~ClassName)
+    .WithAttribute("AttrName")  // Has attribute
+    .WithAttribute("A", "B")    // Has any of these attributes
+    .Matches(method);
+```
+
+## Type Matcher
+
+```csharp
+Match.Type()
+    .Class() / .Struct() / .Interface() / .Record() / .Enum()
+    .Public() / .Internal()
+    .Sealed() / .Abstract() / .Static()
+    .Partial()
+    .Generic() / .NotGeneric()
+    .Implements("IDisposable")
+    .InheritsFrom("BaseClass")
+    .InNamespace("MyNamespace")
+    .HasParameterlessConstructor()
+    .HasMethod("Dispose")
+    .HasProperty("Id")
+    .Nested() / .TopLevel()
+    .WithAttribute("AttrName")
+    .Matches(type);
+```
+
+## Invoke.\* (Invocation Matching)
+
+Match `IInvocationOperation`:
 
 ```csharp
 // Match specific method
@@ -133,41 +113,98 @@ Invoke.Method("Dispose")
     .WithNoArguments()
     .Matches(invocation);
 
-// Match LINQ methods
+// LINQ methods
 Invoke.Method()
-    .Linq()
+    .Linq()                     // System.Linq extensions
     .Named("Where")
     .Matches(invocation);
 
-// Match string methods
-Invoke.Method()
-    .OnType("System.String")
-    .Named("Contains")
+// Match multiple method names (any match)
+Invoke.Method("WriteLine", "Write")
+    .OnConsole()
+    .Matches(invocation);
+
+// Match multiple receiver types (any match)
+Invoke.Method("Wait", "GetAwaiter")
+    .OnType("Task", "ValueTask")
     .Matches(invocation);
 ```
 
-## Composition Examples
+## Invocation Matcher
 
 ```csharp
-// Handler method: async, public, returns Task, has CancellationToken
-var handler = SymbolPattern.Method()
+Invoke.Method()
+    .Named("name")              // Exact name
+    .Named("A", "B", "C")       // Any of these names
+    .NameStartsWith("Get")
+    .NameEndsWith("Async")
+    .OnType("TypeName")         // Receiver type name
+    .OnType("A", "B")           // Any of these types
+    .OnTypeInheritingFrom("Base")
+    .OnTypeImplementing("IFace")
+    .Extension() / .NotExtension()
+    .Static() / .Instance()
+    .Async()
+    .Generic()
+    .ReturningVoid() / .ReturningTask() / .Returning("Type")
+    .WithArguments(2)           // Exact argument count
+    .WithNoArguments()
+    .WithMinArguments(1)
+    .WithConstantArg(0)
+    .WithConstantStringArg(0)
+    .WithNullArg(0)
+    .WithAllConstantArgs()
+    .InNamespace("System.Linq")
+    .InNamespaceStartingWith("System")
+    .Linq()                     // Shortcut for System.Linq extensions
+    .OnString()                 // Shortcut for String receiver
+    .OnTask()                   // Shortcut for Task receiver
+    .OnConsole()                // Shortcut for Console receiver
+    .Where(custom => ...)       // Custom predicate
+    .Matches(invocation);
+```
+
+## Examples
+
+### Test Method Detection
+
+```csharp
+var isTestMethod = Match.Method()
+    .WithAttribute(
+        "Xunit.FactAttribute",
+        "Xunit.TheoryAttribute",
+        "NUnit.Framework.TestAttribute",
+        "Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute")
+    .Public()
+    .Matches(method);
+```
+
+### Async Handler Detection
+
+```csharp
+var isAsyncHandler = Match.Method()
     .Async()
     .Public()
-    .ReturnsTask()
+    .ReturningTask()
     .WithCancellationToken()
-    .Build();
+    .NotStatic()
+    .Matches(method);
+```
 
-// Disposable type: class, implements IDisposable
-var disposable = SymbolPattern.Type()
-    .IsClass()
-    .Implements("System.IDisposable")
-    .Build();
+### Dispose Call Detection
 
-// Either async void or async Task
-var asyncMethod = SymbolPattern.Method().Async().ReturnsVoid().Build()
-    | SymbolPattern.Method().Async().ReturnsTask().Build();
+```csharp
+var isDisposeCall = Invoke.Method("Dispose", "DisposeAsync")
+    .OnTypeImplementing("IDisposable")
+    .WithNoArguments()
+    .Matches(invocation);
+```
 
-// Public and not abstract
-var concrete = SymbolPattern.Type().Public().Build()
-    & !SymbolPattern.Type().Abstract().Build();
+### LINQ Query Detection
+
+```csharp
+var isLinqQuery = Invoke.Method()
+    .Linq()
+    .Named("Where", "Select", "FirstOrDefault", "Any", "All")
+    .Matches(invocation);
 ```
