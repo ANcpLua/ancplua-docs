@@ -374,6 +374,46 @@ Tracked events:
 
 ---
 
+## VALE PROSE LINTER
+
+Vale enforces consistent writing style across documentation.
+
+### Commands
+
+| Command                          | Purpose                 |
+| -------------------------------- | ----------------------- |
+| `vale .`                         | Lint all docs           |
+| `vale sync`                      | Download style packages |
+| `vale --config=.vale.ini <file>` | Lint specific file      |
+
+### Configuration
+
+- **Config file**: `.vale.ini`
+- **Styles**: `.github/styles/`
+- **Vocabulary**: `.github/styles/config/vocabularies/ANcpLua/`
+
+### Styles used
+
+- **Microsoft**: Technical writing standards
+- **write-good**: Plain English checks
+- **Vale**: Built-in rules (spelling)
+
+### Adding project terms
+
+Add accepted terms to `.github/styles/config/vocabularies/ANcpLua/accept.txt`:
+
+```
+ANcpLua
+Roslyn
+polyfills
+```
+
+### CI Integration
+
+Vale runs automatically on PRs via `.github/workflows/vale.yml` using `errata-ai/vale-action@v2`.
+
+---
+
 ## INTERNATIONALIZATION (i18n)
 
 ### File structure
