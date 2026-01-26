@@ -112,6 +112,12 @@ public static ErrorOr<Todo> GetById(int id) { ... }
 Results<Ok<Todo>, NotFound<ProblemDetails>, InternalServerError<ProblemDetails>>
 ```
 
+<Note>
+  When calling interface/abstract methods, the generator reads `[ReturnsError]`
+  attributes to build the complete union. See [Interface Types with
+  ReturnsError](/erroror/generator#interface-types-with-returnserror).
+</Note>
+
 ### BCL Limit
 
 The BCL provides `Results<T1, T2, ..., T6>` - maximum 6 type parameters.

@@ -94,6 +94,61 @@ public static ErrorOr<List<Todo>> Search([FromQuery] SearchFilter filter) => ...
 public static ErrorOr<List<Todo>> Search([AsParameters] SearchFilter filter) => ...
 ```
 
+## Interface Types with `[ReturnsError]`
+
+Document possible errors on interface or abstract methods for OpenAPI generation:
+
+```csharp
+public interface ITodoService
+{
+    [ReturnsError(ErrorType.NotFound, "Todo.NotFound")]
+    [ReturnsError(ErrorType.Validation, "Todo.Invalid")]
+    ErrorOr<Todo> GetById(int id);
+}
+
+[Get("/todos/{id}")]
+public static ErrorOr<Todo> GetById(int id, ITodoService svc) =>
+    svc.GetById(id);
+```
+
+The generator reads `[ReturnsError]` attributes from interface/abstract methods to build the complete `Results<...>` union:
+
+```csharp
+// Generated OpenAPI union
+Results<Ok<Todo>, NotFound<ProblemDetails>, ValidationProblem>
+```
+
+### Why This Matters
+
+When calling service methods that return `ErrorOr<T>`, the generator:
+
+1. Inspects the interface/abstract method signature
+2. Collects all `[ReturnsError]` attributes
+3. Includes corresponding TypedResults in the `Results<...>` union
+4. Produces accurate OpenAPI documentation with all possible response codes
+
+Without `[ReturnsError]`, the generator only knows about the success type `T`, not possible error types.
+
+### Multiple Error Types
+
+You can declare multiple possible errors:
+
+```csharp
+public interface IOrderService
+{
+    [ReturnsError(ErrorType.NotFound, "Order.NotFound")]
+    [ReturnsError(ErrorType.Forbidden, "Order.AccessDenied")]
+    [ReturnsError(ErrorType.Conflict, "Order.AlreadyShipped")]
+    ErrorOr<Order> Ship(int orderId);
+}
+
+[Post("/orders/{orderId}/ship")]
+public static ErrorOr<Order> Ship(int orderId, IOrderService svc) =>
+    svc.Ship(orderId);
+
+// Generates: Results<Ok<Order>, NotFound<ProblemDetails>, ForbiddenHttpResult, Conflict<ProblemDetails>>
+```
+
 ## Middleware Attributes
 
 The generator emits middleware fluent calls since the wrapper delegate loses original method attributes:

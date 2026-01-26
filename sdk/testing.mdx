@@ -87,46 +87,46 @@ xUnit v3 replaces constructor-injected `ITestOutputHelper` with ambient `TestCon
 ### Migration Example
 
 <CodeGroup>
-```csharp xUnit v2 (before)
-public class MyApiTests : IntegrationTestBase<Program>
-{
-    private readonly ITestOutputHelper _output;
-    private readonly MyFixture _fixture;
+    ```csharp xUnit v2 (before)
+    public class MyApiTests : IntegrationTestBase<Program>
+    {
+        private readonly ITestOutputHelper _output;
+        private readonly MyFixture _fixture;
 
-    public MyApiTests(MyFixture fixture, ITestOutputHelper output)
+        public MyApiTests(MyFixture fixture, ITestOutputHelper output)
     {
         _fixture = fixture;
         _output = output;
     }
 
-    [Fact]
-    public async Task Get_ReturnsSuccess()
+        [Fact]
+        public async Task Get_ReturnsSuccess()
     {
         _output.WriteLine("Starting test...");
         var response = await Client.GetAsync("/api/items");
         response.EnsureSuccessStatusCode();
     }
 
-}
+    }
 
-````
+    ````
 
-```csharp xUnit v3 (after)
-public class MyApiTests : IntegrationTestBase<Program>
-{
-    private readonly MyFixture _fixture;
+    ```csharp xUnit v3 (after)
+    public class MyApiTests : IntegrationTestBase<Program>
+    {
+        private readonly MyFixture _fixture;
 
-    public MyApiTests(MyFixture fixture) => _fixture = fixture;
+        public MyApiTests(MyFixture fixture) => _fixture = fixture;
 
-    [Fact]
-    public async Task Get_ReturnsSuccess()
+        [Fact]
+        public async Task Get_ReturnsSuccess()
     {
         TestContext.Current.TestOutputHelper.WriteLine("Starting test...");
         var response = await Client.GetAsync("/api/items");
         response.EnsureSuccessStatusCode();
     }
-}
-````
+    }
+    ````
 
 </CodeGroup>
 
@@ -140,38 +140,39 @@ public class MyApiTests : IntegrationTestBase<Program>
 
 In-memory TestServer for fast API testing.
 
-```csharp
+````csharp
 public class MyApiTests : IntegrationTestBase<Program>
-{
-    [Fact]
-    public async Task Get_ReturnsSuccess()
+    {
+        [Fact]
+        public async Task Get_ReturnsSuccess()
     {
         var response = await Client.GetAsync("/api/items");
         response.EnsureSuccessStatusCode();
     }
-}
-```
+    }
+    ```
 
-Uses `WebApplicationFactory<TProgram>` internally.
+    Uses `WebApplicationFactory<TProgram>` internally.
 
-## KestrelTestBase
+    ## KestrelTestBase
 
-Real Kestrel server for HTTP/2, WebSockets, SSE, or Playwright.
+    Real Kestrel server for HTTP/2, WebSockets, SSE, or Playwright.
 
-```csharp
-public class WebSocketTests : KestrelTestBase<Program>
-{
-    [Fact]
-    public async Task WebSocket_ConnectsSuccessfully()
+    ```csharp
+    public class WebSocketTests : KestrelTestBase<Program>
+    {
+        [Fact]
+        public async Task WebSocket_ConnectsSuccessfully()
     {
         var ws = new ClientWebSocket();
         await ws.ConnectAsync(new Uri($"{BaseAddress}/ws"), CancellationToken.None);
     }
-}
-```
+    }
+    ```
 
-Starts on random port via `UseKestrel(0)`.
+    Starts on random port via `UseKestrel(0)`.
 
-## FakeLogger
+    ## FakeLogger
 
-See [Extensions](/sdk/extensions) for `FakeLogCollector` test helpers.
+    See [Extensions](/sdk/extensions) for `FakeLogCollector` test helpers.
+````
