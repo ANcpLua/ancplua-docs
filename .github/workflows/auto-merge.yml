@@ -1,10 +1,12 @@
 # Auto-merge workflow for trusted PRs
 #
 # Tiers:
-# 1a. Dependabot PRs: Auto-approve + auto-merge for patch/minor
-# 1b. Renovate PRs: Auto-approve + auto-merge
+# 1a. Dependabot PRs: Auto-merge for patch/minor
+# 1b. Renovate PRs: Auto-merge
 # 2.  AI Agent fix PRs (copilot/, jules/, claude/): Auto-merge when CI passes
-# 3.  CodeRabbit/Claude approved PRs: Auto-merge when CI passes
+# 3.  CodeRabbit approved PRs: Auto-merge when CI passes
+#
+# Note: No approval required since main branch has no protection rules
 
 name: Auto-merge
 
@@ -30,13 +32,6 @@ jobs:
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Auto-approve patch and minor updates
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr review --approve "$PR_URL"
 
       - name: Enable auto-merge for patch and minor
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
@@ -69,12 +64,6 @@ jobs:
     if: github.actor == 'renovate[bot]'
 
     steps:
-      - name: Auto-approve Renovate PRs
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr review --approve "$PR_URL"
-
       - name: Enable auto-merge for Renovate
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -102,15 +91,6 @@ jobs:
           elif [[ "$BRANCH" == claude/* ]]; then
             echo "agent=Claude" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Auto-approve AI agent PRs
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AGENT: ${{ steps.agent.outputs.agent }}
-        run: |
-          echo "Auto-approving $AGENT PR"
-          gh pr review --approve "$PR_URL" --body "✅ Auto-approved: $AGENT autonomous fix PR"
 
       - name: Enable auto-merge for AI agent PRs
         env:
