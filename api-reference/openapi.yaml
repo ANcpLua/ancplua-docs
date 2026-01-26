@@ -2,6 +2,11 @@ openapi: 3.1.0
 info:
   title: QYL Observability API
   version: '2025-01-01'
+servers:
+  - url: https://qyl-api-production.up.railway.app
+    description: Production (Railway)
+  - url: http://localhost:5100
+    description: Local development
 tags:
   - name: Streaming
   - name: Traces
@@ -6513,10 +6518,3 @@ components:
           type: string
           description: Cursor
       description: Trace search query
-servers:
-  - url: https://api.staging.qyl.dev
-    description: QYL Staging API
-    variables: {}
-  - url: https://api.qyl.dev
-    description: QYL Production API
-    variables: {}

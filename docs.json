@@ -29,7 +29,7 @@
     "playground": {
       "mode": "show"
     },
-    "baseUrl": "http://localhost:5100"
+    "baseUrl": "https://qyl-api-production.up.railway.app"
   },
   "navigation": {
     "tabs": [

@@ -11,16 +11,15 @@ The qyl API provides programmatic access to telemetry data collected by the qyl 
 Fetch the 10 most recent traces:
 
 ```bash
-curl "https://api.qyl.dev/v1/traces?limit=10"
+curl "https://qyl-api-production.up.railway.app/v1/traces?limit=10"
 ```
 
 ## Base URLs
 
-| Environment | URL                           | Description              |
-| ----------- | ----------------------------- | ------------------------ |
-| Production  | `https://api.qyl.dev`         | Production API           |
-| Staging     | `https://api.staging.qyl.dev` | Staging for testing      |
-| Local       | `http://localhost:5100`       | Local collector instance |
+| Environment | URL                                         | Description              |
+| ----------- | ------------------------------------------- | ------------------------ |
+| Production  | `https://qyl-api-production.up.railway.app` | Production API (Railway) |
+| Local       | `http://localhost:5100`                     | Local collector instance |
 
 ## Authentication
 
@@ -77,7 +76,7 @@ All list endpoints support cursor-based pagination:
 
 <CodeGroup>
     ```bash Request
-    curl "https://api.qyl.dev/v1/traces?limit=50"
+    curl "https://qyl-api-production.up.railway.app/v1/traces?limit=50"
     ```
 
     ```json Response
@@ -89,7 +88,7 @@ All list endpoints support cursor-based pagination:
     ```
 
     ```bash Next Page
-    curl "https://api.qyl.dev/v1/traces?limit=50&cursor=eyJpZCI6IjEyMyJ9"
+    curl "https://qyl-api-production.up.railway.app/v1/traces?limit=50&cursor=eyJpZCI6IjEyMyJ9"
     ```
 
 </CodeGroup>
@@ -155,7 +154,7 @@ Errors follow the [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) Prob
 Subscribe to telemetry events in real-time using Server-Sent Events (SSE):
 
 ```bash
-curl -N "https://api.qyl.dev/v1/stream/events?types=traces,logs"
+curl -N "https://qyl-api-production.up.railway.app/v1/stream/events?types=traces,logs"
 ```
 
 Events are delivered as JSON with a `type` discriminator:
