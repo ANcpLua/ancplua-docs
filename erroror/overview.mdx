@@ -46,7 +46,13 @@ public static class TodoEndpoints
     }
 }
 
-// Register in Program.cs
+// Register services (Program.cs)
+builder.Services.AddErrorOrEndpoints()
+    .UseJsonContext<AppJsonSerializerContext>()
+    .WithCamelCase()
+    .WithIgnoreNulls();
+
+// Map endpoints
 app.MapErrorOrEndpoints();
 ```
 

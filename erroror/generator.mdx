@@ -226,6 +226,46 @@ private static Task<IResult> Invoke_Ep1_Core(HttpContext ctx)
 }
 ```
 
+## Service Registration
+
+The builder pattern follows ASP.NET Core conventions (like `AddRazorComponents()`):
+
+```csharp
+// Program.cs
+builder.Services.AddErrorOrEndpoints()
+    .UseJsonContext<AppJsonSerializerContext>()
+    .WithCamelCase()
+    .WithIgnoreNulls();
+```
+
+### Available Methods
+
+| Method                       | Purpose                                     |
+| ---------------------------- | ------------------------------------------- |
+| `UseJsonContext<TContext>()` | Register AOT-compatible JSON context        |
+| `WithCamelCase(bool)`        | Use camelCase for JSON properties (default) |
+| `WithIgnoreNulls(bool)`      | Ignore null values in JSON (default)        |
+
+<Note>
+  Calling `MapErrorOrEndpoints()` without `AddErrorOrEndpoints()` throws an
+  `InvalidOperationException` with a clear error message.
+</Note>
+
+## Endpoint Mapping
+
+`MapErrorOrEndpoints()` returns an `IEndpointConventionBuilder` for global configuration:
+
+```csharp
+// Apply conventions to ALL ErrorOr endpoints
+app.MapErrorOrEndpoints()
+    .RequireAuthorization()           // All endpoints require auth
+    .RequireRateLimiting("api")       // Rate limiting for all
+    .RequireCors("Production")        // CORS policy
+    .WithGroupName("v1");             // OpenAPI grouping
+```
+
+This follows ASP.NET Core patterns like `MapRazorComponents()`.
+
 ## API Versioning
 
 Supports `Asp.Versioning.Http`:
