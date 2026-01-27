@@ -12,13 +12,14 @@ ANcpLua.Analyzers enforces code quality and prevents common bugs. Included autom
 | Category          | Rules | Examples                                                         |
 | ----------------- | ----- | ---------------------------------------------------------------- |
 | Design            | 4     | Primary constructor patterns, type partialness                   |
-| Usage             | 12    | Span comparisons, IXmlSerializable, static lambdas, Roslyn utils |
+| Usage             | 17    | Span comparisons, IXmlSerializable, static lambdas, Roslyn utils |
 | Style             | 3     | Pattern matching, null-guard normalization                       |
 | ASP.NET Core      | 5     | Form binding, parameter validation                               |
 | OpenTelemetry     | 2     | Semantic conventions, schema URLs                                |
 | Threading         | 1     | Lock statement best practices                                    |
-| Reliability       | 1     | Division by zero prevention                                      |
+| Reliability       | 3     | Division by zero, trim/AOT safety                                |
 | VersionManagement | 2     | Hardcoded version, Version.props import                          |
+| AOT/Trim Safety   | 4     | AotTest return codes, TrimSafe/AotSafe violations                |
 
 ## Rules
 
@@ -54,6 +55,19 @@ ANcpLua.Analyzers enforces code quality and prevents common bugs. Included autom
 | [AL0029](/analyzers/rules/AL0029) | Usage             | Use HasAttribute() for attribute checks                 |   Info   |  -  |
 | [AL0030](/analyzers/rules/AL0030) | Usage             | Use type hierarchy extensions                           |   Info   |  -  |
 | [AL0031](/analyzers/rules/AL0031) | Usage             | Use operation extensions                                |   Info   |  -  |
+| [AL0032](/analyzers/rules/AL0032) | Usage             | Use OrEmpty() extension                                 |   Info   |  -  |
+| [AL0033](/analyzers/rules/AL0033) | Usage             | Use ToImmutableArrayOrEmpty() extension                 |   Info   |  -  |
+| [AL0034](/analyzers/rules/AL0034) | Usage             | Use WhereNotNull() extension                            |   Info   |  -  |
+| [AL0035](/analyzers/rules/AL0035) | Usage             | Use GetFullyQualifiedName/GetMetadataName()             |   Info   |  -  |
+| [AL0036](/analyzers/rules/AL0036) | Usage             | Use Guard.NotNull() extension                           | Warning  |  -  |
+| [AL0037](/analyzers/rules/AL0037) | Usage             | Use TryParse extensions                                 | Warning  |  -  |
+| [AL0038](/analyzers/rules/AL0038) | Usage             | Use GetOrNull/GetOrDefault extensions                   | Warning  |  -  |
+| [AL0039](/analyzers/rules/AL0039) | Usage             | Use StringComparison extensions                         | Warning  |  -  |
+| [AL0040](/analyzers/rules/AL0040) | Usage             | Use attribute argument extensions                       | Warning  |  -  |
+| [AL0041](/analyzers/rules/AL0041) | AOT/Trim          | [AotTest]/[TrimTest] must return int                    |  Error   |  -  |
+| [AL0042](/analyzers/rules/AL0042) | AOT/Trim          | [AotTest]/[TrimTest] should return 100                  | Warning  |  -  |
+| [AL0043](/analyzers/rules/AL0043) | Reliability       | [TrimSafe] violates trim safety                         | Warning  |  -  |
+| [AL0044](/analyzers/rules/AL0044) | Reliability       | [AotSafe] violates AOT safety                           | Warning  |  -  |
 
 ## Refactorings
 

@@ -1,0 +1,52 @@
+---
+title: 'AL0035 - Use GetFullyQualifiedName/GetMetadataName()'
+sidebarTitle: 'AL0035'
+description: Replace ToDisplayString() with semantic name extensions
+icon: 'shield-check'
+---
+
+Source: [AL0035UseToDisplayStringExtensionsAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0035UseToDisplayStringExtensionsAnalyzer.cs)
+
+## Description
+
+Using `ToDisplayString()` with format options is verbose. ANcpLua.Roslyn.Utilities provides clearer alternatives for common symbol name formats.
+
+## Bad Code
+
+```csharp
+using Microsoft.CodeAnalysis;
+
+// Verbose display format
+var fqn = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+var metadata = symbol.ToDisplayString(
+    new SymbolDisplayFormat(typeQualificationStyle: ...));
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clear intent
+var fqn = symbol.GetFullyQualifiedName();
+var metadata = symbol.GetMetadataName();
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0035.severity = suggestion
+```
+
+## Notes
+
+- `GetFullyQualifiedName()` - returns `global::Namespace.Type` format
+- `GetMetadataName()` - returns assembly metadata name format
+- Both are common operations in Roslyn analyzer development

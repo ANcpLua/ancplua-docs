@@ -1,0 +1,52 @@
+---
+title: 'AL0040 - Use attribute extensions'
+sidebarTitle: 'AL0040'
+description: Replace direct AttributeData access with GetConstructorArgument/GetNamedArgument extensions
+icon: 'shield-check'
+---
+
+Source: [AL0040UseAttributeExtensionsAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0040UseAttributeExtensionsAnalyzer.cs)
+
+## Description
+
+Direct access to `AttributeData.ConstructorArguments[i].Value` is verbose and error-prone. ANcpLua.Roslyn.Utilities provides typed extraction extensions.
+
+## Bad Code
+
+```csharp
+using Microsoft.CodeAnalysis;
+
+// Verbose attribute argument access
+var typeArg = (ITypeSymbol?)attr.ConstructorArguments[0].Value;
+var name = attr.NamedArguments.FirstOrDefault(x => x.Key == "Name").Value.Value as string;
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Type-safe extraction
+var typeArg = attr.GetConstructorArgument<ITypeSymbol>(0);
+var name = attr.GetNamedArgument<string>("Name");
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0040.severity = warning
+```
+
+## Notes
+
+- `GetConstructorArgument<T>(index)` - type-safe positional argument extraction
+- `GetNamedArgument<T>(name)` - type-safe named argument extraction
+- Handles null and type conversion gracefully
+- Common pattern in Roslyn analyzer development

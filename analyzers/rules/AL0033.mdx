@@ -1,0 +1,49 @@
+---
+title: 'AL0033 - Use ToImmutableArrayOrEmpty()'
+sidebarTitle: 'AL0033'
+description: Replace nullable ToImmutableArray patterns with ToImmutableArrayOrEmpty() extension
+icon: 'shield-check'
+---
+
+Source: [AL0033UseToImmutableArrayOrEmptyAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0033UseToImmutableArrayOrEmptyAnalyzer.cs)
+
+## Description
+
+The pattern `?.ToImmutableArray() ?? ImmutableArray<T>.Empty` is verbose. ANcpLua.Roslyn.Utilities provides `ToImmutableArrayOrEmpty()` for cleaner conversion.
+
+## Bad Code
+
+```csharp
+using System.Collections.Immutable;
+
+// Verbose nullable pattern
+var result = items?.ToImmutableArray() ?? ImmutableArray<string>.Empty;
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean extension
+var result = items.ToImmutableArrayOrEmpty();
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0033.severity = suggestion
+```
+
+## Notes
+
+- Handles null input gracefully
+- Returns `ImmutableArray<T>.Empty` for null
+- Common pattern in Roslyn analyzer development

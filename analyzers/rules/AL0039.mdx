@@ -1,0 +1,55 @@
+---
+title: 'AL0039 - Use StringComparison extensions'
+sidebarTitle: 'AL0039'
+description: Replace string methods with StringComparison parameter using named extensions
+icon: 'shield-check'
+---
+
+Source: [AL0039UseStringComparisonExtensionsAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0039UseStringComparisonExtensionsAnalyzer.cs)
+
+## Description
+
+String methods with `StringComparison` enum parameters are less readable. ANcpLua.Roslyn.Utilities provides named extension methods for clearer intent.
+
+## Bad Code
+
+```csharp
+// Verbose StringComparison parameters
+if (value.Equals("Warning", StringComparison.OrdinalIgnoreCase)) { }
+if (path.StartsWith("/api/", StringComparison.Ordinal)) { }
+if (text.Contains("error", StringComparison.OrdinalIgnoreCase)) { }
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clear intent with named extensions
+if (value.EqualsIgnoreCase("Warning")) { }
+if (path.StartsWithOrdinal("/api/")) { }
+if (text.ContainsIgnoreCase("error")) { }
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0039.severity = warning
+```
+
+## Available Extensions
+
+| Method     | Ordinal               | IgnoreCase               |
+| ---------- | --------------------- | ------------------------ |
+| Equals     | `EqualsOrdinal()`     | `EqualsIgnoreCase()`     |
+| StartsWith | `StartsWithOrdinal()` | `StartsWithIgnoreCase()` |
+| EndsWith   | `EndsWithOrdinal()`   | `EndsWithIgnoreCase()`   |
+| Contains   | `ContainsOrdinal()`   | `ContainsIgnoreCase()`   |
+| IndexOf    | `IndexOfOrdinal()`    | `IndexOfIgnoreCase()`    |

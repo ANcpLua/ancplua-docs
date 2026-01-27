@@ -4,7 +4,7 @@ description: Complete reference for all ANcpLua.Analyzers diagnostic rules
 icon: 'shield-check'
 ---
 
-ANcpLua.Analyzers provides 27 diagnostic rules and 2 refactorings for C# code quality, organized by category.
+ANcpLua.Analyzers provides 44 diagnostic rules and 2 refactorings for C# code quality, organized by category.
 
 ## Design Rules
 
@@ -71,6 +71,33 @@ ANcpLua.Analyzers provides 27 diagnostic rules and 2 refactorings for C# code qu
 | [AL0022](/analyzers/rules/AL0022) | Error    | Mixed IFormCollection and DTO form binding unsupported          |
 | [AL0023](/analyzers/rules/AL0023) | Error    | Type cannot be form-bound (abstract, interface, no constructor) |
 | [AL0024](/analyzers/rules/AL0024) | Error    | [FromForm] and [FromBody] conflict on same method               |
+
+## Roslyn Utilities Rules
+
+| Rule                              | Severity | Description                                                 |
+| --------------------------------- | -------- | ----------------------------------------------------------- |
+| [AL0028](/analyzers/rules/AL0028) | Info     | Use IsEqualTo instead of SymbolEqualityComparer.Equals      |
+| [AL0029](/analyzers/rules/AL0029) | Info     | Use HasAttribute instead of GetAttributes() patterns        |
+| [AL0030](/analyzers/rules/AL0030) | Info     | Use Implements/InheritsFrom instead of type hierarchy loops |
+| [AL0031](/analyzers/rules/AL0031) | Info     | Use IsMethodNamed/TryGetConstantValue extensions            |
+| [AL0032](/analyzers/rules/AL0032) | Info     | Use OrEmpty() instead of null-coalescing                    |
+| [AL0033](/analyzers/rules/AL0033) | Info     | Use ToImmutableArrayOrEmpty() extension                     |
+| [AL0034](/analyzers/rules/AL0034) | Info     | Use WhereNotNull() instead of Where(x => x != null)         |
+| [AL0035](/analyzers/rules/AL0035) | Info     | Use GetFullyQualifiedName/GetMetadataName()                 |
+| [AL0036](/analyzers/rules/AL0036) | Warning  | Use Guard.NotNull() instead of throw pattern                |
+| [AL0037](/analyzers/rules/AL0037) | Warning  | Use TryParseInt32/Guid/etc. extensions                      |
+| [AL0038](/analyzers/rules/AL0038) | Warning  | Use GetOrNull/GetOrDefault instead of TryGetValue           |
+| [AL0039](/analyzers/rules/AL0039) | Warning  | Use EqualsIgnoreCase/StartsWithOrdinal extensions           |
+| [AL0040](/analyzers/rules/AL0040) | Warning  | Use GetConstructorArgument/GetNamedArgument extensions      |
+
+## AOT/Trim Safety Rules
+
+| Rule                              | Severity | Description                                              |
+| --------------------------------- | -------- | -------------------------------------------------------- |
+| [AL0041](/analyzers/rules/AL0041) | Error    | [AotTest]/[TrimTest] must return int                     |
+| [AL0042](/analyzers/rules/AL0042) | Warning  | [AotTest]/[TrimTest] should return 100 on success        |
+| [AL0043](/analyzers/rules/AL0043) | Warning  | [TrimSafe] code must not call [RequiresUnreferencedCode] |
+| [AL0044](/analyzers/rules/AL0044) | Warning  | [AotSafe] code must not call [RequiresDynamicCode]       |
 
 ## Refactorings
 

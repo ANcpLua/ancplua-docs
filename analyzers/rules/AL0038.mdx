@@ -1,0 +1,49 @@
+---
+title: 'AL0038 - Use GetOrNull/GetOrDefault'
+sidebarTitle: 'AL0038'
+description: Replace TryGetValue ternary patterns with dictionary extensions
+icon: 'shield-check'
+---
+
+Source: [AL0038UseGetOrNullAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0038UseGetOrNullAnalyzer.cs)
+
+## Description
+
+The pattern `dict.TryGetValue(key, out var v) ? v : null` is verbose. ANcpLua.Roslyn.Utilities provides cleaner dictionary access extensions.
+
+## Bad Code
+
+```csharp
+// Verbose TryGetValue patterns
+var value = dict.TryGetValue(key, out var v) ? v : null;
+var item = cache.TryGetValue(id, out var i) ? i : default;
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean extension methods
+var value = dict.GetOrNull(key);
+var item = cache.GetOrDefault(id);
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0038.severity = warning
+```
+
+## Notes
+
+- `GetOrNull()` - returns `null` for missing keys (reference types)
+- `GetOrDefault()` - returns `default(T)` for missing keys
+- Works with `Dictionary<K,V>`, `IDictionary<K,V>`, `IReadOnlyDictionary<K,V>`

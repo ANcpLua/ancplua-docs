@@ -1,0 +1,68 @@
+---
+title: 'AL0042 - AotTest should return 100'
+sidebarTitle: 'AL0042'
+description: '[AotTest]/[TrimTest] methods should return 100 on success by convention'
+icon: 'shield-check'
+---
+
+Source: [AL0042AotTestExitCode100Analyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0042AotTestExitCode100Analyzer.cs)
+
+## Description
+
+By convention, AOT/Trim test methods should return 100 to indicate success. Other values are reserved for failure conditions.
+
+## Bad Code
+
+```csharp
+[AotTest]
+public int TestMethod() {
+    // Test logic
+    return 0;  // Warning: use 100 for success
+}
+
+[TrimTest]
+public static int RunTest() {
+    return 1;  // Warning: non-standard success code
+}
+```
+
+## Good Code
+
+```csharp
+[AotTest]
+public int TestMethod() {
+    // Test logic
+    return 100;  // Convention: 100 = success
+}
+
+[TrimTest]
+public static int RunTest() {
+    try {
+        // Test logic
+        return 100;  // Success
+    } catch {
+        return 1;  // Failure
+    }
+}
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0042.severity = warning
+```
+
+## Exit Code Convention
+
+| Code | Meaning                             |
+| ---- | ----------------------------------- |
+| 100  | Success                             |
+| 1-99 | Test failure (specific error codes) |
+| 101+ | Test infrastructure error           |

@@ -1,0 +1,49 @@
+---
+title: 'AL0034 - Use WhereNotNull()'
+sidebarTitle: 'AL0034'
+description: Replace Where(x => x != null) with WhereNotNull() extension
+icon: 'shield-check'
+---
+
+Source: [AL0034UseWhereNotNullAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0034UseWhereNotNullAnalyzer.cs)
+
+## Description
+
+Filtering null values with `Where(x => x != null)` is a common pattern that can be simplified using the `WhereNotNull()` extension.
+
+## Bad Code
+
+```csharp
+// Verbose null filtering
+var nonNull = items.Where(x => x != null);
+var filtered = symbols.Where(s => s is not null);
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean extension
+var nonNull = items.WhereNotNull();
+var filtered = symbols.WhereNotNull();
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0034.severity = suggestion
+```
+
+## Notes
+
+- Also changes the return type from `IEnumerable<T?>` to `IEnumerable<T>`
+- Eliminates nullable warnings in subsequent code
+- Clearer intent than explicit null check

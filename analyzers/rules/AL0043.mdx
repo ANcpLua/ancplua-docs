@@ -1,0 +1,63 @@
+---
+title: 'AL0043 - TrimSafe violation'
+sidebarTitle: 'AL0043'
+description: '[TrimSafe] code must not call methods with [RequiresUnreferencedCode]'
+icon: 'shield-check'
+---
+
+Source: [AL0043TrimSafeViolationAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0043TrimSafeViolationAnalyzer.cs)
+
+## Description
+
+Code marked with `[TrimSafe]` guarantees it will work correctly in trimmed applications. Calling methods with `[RequiresUnreferencedCode]` violates this guarantee because those methods may fail at runtime when types are trimmed.
+
+## Bad Code
+
+```csharp
+[TrimSafe]
+public void ProcessData(object data) {
+    // Warning: violates trim safety
+    var json = JsonSerializer.Serialize(data);  // Uses reflection
+}
+
+[TrimSafe]
+public T CreateInstance<T>() where T : new() {
+    // Warning: Activator.CreateInstance uses reflection
+    return Activator.CreateInstance<T>();
+}
+```
+
+## Good Code
+
+```csharp
+[TrimSafe]
+public void ProcessData<T>(T data) {
+    // Use source-generated serializer
+    var json = JsonSerializer.Serialize(data, MyJsonContext.Default.GetTypeInfo<T>());
+}
+
+[TrimSafe]
+public T CreateInstance<T>() where T : new() {
+    // Direct constructor call - trim safe
+    return new T();
+}
+```
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0043.severity = warning
+```
+
+## Notes
+
+- Trimming removes unused code to reduce binary size
+- Reflection-based code may fail when referenced types are trimmed
+- Use source generators instead of reflection for trim-safe code

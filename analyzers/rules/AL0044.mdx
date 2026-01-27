@@ -1,0 +1,63 @@
+---
+title: 'AL0044 - AotSafe violation'
+sidebarTitle: 'AL0044'
+description: '[AotSafe] code must not call methods with [RequiresDynamicCode]'
+icon: 'shield-check'
+---
+
+Source: [AL0044AotSafeViolationAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0044AotSafeViolationAnalyzer.cs)
+
+## Description
+
+Code marked with `[AotSafe]` guarantees it will work correctly in AOT-compiled applications. Calling methods with `[RequiresDynamicCode]` violates this guarantee because those methods rely on runtime code generation which is not available in AOT scenarios.
+
+## Bad Code
+
+```csharp
+[AotSafe]
+public void ProcessItems<T>(IEnumerable<T> items) {
+    // Warning: violates AOT safety
+    var array = items.ToArray();  // May use dynamic code for T[]
+}
+
+[AotSafe]
+public object CreateProxy(Type interfaceType) {
+    // Warning: dynamic proxy generation not available in AOT
+    return DispatchProxy.Create(interfaceType, typeof(MyProxy));
+}
+```
+
+## Good Code
+
+```csharp
+[AotSafe]
+public void ProcessItems(IEnumerable<string> items) {
+    // Concrete type - AOT safe
+    var array = items.ToArray();
+}
+
+[AotSafe]
+public IMyInterface CreateService() {
+    // Direct instantiation - AOT safe
+    return new MyImplementation();
+}
+```
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0044.severity = warning
+```
+
+## Notes
+
+- AOT (Ahead-of-Time) compilation generates native code at build time
+- Dynamic code generation (Reflection.Emit, Expression.Compile) is not available
+- Use concrete types and source generators for AOT-compatible code

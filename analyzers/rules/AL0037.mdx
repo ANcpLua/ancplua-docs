@@ -1,0 +1,58 @@
+---
+title: 'AL0037 - Use TryParse extensions'
+sidebarTitle: 'AL0037'
+description: Replace verbose TryParse ternary patterns with extension methods
+icon: 'shield-check'
+---
+
+Source: [AL0037UseTryParseExtensionsAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0037UseTryParseExtensionsAnalyzer.cs)
+
+## Description
+
+The pattern `int.TryParse(s, out var v) ? v : null` is verbose. ANcpLua.Roslyn.Utilities provides typed TryParse extensions.
+
+## Bad Code
+
+```csharp
+// Verbose TryParse patterns
+var number = int.TryParse(input, out var n) ? n : null;
+var guid = Guid.TryParse(input, out var g) ? g : default;
+var date = DateTime.TryParse(input, out var d) ? d : null;
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean extension methods
+var number = input.TryParseInt32();
+var guid = input.TryParseGuid();
+var date = input.TryParseDateTime();
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0037.severity = warning
+```
+
+## Supported Types
+
+| Type     | Extension            |
+| -------- | -------------------- |
+| int      | `TryParseInt32()`    |
+| long     | `TryParseInt64()`    |
+| double   | `TryParseDouble()`   |
+| decimal  | `TryParseDecimal()`  |
+| bool     | `TryParseBool()`     |
+| Guid     | `TryParseGuid()`     |
+| DateTime | `TryParseDateTime()` |
+| TimeSpan | `TryParseTimeSpan()` |

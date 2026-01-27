@@ -1,0 +1,51 @@
+---
+title: 'AL0032 - Use OrEmpty()'
+sidebarTitle: 'AL0032'
+description: Replace null-coalescing with empty collections using OrEmpty() extension
+icon: 'shield-check'
+---
+
+Source: [AL0032UseOrEmptyAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0032UseOrEmptyAnalyzer.cs)
+
+## Description
+
+Null-coalescing with empty collections is verbose. ANcpLua.Roslyn.Utilities provides the `OrEmpty()` extension for cleaner null handling.
+
+## Bad Code
+
+```csharp
+// Verbose null-coalescing patterns
+var items = GetItems() ?? Array.Empty<string>();
+var list = GetList() ?? new List<int>();
+var enumerable = GetEnumerable() ?? Enumerable.Empty<T>();
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+// Clean OrEmpty() extension
+var items = GetItems().OrEmpty();
+var list = GetList().OrEmpty();
+var enumerable = GetEnumerable().OrEmpty();
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0032.severity = suggestion
+```
+
+## Notes
+
+- Works with arrays, lists, and any `IEnumerable<T>`
+- Returns empty collection of the same type when null
+- Reduces boilerplate in LINQ chains

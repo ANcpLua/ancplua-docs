@@ -1,0 +1,61 @@
+---
+title: 'AL0041 - AotTest must return int'
+sidebarTitle: 'AL0041'
+description: Methods with [AotTest] or [TrimTest] attributes must return int as exit code
+icon: 'shield-check'
+---
+
+Source: [AL0041AotTestMustReturnIntAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0041AotTestMustReturnIntAnalyzer.cs)
+
+## Description
+
+Methods decorated with `[AotTest]` or `[TrimTest]` attributes must return `int` as their exit code. The test harness expects an integer return value to determine success or failure.
+
+## Bad Code
+
+```csharp
+[AotTest]
+public void TestMethod() {  // Error: returns void
+    // Test logic
+}
+
+[TrimTest]
+public static string RunTest() {  // Error: returns string
+    return "passed";
+}
+```
+
+## Good Code
+
+```csharp
+[AotTest]
+public int TestMethod() {
+    // Test logic
+    return 100;  // Success
+}
+
+[TrimTest]
+public static int RunTest() {
+    // Test logic
+    return 100;  // Success
+}
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0041.severity = error
+```
+
+## Notes
+
+- AOT/Trim tests run as separate processes
+- Exit code determines pass/fail status
+- Convention: return 100 for success (see AL0042)

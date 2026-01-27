@@ -1,0 +1,57 @@
+---
+title: 'AL0036 - Use Guard.NotNull()'
+sidebarTitle: 'AL0036'
+description: Replace null-coalescing throw patterns with Guard.NotNull() extension
+icon: 'shield-check'
+---
+
+Source: [AL0036UseGuardNotNullAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0036UseGuardNotNullAnalyzer.cs)
+
+## Description
+
+The pattern `value ?? throw new ArgumentNullException(nameof(value))` is verbose. ANcpLua.Roslyn.Utilities provides `Guard.NotNull()` for cleaner null validation.
+
+## Bad Code
+
+```csharp
+public class Service {
+    private readonly ILogger _logger;
+
+    public Service(ILogger logger) {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+}
+```
+
+## Good Code
+
+```csharp
+using ANcpLua.Roslyn.Utilities;
+
+public class Service {
+    private readonly ILogger _logger;
+
+    public Service(ILogger logger) {
+        _logger = Guard.NotNull(logger);
+    }
+}
+```
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0036.severity = warning
+```
+
+## Notes
+
+- Automatically uses `CallerArgumentExpression` for parameter name
+- Throws `ArgumentNullException` with correct parameter name
+- Reduces boilerplate in constructors and methods
