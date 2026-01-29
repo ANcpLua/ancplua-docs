@@ -669,6 +669,185 @@ tests/MyGenerator.Tests/
   infrastructure across files.
 </Tip>
 
+## Dynamic Compilation
+
+The `Compile` class provides a fluent API for dynamic compilation in tests, useful for testing code that needs to compile and execute user-provided source code.
+
+### Basic Usage
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing;
+
+// Compile and assert success
+Compile.Source("""
+    public class Calculator
+    {
+        public int Add(int a, int b) => a + b;
+    }
+    """)
+    .WithCommonReferences()
+    .Build()
+    .ShouldSucceed();
+
+// Get assembly directly (throws on failure)
+var assembly = Compile.Source(code).BuildOrThrow();
+
+// Create instance from compiled code
+var calc = Compile.Source(code)
+    .Build()
+    .ShouldSucceed()
+    .CreateInstance<ICalculator>("Calculator");
+```
+
+### Compile Builder Methods
+
+| Method                    | Description                                |
+| ------------------------- | ------------------------------------------ |
+| `Source(code)`            | Create compiler with source code           |
+| `Empty()`                 | Create empty compiler for configuration    |
+| `WithSource(code)`        | Add additional source code                 |
+| `WithSources(codes)`      | Add multiple source files                  |
+| `WithReference<T>()`      | Add reference from type's assembly         |
+| `WithReference(assembly)` | Add reference from assembly                |
+| `WithReference(path)`     | Add reference from file path               |
+| `WithReferences(types)`   | Add references from multiple types         |
+| `WithCommonReferences()`  | Add Console, Linq, Collections references  |
+| `WithAssemblyName(name)`  | Set output assembly name                   |
+| `WithOutputKind(kind)`    | Set output kind                            |
+| `AsExecutable()`          | Configure as console application           |
+| `WithLanguageVersion(v)`  | Set C# language version                    |
+| `WithOptimization()`      | Enable release mode                        |
+| `WithUnsafe()`            | Allow unsafe code                          |
+| `Build()`                 | Build and return `CompileResult`           |
+| `BuildOrThrow()`          | Build and return assembly (throws on fail) |
+
+### CompileResult Properties
+
+| Property      | Description                      |
+| ------------- | -------------------------------- |
+| `Succeeded`   | Whether compilation succeeded    |
+| `Failed`      | Whether compilation failed       |
+| `Assembly`    | Loaded assembly if succeeded     |
+| `Compilation` | CSharpCompilation for inspection |
+| `Diagnostics` | All diagnostics                  |
+| `Errors`      | Error diagnostics only           |
+| `Warnings`    | Warning diagnostics only         |
+
+### CompileResult Query Methods
+
+| Method                         | Description                      |
+| ------------------------------ | -------------------------------- |
+| `HasError(errorId)`            | Check if error with ID exists    |
+| `HasWarning(warningId)`        | Check if warning with ID exists  |
+| `ContainsType(typeName)`       | Check if type exists in assembly |
+| `GetType(name)`                | Get type from assembly           |
+| `GetRequiredType(name)`        | Get type or throw                |
+| `CreateInstance(typeName)`     | Create instance of type          |
+| `CreateInstance<T>(typeName)`  | Create instance cast to T        |
+| `CreateRequiredInstance<T>(t)` | Create instance or throw         |
+| `FormatDiagnostics()`          | Format diagnostics for display   |
+
+### CompileResult Assertions
+
+```csharp
+result
+    .ShouldSucceed()           // Assert compilation succeeded
+    .ShouldHaveNoWarnings()    // Assert no warnings
+    .ShouldContainType("MyNamespace.MyClass");
+
+result.ShouldFail();           // Assert compilation failed
+result.ShouldHaveError("CS0246");
+result.ShouldHaveWarning("CS8618");
+result.ShouldHaveErrors(3);    // At least 3 errors
+```
+
+## Log Testing
+
+The `LogAssert` class provides fluent assertions for `FakeLogCollector` from `Microsoft.Extensions.Logging.Testing`.
+
+### Basic Usage
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing;
+using Microsoft.Extensions.Logging.Testing;
+
+var collector = new FakeLogCollector();
+var logger = new FakeLogger(collector);
+
+// ... code that logs ...
+
+collector
+    .ShouldHaveCount(3)
+    .ShouldContain("started")
+    .ShouldHaveNoErrors();
+```
+
+### Count Assertions
+
+| Method                    | Description        |
+| ------------------------- | ------------------ |
+| `ShouldHaveCount(n)`      | At least N entries |
+| `ShouldHaveExactCount(n)` | Exactly N entries  |
+| `ShouldBeEmpty()`         | No entries         |
+
+### Content Assertions
+
+| Method                             | Description           |
+| ---------------------------------- | --------------------- |
+| `ShouldContain(text, comparison?)` | Contains text         |
+| `ShouldNotContain(text)`           | Does not contain text |
+| `ShouldMatch(pattern)`             | Matches regex pattern |
+
+### Level Assertions
+
+| Method                   | Description           |
+| ------------------------ | --------------------- |
+| `ShouldHaveLevel(level)` | Has log at level      |
+| `ShouldNotHaveLevel(l)`  | No log at level       |
+| `ShouldHaveNoErrors()`   | No Error level logs   |
+| `ShouldHaveNoWarnings()` | No Warning level logs |
+| `ShouldBeClean()`        | No errors or warnings |
+
+### Combined Assertions
+
+```csharp
+collector.ShouldHave(LogLevel.Error, "connection failed");
+```
+
+### Predicate Assertions
+
+```csharp
+collector.ShouldHaveAny(r => r.Exception is not null, "Expected exception log");
+collector.ShouldHaveAll(r => r.Level >= LogLevel.Information);
+collector.ShouldHaveNone(r => r.Message?.Contains("secret") == true);
+```
+
+### Async Waiting
+
+For testing async logging scenarios, use polling assertions:
+
+```csharp
+// Wait for log containing text (5s default timeout)
+await collector.ShouldEventuallyContain("operation completed");
+
+// Wait for count
+await collector.ShouldEventuallyHaveCount(5);
+
+// Wait for log level
+await collector.ShouldEventuallyHaveLevel(LogLevel.Error);
+
+// Custom condition
+await collector.ShouldEventuallySatisfy(
+    logs => logs.Count(r => r.Level == LogLevel.Warning) >= 2,
+    because: "Expected at least 2 warnings",
+    timeout: TimeSpan.FromSeconds(10));
+```
+
+<Tip>
+  Async assertions poll every 25ms and timeout after 5 seconds by default. Pass
+  a custom `timeout` parameter for longer operations.
+</Tip>
+
 ## Integration Testing
 
 For testing that requires real MSBuild execution (SDK features, package behavior, build-time code generation), see [MSBuild Testing](/utilities/msbuild-testing).

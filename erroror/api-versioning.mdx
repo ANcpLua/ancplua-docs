@@ -1,0 +1,297 @@
+---
+title: API Versioning
+sidebarTitle: API Versioning
+description: Full API versioning support with Asp.Versioning.Http integration
+icon: 'code-branch'
+---
+
+ErrorOrX provides full support for ASP.NET Core API versioning through the `Asp.Versioning.Http` package. The generator automatically emits version sets and applies them to endpoints.
+
+<Note>
+  API versioning support was added in **v3.1.0**. Make sure you have the latest
+  version of `ErrorOrX.Generators`.
+</Note>
+
+## Quick Start
+
+```csharp
+using Asp.Versioning;
+using ErrorOrX.Attributes;
+
+[ApiVersion(1.0)]
+[ApiVersion(2.0)]
+public static class TodoApi
+{
+    [Get("/api/todos/{id}")]
+    [MapToApiVersion(1.0)]
+    public static ErrorOr<TodoV1> GetV1(int id) => new TodoV1(id, "Task");
+
+    [Get("/api/todos/{id}")]
+    [MapToApiVersion(2.0)]
+    public static ErrorOr<TodoV2> GetV2(int id, TimeProvider time)
+        => new TodoV2(id, "Task", time.GetUtcNow());
+}
+```
+
+## Installation
+
+```bash
+dotnet add package Asp.Versioning.Http
+```
+
+<Warning>
+  If you use versioning attributes without the `Asp.Versioning.Http` package
+  referenced, the generator emits **EOE052** warning.
+</Warning>
+
+## Attributes
+
+### `[ApiVersion]`
+
+Declares which API versions an endpoint class or method supports.
+
+<CodeGroup>
+```csharp title="Class-level"
+// All endpoints in this class support v1.0 and v2.0
+[ApiVersion(1.0)]
+[ApiVersion(2.0)]
+public static class MyApi { }
+```
+
+```csharp title="Method-level"
+// Override class versions for specific endpoint
+[ApiVersion(3.0)]
+[Get("/v3/resource")]
+public static ErrorOr<Resource> GetV3() => ...
+```
+
+</CodeGroup>
+
+### `[MapToApiVersion]`
+
+Maps a specific endpoint to a specific version. Required when multiple endpoints share the same route but serve different versions.
+
+```csharp
+[ApiVersion(1.0)]
+[ApiVersion(2.0)]
+public static class ProductApi
+{
+    // Both endpoints have the same route, distinguished by version
+    [Get("/api/products")]
+    [MapToApiVersion(1.0)]
+    public static ErrorOr<List<ProductV1>> ListV1() => ...
+
+    [Get("/api/products")]
+    [MapToApiVersion(2.0)]
+    public static ErrorOr<List<ProductV2>> ListV2() => ...
+}
+```
+
+### `[ApiVersionNeutral]`
+
+Marks an endpoint as version-neutral (available on all versions). Use this for infrastructure endpoints like health checks.
+
+```csharp
+[ApiVersionNeutral]
+[Get("/health")]
+public static ErrorOr<string> HealthCheck() => "OK";
+```
+
+<Warning>
+  `[ApiVersionNeutral]` and `[MapToApiVersion]` are mutually exclusive. Using
+  both triggers **EOE050** warning.
+</Warning>
+
+## Version Formats
+
+ErrorOrX supports multiple version formats:
+
+| Format             | Example                         | Description                     |
+| ------------------ | ------------------------------- | ------------------------------- |
+| Numeric            | `[ApiVersion(1.0)]`             | Major.minor numeric version     |
+| Major only         | `[ApiVersion(2)]`               | Major version only              |
+| String with status | `[ApiVersion("1.0-beta")]`      | Version with pre-release status |
+| Preview            | `[ApiVersion("2.0-preview.1")]` | Preview version with iteration  |
+
+```csharp
+// Valid formats
+[ApiVersion(1.0)]
+[ApiVersion(2.5)]
+[ApiVersion("1.0-beta")]
+[ApiVersion("2.0-preview.1")]
+
+// Invalid formats (trigger EOE054)
+[ApiVersion("v1")]        // No "v" prefix
+[ApiVersion("1.0.0.0")]   // Too many segments
+[ApiVersion("latest")]    // Not a version number
+```
+
+## Generated Code
+
+The generator emits version sets and applies them to endpoints:
+
+```csharp
+// Generated version set (created once per unique version combination)
+private static readonly ApiVersionSet __vs1 = app.NewApiVersionSet()
+    .HasApiVersion(new ApiVersion(1, 0))
+    .HasApiVersion(new ApiVersion(2, 0))
+    .Build();
+
+// Applied to endpoint
+app.MapGet("/api/todos/{id}", Invoke_Ep1)
+    .WithApiVersionSet(__vs1)
+    .MapToApiVersion(new ApiVersion(1, 0));
+```
+
+### Version-Neutral Endpoints
+
+```csharp
+// Generated for [ApiVersionNeutral]
+app.MapGet("/health", Invoke_Ep_Health)
+    .WithApiVersionSet(__vsNeutral);
+
+private static readonly ApiVersionSet __vsNeutral = app.NewApiVersionSet()
+    .IsApiVersionNeutral()
+    .Build();
+```
+
+### Deprecated Versions
+
+```csharp
+// Mark a version as deprecated
+[ApiVersion(1.0, Deprecated = true)]
+[ApiVersion(2.0)]
+public static class LegacyApi { }
+
+// Generated
+private static readonly ApiVersionSet __vs2 = app.NewApiVersionSet()
+    .HasDeprecatedApiVersion(new ApiVersion(1, 0))
+    .HasApiVersion(new ApiVersion(2, 0))
+    .Build();
+```
+
+## Service Registration
+
+Register API versioning in your `Program.cs`:
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+// Add API versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(),
+        new HeaderApiVersionReader("X-Api-Version"),
+        new QueryStringApiVersionReader("api-version"));
+});
+
+// Add ErrorOr endpoints
+builder.Services.AddErrorOrEndpoints();
+
+var app = builder.Build();
+app.MapErrorOrEndpoints();
+app.Run();
+```
+
+### Version Reader Options
+
+| Reader                        | Usage                |
+| ----------------------------- | -------------------- |
+| `UrlSegmentApiVersionReader`  | `/api/v1/todos`      |
+| `HeaderApiVersionReader`      | `X-Api-Version: 1.0` |
+| `QueryStringApiVersionReader` | `?api-version=1.0`   |
+
+## Diagnostics
+
+| ID     | Severity | Description                                                             |
+| ------ | -------- | ----------------------------------------------------------------------- |
+| EOE050 | Warning  | `[ApiVersionNeutral]` and `[MapToApiVersion]` are mutually exclusive    |
+| EOE051 | Warning  | `[MapToApiVersion]` references version not declared with `[ApiVersion]` |
+| EOE052 | Warning  | `Asp.Versioning.Http` package not referenced                            |
+| EOE053 | Info     | Endpoint missing versioning when others use it                          |
+| EOE054 | Error    | Invalid API version format                                              |
+
+See [Diagnostics](/erroror/diagnostics#api-versioning-diagnostics-eoe050-eoe059) for detailed examples and fixes.
+
+## OpenAPI Integration
+
+Versioned endpoints automatically include version metadata in OpenAPI documentation:
+
+```json
+{
+  "paths": {
+    "/api/todos/{id}": {
+      "get": {
+        "tags": ["TodoApi"],
+        "operationId": "TodoApi_GetV1",
+        "x-api-version": "1.0"
+      }
+    }
+  }
+}
+```
+
+## Best Practices
+
+<Steps>
+  <Step title="Declare versions at class level">
+    When all endpoints in a class share the same versions, declare them once at
+    the class level.
+  </Step>
+  <Step title="Use MapToApiVersion sparingly">
+    Only use `[MapToApiVersion]` when multiple endpoints share the same route
+    but serve different versions.
+  </Step>
+  <Step title="Mark infrastructure as version-neutral">
+    Use `[ApiVersionNeutral]` for health checks, metrics, and other
+    infrastructure endpoints.
+  </Step>
+  <Step title="Deprecate before removing">
+    Mark old versions as deprecated before removing them to give consumers time
+    to migrate.
+  </Step>
+</Steps>
+
+## Complete Example
+
+```csharp
+using Asp.Versioning;
+using ErrorOrX.Attributes;
+
+[ApiVersion(1.0)]
+[ApiVersion(2.0)]
+public static class OrderApi
+{
+    // Available on v1 only
+    [Get("/api/orders")]
+    [MapToApiVersion(1.0)]
+    public static ErrorOr<List<OrderV1>> ListV1(IOrderService svc)
+        => svc.GetAllV1();
+
+    // Available on v2 only (breaking change: pagination required)
+    [Get("/api/orders")]
+    [MapToApiVersion(2.0)]
+    public static ErrorOr<PagedResult<OrderV2>> ListV2(
+        IOrderService svc,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+        => svc.GetPagedV2(page, pageSize);
+
+    // Available on both versions (no MapToApiVersion)
+    [Get("/api/orders/{id}")]
+    public static ErrorOr<Order> GetById(Guid id, IOrderService svc)
+        => svc.GetById(id);
+}
+
+// Health check: version-neutral
+[ApiVersionNeutral]
+public static class HealthApi
+{
+    [Get("/health")]
+    public static ErrorOr<HealthStatus> Check() => new HealthStatus("Healthy");
+}
+```
