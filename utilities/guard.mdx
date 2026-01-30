@@ -638,13 +638,13 @@ public void SaveFile(string? fileName)
 
 ### Null Validation
 
-| Method                                            | Throws                                       | Description                         |
-| ------------------------------------------------- | -------------------------------------------- | ----------------------------------- |
-| `NotNull<T>(value)`                               | `ArgumentNullException`                      | Validates non-null                  |
-| `NotNullOrElse<T>(value, default)`                | -                                            | Returns value or default            |
-| `NotNullOrElse<T>(value, Func<T>)`                | -                                            | Lazy default evaluation             |
-| `NotNullWithMember<TParam, TMember>(obj, member)` | `ArgumentNullException`, `ArgumentException` | Validates both object and member    |
-| `MemberNotNull<TParam, TMember>(obj, member)`     | `ArgumentException`                          | Validates member of non-null object |
+| Method                                                  | Throws                                       | Description                         |
+| ------------------------------------------------------- | -------------------------------------------- | ----------------------------------- |
+| `NotNull&lt;T&gt;(value)`                               | `ArgumentNullException`                      | Validates non-null                  |
+| `NotNullOrElse&lt;T&gt;(value, default)`                | -                                            | Returns value or default            |
+| `NotNullOrElse&lt;T&gt;(value, Func&lt;T&gt;)`          | -                                            | Lazy default evaluation             |
+| `NotNullWithMember&lt;TParam, TMember&gt;(obj, member)` | `ArgumentNullException`, `ArgumentException` | Validates both object and member    |
+| `MemberNotNull&lt;TParam, TMember&gt;(obj, member)`     | `ArgumentException`                          | Validates member of non-null object |
 
 ### String Validation
 
@@ -663,29 +663,29 @@ public void SaveFile(string? fileName)
 
 ### Collection Validation
 
-| Method                                        | Throws                                       | Description                |
-| --------------------------------------------- | -------------------------------------------- | -------------------------- |
-| `NotNullOrEmpty<T>(collection)`               | `ArgumentNullException`, `ArgumentException` | Validates collection       |
-| `NoDuplicates<T>(IEnumerable<T>)`             | `ArgumentException`                          | Validates no duplicates    |
-| `NoDuplicates<T>(IEnumerable<T>, comparer)`   | `ArgumentException`                          | With custom equality       |
-| `NoDuplicates<T>(IReadOnlyList<T>)`           | `ArgumentNullException`, `ArgumentException` | Validates and returns list |
-| `NoDuplicates<T>(IReadOnlyList<T>, comparer)` | `ArgumentNullException`, `ArgumentException` | With custom equality       |
+| Method                                                    | Throws                                       | Description                |
+| --------------------------------------------------------- | -------------------------------------------- | -------------------------- |
+| `NotNullOrEmpty&lt;T&gt;(collection)`                     | `ArgumentNullException`, `ArgumentException` | Validates collection       |
+| `NoDuplicates&lt;T&gt;(IEnumerable&lt;T&gt;)`             | `ArgumentException`                          | Validates no duplicates    |
+| `NoDuplicates&lt;T&gt;(IEnumerable&lt;T&gt;, comparer)`   | `ArgumentException`                          | With custom equality       |
+| `NoDuplicates&lt;T&gt;(IReadOnlyList&lt;T&gt;)`           | `ArgumentNullException`, `ArgumentException` | Validates and returns list |
+| `NoDuplicates&lt;T&gt;(IReadOnlyList&lt;T&gt;, comparer)` | `ArgumentNullException`, `ArgumentException` | With custom equality       |
 
 ### Value Type Validation
 
-| Method             | Throws              | Description            |
-| ------------------ | ------------------- | ---------------------- |
-| `NotDefault<T>(T)` | `ArgumentException` | Value type not default |
-| `NotEmpty(Guid)`   | `ArgumentException` | Guid is not Guid.Empty |
+| Method                   | Throws              | Description            |
+| ------------------------ | ------------------- | ---------------------- |
+| `NotDefault&lt;T&gt;(T)` | `ArgumentException` | Value type not default |
+| `NotEmpty(Guid)`         | `ArgumentException` | Guid is not Guid.Empty |
 
 ### Set Membership Validation
 
-| Method                       | Throws              | Description                 |
-| ---------------------------- | ------------------- | --------------------------- |
-| `OneOf<T>(T, T[])`           | `ArgumentException` | Value in allowed set        |
-| `OneOf<T>(T, HashSet<T>)`    | `ArgumentException` | O(1) lookup variant         |
-| `NotOneOf<T>(T, T[])`        | `ArgumentException` | Value not in disallowed set |
-| `NotOneOf<T>(T, HashSet<T>)` | `ArgumentException` | O(1) lookup variant         |
+| Method                                   | Throws              | Description                 |
+| ---------------------------------------- | ------------------- | --------------------------- |
+| `OneOf&lt;T&gt;(T, T[])`                 | `ArgumentException` | Value in allowed set        |
+| `OneOf&lt;T&gt;(T, HashSet&lt;T&gt;)`    | `ArgumentException` | O(1) lookup variant         |
+| `NotOneOf&lt;T&gt;(T, T[])`              | `ArgumentException` | Value not in disallowed set |
+| `NotOneOf&lt;T&gt;(T, HashSet&lt;T&gt;)` | `ArgumentException` | O(1) lookup variant         |
 
 ### File System Validation
 
@@ -702,26 +702,26 @@ public void SaveFile(string? fileName)
 
 ### Type Validation
 
-| Method                    | Throws                                       | Description               |
-| ------------------------- | -------------------------------------------- | ------------------------- |
-| `DefinedEnum<T>(value)`   | `ArgumentOutOfRangeException`                | Validates enum is defined |
-| `NotNullableType(type)`   | `ArgumentNullException`, `ArgumentException` | Not Nullable<T>           |
-| `AssignableTo<T>(type)`   | `ArgumentNullException`, `ArgumentException` | Type implements T         |
-| `AssignableFrom<T>(type)` | `ArgumentNullException`, `ArgumentException` | T assignable to type      |
+| Method                          | Throws                                       | Description               |
+| ------------------------------- | -------------------------------------------- | ------------------------- |
+| `DefinedEnum&lt;T&gt;(value)`   | `ArgumentOutOfRangeException`                | Validates enum is defined |
+| `NotNullableType(type)`         | `ArgumentNullException`, `ArgumentException` | Not `Nullable<T>`         |
+| `AssignableTo&lt;T&gt;(type)`   | `ArgumentNullException`, `ArgumentException` | Type implements T         |
+| `AssignableFrom&lt;T&gt;(type)` | `ArgumentNullException`, `ArgumentException` | T assignable to type      |
 
 ### Numeric Validation (int, long, double, decimal)
 
-| Method                        | Throws                        | Description          |
-| ----------------------------- | ----------------------------- | -------------------- |
-| `NotZero(value)`              | `ArgumentOutOfRangeException` | Value != 0           |
-| `NotNegative(value)`          | `ArgumentOutOfRangeException` | Value >= 0           |
-| `Positive(value)`             | `ArgumentOutOfRangeException` | Value > 0            |
-| `NotGreaterThan(value, max)`  | `ArgumentOutOfRangeException` | value ≤ max          |
-| `NotLessThan(value, min)`     | `ArgumentOutOfRangeException` | value ≥ min          |
-| `LessThan(value, max)`        | `ArgumentOutOfRangeException` | value &lt; max       |
-| `GreaterThan(value, min)`     | `ArgumentOutOfRangeException` | value &gt; min       |
-| `InRange<T>(value, min, max)` | `ArgumentOutOfRangeException` | min ≤ value ≤ max    |
-| `ValidIndex(index, count)`    | `ArgumentOutOfRangeException` | 0 ≤ index &lt; count |
+| Method                              | Throws                        | Description          |
+| ----------------------------------- | ----------------------------- | -------------------- |
+| `NotZero(value)`                    | `ArgumentOutOfRangeException` | Value != 0           |
+| `NotNegative(value)`                | `ArgumentOutOfRangeException` | Value >= 0           |
+| `Positive(value)`                   | `ArgumentOutOfRangeException` | Value > 0            |
+| `NotGreaterThan(value, max)`        | `ArgumentOutOfRangeException` | value ≤ max          |
+| `NotLessThan(value, min)`           | `ArgumentOutOfRangeException` | value ≥ min          |
+| `LessThan(value, max)`              | `ArgumentOutOfRangeException` | value &lt; max       |
+| `GreaterThan(value, min)`           | `ArgumentOutOfRangeException` | value &gt; min       |
+| `InRange&lt;T&gt;(value, min, max)` | `ArgumentOutOfRangeException` | min ≤ value ≤ max    |
+| `ValidIndex(index, count)`          | `ArgumentOutOfRangeException` | 0 ≤ index &lt; count |
 
 ### Double-Specific
 
@@ -732,13 +732,13 @@ public void SaveFile(string? fileName)
 
 ### Condition Validation
 
-| Method                                    | Throws                      | Description                     |
-| ----------------------------------------- | --------------------------- | ------------------------------- |
-| `That(condition, message)`                | `ArgumentException`         | Validates condition             |
-| `Satisfies<T>(value, predicate, message)` | `ArgumentException`         | Validates with predicate        |
-| `Unreachable(message?)`                   | `InvalidOperationException` | Marks unreachable code          |
-| `Unreachable<T>(message?)`                | `InvalidOperationException` | For expression contexts         |
-| `UnreachableIf(condition, message?)`      | `InvalidOperationException` | Throws only when condition true |
+| Method                                          | Throws                      | Description                     |
+| ----------------------------------------------- | --------------------------- | ------------------------------- |
+| `That(condition, message)`                      | `ArgumentException`         | Validates condition             |
+| `Satisfies&lt;T&gt;(value, predicate, message)` | `ArgumentException`         | Validates with predicate        |
+| `Unreachable(message?)`                         | `InvalidOperationException` | Marks unreachable code          |
+| `Unreachable&lt;T&gt;(message?)`                | `InvalidOperationException` | For expression contexts         |
+| `UnreachableIf(condition, message?)`            | `InvalidOperationException` | Throws only when condition true |
 
 <Note>
   All validation methods use `CallerArgumentExpressionAttribute` to
