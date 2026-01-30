@@ -64,6 +64,30 @@ var service = Guard.NotNullOrElse(optionalService, DefaultService.Instance);
 
 // Value types
 int count = Guard.NotNullOrElse(maybeCount, 0);
+
+// Lazy evaluation for expensive defaults
+var config = Guard.NotNullOrElse(optionalConfig, () => LoadDefaultConfig());
+```
+
+### Member Validation
+
+Validate an object and its member in one call:
+
+```csharp
+// Validates both config and config.ConnectionString are non-null
+public void Configure(Config? config)
+{
+    var connectionString = Guard.NotNullWithMember(config, config?.ConnectionString);
+    // Throws ArgumentNullException if config is null
+    // Throws ArgumentException if config.ConnectionString is null
+}
+
+// When the parent is known non-null, validate only the member
+public void Process(Config config)
+{
+    var timeout = Guard.MemberNotNull(config, config.Timeout);
+    // Throws ArgumentException if config.Timeout is null
+}
 ```
 
 ## String Validation
@@ -103,10 +127,12 @@ var displayName = Guard.NotNullOrEmptyOrElse(user.DisplayName, user.Username);
 var title = Guard.NotNullOrWhiteSpaceOrElse(article.Title, "Untitled");
 
 // Lazy evaluation for expensive defaults
-var config = Guard.NotNullOrElse(optionalConfig, () => LoadDefaultConfig());
+var config = Guard.NotNullOrEmptyOrElse(optionalConfig, () => LoadDefaultConfig());
 ```
 
 ## Collection Validation
+
+### NotNullOrEmpty
 
 ```csharp
 public void ProcessItems(IReadOnlyCollection<Item>? items)
@@ -119,6 +145,25 @@ public void ProcessItems(IReadOnlyCollection<Item>? items)
     {
         // Process items
     }
+}
+```
+
+### NoDuplicates
+
+Validates that a collection contains no duplicate elements:
+
+```csharp
+public void SetIds(IEnumerable<int> ids)
+{
+    Guard.NoDuplicates(ids);
+    // Throws ArgumentException with "Duplicate value found: {value}"
+}
+
+// IReadOnlyList overload returns the validated list
+public void Process(IReadOnlyList<string>? names)
+{
+    var validNames = Guard.NoDuplicates(names);
+    // Validates non-null AND no duplicates
 }
 ```
 
@@ -152,6 +197,146 @@ public T GetItem(int index)
 }
 ```
 
+## Numeric Validation
+
+All numeric validation methods use `[MethodImpl(AggressiveInlining)]` for hot paths and are available for `int`, `long`, `double`, and `decimal` types.
+
+### Basic Constraints
+
+```csharp
+// Value cannot be zero
+var divisor = Guard.NotZero(value);
+
+// Value must be >= 0
+var count = Guard.NotNegative(value);
+
+// Value must be > 0
+var quantity = Guard.Positive(value);
+```
+
+### Boundary Constraints
+
+```csharp
+// Upper bound (inclusive): value <= max
+var percentage = Guard.NotGreaterThan(value, 100);
+
+// Lower bound (inclusive): value >= min
+var temperature = Guard.NotLessThan(value, -273.15);
+
+// Upper bound (exclusive): value < max
+var index = Guard.LessThan(value, array.Length);
+
+// Lower bound (exclusive): value > min
+var priority = Guard.GreaterThan(value, 0);
+```
+
+### Double-Specific Validation
+
+```csharp
+// Validates value is not NaN
+var result = Guard.NotNaN(calculatedValue);
+
+// Validates value is finite (not NaN or Infinity)
+var coefficient = Guard.Finite(inputValue);
+```
+
+<Note>
+  Double comparison methods (`NotNegative`, `Positive`, etc.) correctly handle
+  NaN values by throwing `ArgumentOutOfRangeException` - NaN is not a valid
+  number.
+</Note>
+
+## File System Validation
+
+### FileExists / DirectoryExists
+
+Validates that a file or directory exists at the specified path:
+
+```csharp
+public void LoadConfig(string? path)
+{
+    var validPath = Guard.FileExists(path);
+    // Throws ArgumentNullException if null
+    // Throws ArgumentException if empty or file doesn't exist
+    var content = File.ReadAllText(validPath);
+}
+
+public void ProcessDirectory(string? path)
+{
+    var validPath = Guard.DirectoryExists(path);
+    foreach (var file in Directory.GetFiles(validPath)) { }
+}
+```
+
+### Path Character Validation
+
+```csharp
+// Validates filename contains no invalid characters
+var fileName = Guard.ValidFileName(name);
+// Throws if name contains characters like: \ / : * ? " < > |
+
+// Nullable variant - returns null if input is null
+var optionalName = Guard.ValidFileNameOrNull(name);
+
+// Validates path contains no invalid characters
+var validPath = Guard.ValidPath(userInput);
+
+// Nullable variant
+var optionalPath = Guard.ValidPathOrNull(userInput);
+```
+
+### Extension Validation
+
+```csharp
+// ValidExtension requires NO leading dot
+var ext = Guard.ValidExtension("txt");      // Returns "txt"
+Guard.ValidExtension(".txt");               // Throws - no leading dot allowed
+Guard.ValidExtension("path/txt");           // Throws - no separators allowed
+
+// NormalizedExtension accepts both and ensures leading dot
+var ext1 = Guard.NormalizedExtension("txt");   // Returns ".txt"
+var ext2 = Guard.NormalizedExtension(".txt");  // Returns ".txt"
+```
+
+## Type Validation
+
+### DefinedEnum
+
+Validates that an enum value is defined:
+
+```csharp
+public void SetStatus(Status status)
+{
+    _status = Guard.DefinedEnum(status);
+    // Throws ArgumentOutOfRangeException for undefined values like (Status)999
+}
+```
+
+### Type Constraints
+
+```csharp
+// Validates type is not Nullable<T>
+public void Register(Type type)
+{
+    Guard.NotNullableType(type);
+    // Throws if type is int?, bool?, etc.
+}
+
+// Validates type implements/inherits from T
+public void RegisterService(Type implementationType)
+{
+    Guard.AssignableTo<IService>(implementationType);
+    // Throws if implementationType doesn't implement IService
+}
+
+// Validates T can be assigned to type
+public void RegisterHandler(Type handlerType)
+{
+    Guard.AssignableFrom<BaseHandler>(handlerType);
+    // Throws if BaseHandler isn't assignable to handlerType
+}
+```
+
 ## Condition Validation
 
 ### That
@@ -181,6 +366,37 @@ _config = Guard.Satisfies(config, c =>
     c.Timeout > TimeSpan.Zero && c.MaxRetries >= 0,
     "Invalid configuration values.");
 ```
+
+## Unreachable Code
+
+Mark code paths that should never execute:
+
+```csharp
+// In statement context
+switch (status)
+{
+    case Status.Active: return "Active";
+    case Status.Inactive: return "Inactive";
+    default: Guard.Unreachable();
+}
+
+// In expression context (switch expressions)
+return status switch
+{
+    Status.Active => "Active",
+    Status.Inactive => "Inactive",
+    _ => Guard.Unreachable<string>()
+};
+
+// With custom message
+Guard.Unreachable("All enum values should be handled");
+```
+
+<Tip>
+  `Unreachable` automatically captures caller info (`CallerMemberName`,
+  `CallerFilePath`, `CallerLineNumber`) to provide detailed exception messages
+  for debugging.
+</Tip>
 
 ## Examples
 
@@ -240,24 +456,103 @@ public class ServerConfig
 }
 ```
 
+### File Processing
+
+```csharp
+public void ProcessFile(string? inputPath, string? outputFileName)
+{
+    // Validate input file exists
+    var input = Guard.FileExists(inputPath);
+
+    // Validate output filename is valid
+    var output = Guard.ValidFileName(outputFileName);
+
+    // Process...
+}
+```
+
 ## API Reference
+
+### Null Validation
+
+| Method                                            | Throws                                       | Description                         |
+| ------------------------------------------------- | -------------------------------------------- | ----------------------------------- |
+| `NotNull<T>(value)`                               | `ArgumentNullException`                      | Validates non-null                  |
+| `NotNullOrElse<T>(value, default)`                | -                                            | Returns value or default            |
+| `NotNullOrElse<T>(value, Func<T>)`                | -                                            | Lazy default evaluation             |
+| `NotNullWithMember<TParam, TMember>(obj, member)` | `ArgumentNullException`, `ArgumentException` | Validates both object and member    |
+| `MemberNotNull<TParam, TMember>(obj, member)`     | `ArgumentException`                          | Validates member of non-null object |
+
+### String Validation
 
 | Method                                            | Throws                                       | Description                   |
 | ------------------------------------------------- | -------------------------------------------- | ----------------------------- |
-| `NotNull<T>(value)`                               | `ArgumentNullException`                      | Validates non-null            |
-| `NotNullOrElse<T>(value, default)`                | -                                            | Returns value or default      |
-| `NotNullOrElse<T>(value, Func<T>)`                | -                                            | Lazy default evaluation       |
 | `NotNullOrEmpty(string)`                          | `ArgumentNullException`, `ArgumentException` | Validates non-null, non-empty |
 | `NotNullOrWhiteSpace(string)`                     | `ArgumentNullException`, `ArgumentException` | Validates has content         |
 | `NotNullOrEmptyOrElse(string, default)`           | -                                            | Returns value or default      |
 | `NotNullOrEmptyOrElse(string, Func<string>)`      | -                                            | Lazy default evaluation       |
 | `NotNullOrWhiteSpaceOrElse(string, default)`      | -                                            | Returns value or default      |
 | `NotNullOrWhiteSpaceOrElse(string, Func<string>)` | -                                            | Lazy default evaluation       |
-| `NotNullOrEmpty<T>(collection)`                   | `ArgumentNullException`, `ArgumentException` | Validates collection          |
-| `InRange<T>(value, min, max)`                     | `ArgumentOutOfRangeException`                | Validates within bounds       |
-| `ValidIndex(index, count)`                        | `ArgumentOutOfRangeException`                | Validates array index         |
-| `That(condition, message)`                        | `ArgumentException`                          | Validates condition           |
-| `Satisfies<T>(value, predicate, message)`         | `ArgumentException`                          | Validates with predicate      |
+
+### Collection Validation
+
+| Method                              | Throws                                       | Description                |
+| ----------------------------------- | -------------------------------------------- | -------------------------- |
+| `NotNullOrEmpty<T>(collection)`     | `ArgumentNullException`, `ArgumentException` | Validates collection       |
+| `NoDuplicates<T>(IEnumerable<T>)`   | `ArgumentException`                          | Validates no duplicates    |
+| `NoDuplicates<T>(IReadOnlyList<T>)` | `ArgumentNullException`, `ArgumentException` | Validates and returns list |
+
+### File System Validation
+
+| Method                      | Throws                                       | Description                   |
+| --------------------------- | -------------------------------------------- | ----------------------------- |
+| `FileExists(path)`          | `ArgumentNullException`, `ArgumentException` | Validates file exists         |
+| `DirectoryExists(path)`     | `ArgumentNullException`, `ArgumentException` | Validates directory exists    |
+| `ValidFileName(name)`       | `ArgumentNullException`, `ArgumentException` | No invalid filename chars     |
+| `ValidFileNameOrNull(name)` | `ArgumentException`                          | Nullable variant              |
+| `ValidPath(path)`           | `ArgumentNullException`, `ArgumentException` | No invalid path chars         |
+| `ValidPathOrNull(path)`     | `ArgumentException`                          | Nullable variant              |
+| `ValidExtension(ext)`       | `ArgumentNullException`, `ArgumentException` | No leading dot, no separators |
+| `NormalizedExtension(ext)`  | `ArgumentNullException`, `ArgumentException` | Ensures leading dot           |
+
+### Type Validation
+
+| Method                    | Throws                                       | Description               |
+| ------------------------- | -------------------------------------------- | ------------------------- |
+| `DefinedEnum<T>(value)`   | `ArgumentOutOfRangeException`                | Validates enum is defined |
+| `NotNullableType(type)`   | `ArgumentNullException`, `ArgumentException` | Not Nullable<T>           |
+| `AssignableTo<T>(type)`   | `ArgumentNullException`, `ArgumentException` | Type implements T         |
+| `AssignableFrom<T>(type)` | `ArgumentNullException`, `ArgumentException` | T assignable to type      |
+
+### Numeric Validation (int, long, double, decimal)
+
+| Method                        | Throws                        | Description         |
+| ----------------------------- | ----------------------------- | ------------------- |
+| `NotZero(value)`              | `ArgumentOutOfRangeException` | Value != 0          |
+| `NotNegative(value)`          | `ArgumentOutOfRangeException` | Value >= 0          |
+| `Positive(value)`             | `ArgumentOutOfRangeException` | Value > 0           |
+| `NotGreaterThan(value, max)`  | `ArgumentOutOfRangeException` | Value <= max        |
+| `NotLessThan(value, min)`     | `ArgumentOutOfRangeException` | Value >= min        |
+| `LessThan(value, max)`        | `ArgumentOutOfRangeException` | Value < max         |
+| `GreaterThan(value, min)`     | `ArgumentOutOfRangeException` | Value > min         |
+| `InRange<T>(value, min, max)` | `ArgumentOutOfRangeException` | min <= value <= max |
+| `ValidIndex(index, count)`    | `ArgumentOutOfRangeException` | 0 <= index < count  |
+
+### Double-Specific
+
+| Method          | Throws                        | Description         |
+| --------------- | ----------------------------- | ------------------- |
+| `NotNaN(value)` | `ArgumentOutOfRangeException` | Value is not NaN    |
+| `Finite(value)` | `ArgumentOutOfRangeException` | Not NaN or Infinity |
+
+### Condition Validation
+
+| Method                                    | Throws                      | Description              |
+| ----------------------------------------- | --------------------------- | ------------------------ |
+| `That(condition, message)`                | `ArgumentException`         | Validates condition      |
+| `Satisfies<T>(value, predicate, message)` | `ArgumentException`         | Validates with predicate |
+| `Unreachable(message?)`                   | `InvalidOperationException` | Marks unreachable code   |
+| `Unreachable<T>(message?)`                | `InvalidOperationException` | For expression contexts  |
 
 <Note>
   All validation methods use `CallerArgumentExpressionAttribute` to

@@ -7,6 +7,20 @@ icon: 'code'
 
 ANcpLua.Roslyn.Utilities provides utilities for building Roslyn analyzers and source generators.
 
+## What's New in v1.19
+
+**Expanded Guard API** - Comprehensive argument validation:
+
+- **Collections**: `NoDuplicates()` for duplicate detection
+- **File System**: `FileExists()`, `DirectoryExists()`, `ValidFileName()`, `ValidPath()`, `ValidExtension()`, `NormalizedExtension()`
+- **Type Validation**: `DefinedEnum()`, `NotNullableType()`, `AssignableTo<T>()`, `AssignableFrom<T>()`
+- **Member Validation**: `NotNullWithMember()`, `MemberNotNull()` for object + member validation
+- **Numeric**: `NotZero`, `NotNegative`, `Positive`, `NotGreaterThan`, `NotLessThan`, `LessThan`, `GreaterThan` (int/long/double/decimal)
+- **Double-specific**: `NotNaN()`, `Finite()` for floating-point edge cases
+- **Unreachable Code**: `Unreachable()`, `Unreachable<T>()` with caller info capture
+
+All numeric methods use `[MethodImpl(AggressiveInlining)]` for hot paths.
+
 ## What's New in v1.18
 
 **API cleanup** - Tightened public surface, renamed methods for clarity:
@@ -38,17 +52,18 @@ dotnet add package ANcpLua.Roslyn.Utilities.Testing
 
 ## Features
 
-| Category          | APIs                                          | Docs                                         |
-| ----------------- | --------------------------------------------- | -------------------------------------------- |
-| Flow Control      | `DiagnosticFlow<T>`, `ReportAndContinue()`    | [DiagnosticFlow](/utilities/diagnostic-flow) |
-| Pattern Matching  | `Match.*` (symbols), `Invoke.*` (operations)  | [Patterns](/utilities/patterns)              |
-| Validation        | `SemanticGuard<T>`, `MustBeAsync()`           | [SemanticGuard](/utilities/semantic-guard)   |
-| Domain Contexts   | `AwaitableContext`, `AspNetContext`           | [Contexts](/utilities/contexts)              |
-| Operations        | `OperationExtensions`, `InvocationExtensions` | [Operations](/utilities/operations)          |
-| Code Generation   | `IndentedStringBuilder`                       | [Codegen](/utilities/codegen)                |
-| Pipeline          | `GroupBy()`, `Batch()`, `Distinct()`          | [Pipeline](/utilities/pipeline)              |
-| Symbol Extensions | `IsEqualTo()`, `HasAttribute()`               | [Symbols](/utilities/symbols)                |
-| Testing           | `Test<TGenerator>.Run()`, caching validation  | [Testing](/utilities/testing)                |
+| Category            | APIs                                          | Docs                                         |
+| ------------------- | --------------------------------------------- | -------------------------------------------- |
+| Flow Control        | `DiagnosticFlow<T>`, `ReportAndContinue()`    | [DiagnosticFlow](/utilities/diagnostic-flow) |
+| Pattern Matching    | `Match.*` (symbols), `Invoke.*` (operations)  | [Patterns](/utilities/patterns)              |
+| Guard Clauses       | `Guard.NotNull()`, `Guard.Positive()`, etc.   | [Guard](/utilities/guard)                    |
+| Semantic Validation | `SemanticGuard<T>`, `MustBeAsync()`           | [SemanticGuard](/utilities/semantic-guard)   |
+| Domain Contexts     | `AwaitableContext`, `AspNetContext`           | [Contexts](/utilities/contexts)              |
+| Operations          | `OperationExtensions`, `InvocationExtensions` | [Operations](/utilities/operations)          |
+| Code Generation     | `IndentedStringBuilder`                       | [Codegen](/utilities/codegen)                |
+| Pipeline            | `GroupBy()`, `Batch()`, `Distinct()`          | [Pipeline](/utilities/pipeline)              |
+| Symbol Extensions   | `IsEqualTo()`, `HasAttribute()`               | [Symbols](/utilities/symbols)                |
+| Testing             | `Test<TGenerator>.Run()`, caching validation  | [Testing](/utilities/testing)                |
 
 ## Quick Example
 
