@@ -30,28 +30,22 @@ dotnet add package ErrorOrX.Generators
 
 ## What's New
 
-{/* prettier-ignore-start */}
-
 <Accordion title="Recent Changes (v3.1+)">
 **Performance:**
 - Fixed N+1 symbol lookup performance issue. `ErrorOrContext` is now created once per compilation instead of once per endpoint, reducing symbol lookups from N x 90 to 90 for N endpoints.
 
 **API Versioning:**
-
 - Full support for `Asp.Versioning.Http` with `[ApiVersion]`, `[MapToApiVersion]`, and `[ApiVersionNeutral]` attributes.
 - New diagnostics EOE050-EOE055 for versioning issues.
 
 **New Diagnostics:**
-
 - EOE055: Warning when multiple method parameters bind to the same route parameter name.
 
 **Bug Fixes:**
-
 - Fixed `NullReferenceException` when error type inference encountered local variables.
 - Added null guards on `AttributeClass` for malformed attributes.
 - Changed route parameter binding to "first wins" semantics for deterministic behavior.
-  </Accordion>
-  {/* prettier-ignore-end */}
+</Accordion>
 
 ## Quick Start
 

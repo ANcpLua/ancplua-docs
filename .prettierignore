@@ -14,3 +14,6 @@ dist/
 
 # Generated files
 llms.txt
+
+# MDX files with JSX components that prettier breaks
+erroror/overview.mdx
