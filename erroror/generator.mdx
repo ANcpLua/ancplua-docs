@@ -11,7 +11,7 @@ The `ErrorOrX.Generators` package provides a Roslyn source generator that conver
 ```csharp
 // You write:
 [Get("/todos/{id}")]
-public static ErrorOr<Todo> GetById(int id) => _db.Find(id) ?? Error.NotFound();
+public static ErrorOr<Todo> GetById(Guid id) => _db.Find(id) ?? Error.NotFound();
 
 // Generator produces:
 app.MapGet("/todos/{id}", Invoke_Ep1)
@@ -25,7 +25,7 @@ private static async Task Invoke_Ep1(HttpContext ctx)
 
 private static Task<IResult> Invoke_Ep1_Core(HttpContext ctx)
 {
-    int id = (int)ctx.Request.RouteValues["id"]!;
+    Guid id = Guid.Parse((string)ctx.Request.RouteValues["id"]!);
     var result = TodoEndpoints.GetById(id);
     if (result.IsError) return Task.FromResult(ToProblem(result.Errors));
     return Task.FromResult(TypedResults.Ok(result.Value));
@@ -385,7 +385,7 @@ public static class TodoEndpoints
 
     [MapToApiVersion("2.0")]
     [Get("/todos/{id}")]
-    public static ErrorOr<Todo> GetByIdV2(int id) => ...
+    public static ErrorOr<Todo> GetByIdV2(Guid id) => ...
 }
 
 // Version-neutral

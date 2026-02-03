@@ -59,7 +59,7 @@ using ErrorOr;
 public static class TodoEndpoints
 {
     [Get("/todos/{id}")]
-    public static ErrorOr<Todo> GetById(int id)
+    public static ErrorOr<Todo> GetById(Guid id)
     {
         var todo = _db.Find(id);
         if (todo is null)
@@ -157,14 +157,14 @@ public static ErrorOr<Created> Create(CreateTodoRequest req)
 }
 
 [Delete("/todos/{id}")]
-public static ErrorOr<Deleted> Delete(int id)
+public static ErrorOr<Deleted> Delete(Guid id)
 {
     _db.Remove(id);
     return Result.Deleted;
 }
 
 [Put("/todos/{id}")]
-public static ErrorOr<Updated> Update(int id, UpdateTodoRequest req)
+public static ErrorOr<Updated> Update(Guid id, UpdateTodoRequest req)
 {
     _db.Update(id, req);
     return Result.Updated;

@@ -116,7 +116,7 @@ public static ErrorOr<Todo> Get() => ...
 
 // ✅ Correct
 [Get("/todos/{id}")]
-public static ErrorOr<Todo> Get(int id) => ...
+public static ErrorOr<Todo> Get(Guid id) => ...
 ```
 
 ### EOE004: Duplicate Route
@@ -124,10 +124,10 @@ public static ErrorOr<Todo> Get(int id) => ...
 ```csharp
 // ❌ Wrong - same route pattern
 [Get("/todos/{id}")]
-public static ErrorOr<Todo> GetById(int id) => ...
+public static ErrorOr<Todo> GetById(Guid id) => ...
 
 [Get("/todos/{todoId}")]  // EOE004: Duplicate of /todos/{id}
-public static ErrorOr<Todo> GetByTodoId(int todoId) => ...
+public static ErrorOr<Todo> GetByTodoId(Guid todoId) => ...
 ```
 
 ### EOE025: Ambiguous Parameter Binding
@@ -237,7 +237,7 @@ builder.Services.AddErrorOrEndpoints()
 // ❌ Warning - duplicate binding to same route parameter
 [Get("/files/{id}")]
 public static ErrorOr<File> Get(
-    [FromRoute(Name = "id")] int fileId,      // Used
+    [FromRoute(Name = "id")] Guid fileId,     // Used
     [FromRoute(Name = "id")] string category) // EOE055: Ignored
 {
     return new File(fileId, category);
@@ -245,5 +245,5 @@ public static ErrorOr<File> Get(
 
 // ✅ Correct - use unique route parameter names
 [Get("/files/{fileId}/{category}")]
-public static ErrorOr<File> Get(int fileId, string category) => ...
+public static ErrorOr<File> Get(Guid fileId, string category) => ...
 ```

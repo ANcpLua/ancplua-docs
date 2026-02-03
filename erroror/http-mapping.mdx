@@ -106,7 +106,7 @@ The generator creates `Results<...>` union types for OpenAPI documentation:
 ```csharp
 // Handler
 [Get("/todos/{id}")]
-public static ErrorOr<Todo> GetById(int id) { ... }
+public static ErrorOr<Todo> GetById(Guid id) { ... }
 
 // Generated union (inferred from possible error types)
 Results<Ok<Todo>, NotFound<ProblemDetails>, InternalServerError<ProblemDetails>>

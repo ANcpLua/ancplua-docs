@@ -24,11 +24,11 @@ public static class TodoApi
 {
     [Get("/api/todos/{id}")]
     [MapToApiVersion(1.0)]
-    public static ErrorOr<TodoV1> GetV1(int id) => new TodoV1(id, "Task");
+    public static ErrorOr<TodoV1> GetV1(Guid id) => new TodoV1(id, "Task");
 
     [Get("/api/todos/{id}")]
     [MapToApiVersion(2.0)]
-    public static ErrorOr<TodoV2> GetV2(int id, TimeProvider time)
+    public static ErrorOr<TodoV2> GetV2(Guid id, TimeProvider time)
         => new TodoV2(id, "Task", time.GetUtcNow());
 }
 ```
