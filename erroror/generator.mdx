@@ -96,42 +96,58 @@ public static ErrorOr<List<Todo>> Search([AsParameters] SearchFilter filter) => 
 
 ## Interface Types with `[ReturnsError]`
 
-Document possible errors on interface or abstract methods for OpenAPI generation:
+<Warning>
+**Without `[ReturnsError]`, your OpenAPI spec is incomplete.**
+
+When an endpoint delegates to a service method, the generator can only see the return type `ErrorOr<T>` - it has no idea what errors that method might return. Your Swagger UI shows only `200 OK` and generic `500`, while your API actually returns `404`, `400`, `403`... Generated API clients miss error handling for real responses.
+
+</Warning>
+
+### The Problem
+
+```csharp
+public interface ITodoService
+{
+    // Generator sees: ErrorOr<Todo>
+    // Generator doesn't know: this can return NotFound, Validation errors
+    ErrorOr<Todo> GetByIdAsync(Guid id, CancellationToken ct);
+}
+
+[Get("/todos/{id}")]
+public static Task<ErrorOr<Todo>> GetById(Guid id, ITodoService svc, CancellationToken ct) =>
+    svc.GetByIdAsync(id, ct);
+
+// ❌ Generated OpenAPI: only 200 OK, 500 Internal Server Error
+// ❌ Swagger UI: misleading - doesn't show 404 is possible
+// ❌ Generated clients: no 404 handling code
+```
+
+### The Solution
+
+Declare possible errors on the interface contract:
 
 ```csharp
 public interface ITodoService
 {
     [ReturnsError(ErrorType.NotFound, "Todo.NotFound")]
-    [ReturnsError(ErrorType.Validation, "Todo.Invalid")]
-    ErrorOr<Todo> GetById(int id);
+    ErrorOr<Todo> GetByIdAsync(Guid id, CancellationToken ct);
 }
 
-[Get("/todos/{id}")]
-public static ErrorOr<Todo> GetById(int id, ITodoService svc) =>
-    svc.GetById(id);
+// ✅ Generated OpenAPI: 200 OK, 404 Not Found, 500 Internal Server Error
+// ✅ Swagger UI: shows all response codes with ProblemDetails schema
+// ✅ Generated clients: proper error handling for each status code
 ```
 
-The generator reads `[ReturnsError]` attributes from interface/abstract methods to build the complete `Results<...>` union:
+The generator reads `[ReturnsError]` and includes the corresponding `TypedResult` in the `Results<...>` union:
 
 ```csharp
-// Generated OpenAPI union
-Results<Ok<Todo>, NotFound<ProblemDetails>, ValidationProblem>
+// Generated
+Results<Ok<Todo>, NotFound<ProblemDetails>>
 ```
-
-### Why This Matters
-
-When calling service methods that return `ErrorOr<T>`, the generator:
-
-1. Inspects the interface/abstract method signature
-2. Collects all `[ReturnsError]` attributes
-3. Includes corresponding TypedResults in the `Results<...>` union
-4. Produces accurate OpenAPI documentation with all possible response codes
-
-Without `[ReturnsError]`, the generator only knows about the success type `T`, not possible error types.
 
 ### Multiple Error Types
 
-You can declare multiple possible errors:
+Real-world operations have multiple failure modes. Declare them all:
 
 ```csharp
 public interface IOrderService
@@ -139,15 +155,17 @@ public interface IOrderService
     [ReturnsError(ErrorType.NotFound, "Order.NotFound")]
     [ReturnsError(ErrorType.Forbidden, "Order.AccessDenied")]
     [ReturnsError(ErrorType.Conflict, "Order.AlreadyShipped")]
-    ErrorOr<Order> Ship(int orderId);
+    ErrorOr<Order> ShipAsync(Guid orderId, CancellationToken ct);
 }
 
 [Post("/orders/{orderId}/ship")]
-public static ErrorOr<Order> Ship(int orderId, IOrderService svc) =>
-    svc.Ship(orderId);
+public static Task<ErrorOr<Order>> Ship(Guid orderId, IOrderService svc, CancellationToken ct) =>
+    svc.ShipAsync(orderId, ct);
 
-// Generates: Results<Ok<Order>, NotFound<ProblemDetails>, ForbiddenHttpResult, Conflict<ProblemDetails>>
+// Generated: Results<Ok<Order>, NotFound<ProblemDetails>, ForbiddenHttpResult, Conflict<ProblemDetails>>
 ```
+
+Now your OpenAPI spec is **accurate**: clients know shipping can fail with 404 (order doesn't exist), 403 (not authorized), or 409 (already shipped).
 
 ## Middleware Attributes
 
