@@ -1,0 +1,82 @@
+---
+title: 'AL0052 - AotSafe code must not call AotUnsafe code'
+sidebarTitle: 'AL0052'
+description: Code marked with [AotSafe] must not call methods marked with [AotUnsafe]
+icon: 'shield-xmark'
+---
+
+Source: [AL0052AotSafeCallsAotUnsafeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0052AotSafeCallsAotUnsafeAnalyzer.cs)
+
+## Description
+
+Code marked with `[AotSafe]` guarantees it will work correctly in AOT-compiled applications. Calling methods marked with `[AotUnsafe]` violates this guarantee because `[AotUnsafe]` code explicitly declares it requires JIT compilation.
+
+This analyzer complements AL0044 which checks for `[RequiresDynamicCode]` calls. While AL0044 catches BCL-annotated unsafe methods, this analyzer catches user-defined unsafe code marked with `[AotUnsafe]`.
+
+## Bad Code
+
+```csharp
+[AotSafe]
+public class SafeProcessor
+{
+    public void Process(object data)
+    {
+        // AL0052: Calling AotUnsafe code from AotSafe context
+        ReflectionHelper.ExtractProperties(data);
+    }
+}
+
+[AotUnsafe("Uses reflection for duck-typing")]
+public static class ReflectionHelper
+{
+    public static void ExtractProperties(object obj)
+    {
+        var type = obj.GetType();
+        foreach (var prop in type.GetProperties())
+        {
+            Console.WriteLine($"{prop.Name}: {prop.GetValue(obj)}");
+        }
+    }
+}
+```
+
+## Good Code
+
+```csharp
+[AotSafe]
+public class SafeProcessor
+{
+    public void Process(IDataContainer data)
+    {
+        // Use strongly-typed interface instead of reflection
+        foreach (var (key, value) in data.GetProperties())
+        {
+            Console.WriteLine($"{key}: {value}");
+        }
+    }
+}
+
+public interface IDataContainer
+{
+    IEnumerable<KeyValuePair<string, object?>> GetProperties();
+}
+```
+
+## Properties
+
+- **Category**: AOT Testing
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0052.severity = error
+```
+
+## See Also
+
+- [AL0044 - AotSafe code must not call RequiresDynamicCode methods](/analyzers/rules/AL0044)
+- [AL0053 - Unnecessary AotUnsafe attribute](/analyzers/rules/AL0053)
+- [AotUnsafe attribute documentation](/utilities/aot-testing)

@@ -1,0 +1,83 @@
+---
+title: 'AL0053 - Unnecessary AotUnsafe attribute'
+sidebarTitle: 'AL0053'
+description: The [AotUnsafe] attribute is applied to code that doesn't use any AOT-incompatible patterns
+icon: 'broom'
+---
+
+Source: [AL0053UnnecessaryAotUnsafeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0053UnnecessaryAotUnsafeAnalyzer.cs)
+
+## Description
+
+This analyzer detects when `[AotUnsafe]` is applied to code that doesn't actually use any AOT-incompatible patterns. This helps prevent over-annotation where developers mark code as unsafe "just to be safe" when it's actually AOT-compatible.
+
+The analyzer checks for these AOT-incompatible patterns:
+
+- Calls to methods with `[RequiresDynamicCode]`
+- Calls to other `[AotUnsafe]` methods
+- Reflection APIs: `Type.GetMethod`, `Type.GetProperty`, `PropertyInfo.GetValue`, `Activator.CreateInstance`, etc.
+- `Reflection.Emit` namespace usage
+- `dynamic` keyword usage
+
+## Bad Code
+
+```csharp
+// AL0053: This method doesn't use any AOT-incompatible patterns
+[AotUnsafe("Not sure if this needs reflection")]
+public string FormatName(string first, string last)
+{
+    return $"{first} {last}";
+}
+```
+
+## Good Code
+
+```csharp
+// Option 1: Remove the attribute since the code is AOT-safe
+public string FormatName(string first, string last)
+{
+    return $"{first} {last}";
+}
+
+// Option 2: If you actually use reflection, the attribute is justified
+[AotUnsafe("Duck-typing response objects")]
+public object? GetPropertyValue(object obj, string name)
+{
+    return obj.GetType().GetProperty(name)?.GetValue(obj);
+}
+```
+
+## Properties
+
+- **Category**: AOT Testing
+- **Severity**: Warning (Suggestion)
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0053.severity = suggestion
+```
+
+## Detected Patterns
+
+The analyzer recognizes these as legitimate reasons for `[AotUnsafe]`:
+
+| Pattern                       | Example                                                |
+| ----------------------------- | ------------------------------------------------------ |
+| `[RequiresDynamicCode]` calls | `JsonSerializer.Deserialize<T>()` (without source gen) |
+| `[AotUnsafe]` method calls    | `ReflectionHelper.Extract()`                           |
+| `Type.GetProperty`            | `type.GetProperty("Name")`                             |
+| `Type.GetMethod`              | `type.GetMethod("Execute")`                            |
+| `PropertyInfo.GetValue`       | `prop.GetValue(obj)`                                   |
+| `Activator.CreateInstance`    | `Activator.CreateInstance(type)`                       |
+| `Expression.Compile`          | `lambda.Compile()`                                     |
+| `Reflection.Emit` types       | `new DynamicMethod(...)`                               |
+| `dynamic` keyword             | `dynamic obj = GetData();`                             |
+
+## See Also
+
+- [AL0052 - AotSafe code must not call AotUnsafe code](/analyzers/rules/AL0052)
+- [AL0044 - AotSafe code must not call RequiresDynamicCode methods](/analyzers/rules/AL0044)
+- [AotUnsafe attribute documentation](/utilities/aot-testing)
