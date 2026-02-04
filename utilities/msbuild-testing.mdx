@@ -522,6 +522,194 @@ public class MyProjectBuilder : ProjectBuilder
 }
 ```
 
+## Package Testing Infrastructure
+
+For testing NuGet packages or MSBuild SDKs, use the specialized infrastructure that handles package pre-warming and SDK import patterns.
+
+### PackageProjectBuilder
+
+Extends `ProjectBuilder` with SDK/package import styles and fixture integration.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing.MSBuild;
+
+[Fact]
+public async Task Package_Sets_Default_Properties()
+{
+    await using var project = PackageProjectBuilder.Create(
+        fixture,
+        packageName: "MyCompany.NET.Sdk",
+        packageVersion: "1.0.0")
+        .WithTargetFramework(Tfm.Net100)
+        .WithPackageImportStyle(PackageImportStyle.SdkElement)
+        .AddSource("Code.cs", "class C { }");
+
+    var result = await project.BuildAsync();
+
+    result.ShouldSucceed();
+    result.ShouldHavePropertyValue("TreatWarningsAsErrors", "true");
+}
+```
+
+#### Package Import Styles
+
+| Style                           | Description                           |
+| ------------------------------- | ------------------------------------- |
+| `Default`                       | Uses configured root SDK              |
+| `ProjectElement`                | `<Project Sdk="Package/Version">`     |
+| `SdkElement`                    | `<Sdk Name="Package" Version="..."/>` |
+| `SdkElementDirectoryBuildProps` | SDK element in Directory.Build.props  |
+
+```csharp
+// Use Sdk element import style
+project.WithPackageImportStyle(PackageImportStyle.SdkElement);
+
+// Use Project Sdk attribute
+project.WithPackageImportStyle(PackageImportStyle.ProjectElement);
+
+// Import via Directory.Build.props
+project.WithPackageImportStyle(PackageImportStyle.SdkElementDirectoryBuildProps);
+```
+
+#### Additional Features
+
+```csharp
+// Add custom project elements
+project.WithAdditionalProjectElement(new XElement("ItemGroup",
+    new XElement("Compile", new XAttribute("Include", "**/*.cs"))));
+
+// Initialize git repo for testing git-dependent features
+await project.InitializeGitRepoAsync();
+
+// Execute git commands
+await project.ExecuteGitCommand("status");
+```
+
+### NuGetPackageFixture
+
+xUnit assembly fixture for pre-warming NuGet packages before tests run.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing.MSBuild;
+
+[assembly: AssemblyFixture(typeof(MyPackageFixture))]
+
+public class MyPackageFixture : NuGetPackageFixture
+{
+    // Use default pre-warm packages (xunit, etc.)
+    public MyPackageFixture() { }
+
+    // Or specify custom packages to pre-warm
+    public MyPackageFixture() : base([
+        ("MyCompany.Package", "1.0.0"),
+        ("AnotherPackage", "2.0.0")
+    ]) { }
+}
+```
+
+The fixture:
+
+- Creates an isolated package directory
+- Pre-warms specified packages to avoid restore delays during tests
+- In CI mode, copies packages from `NUGET_DIRECTORY` environment variable
+- Cleans up automatically via `IAsyncDisposable`
+
+| Property           | Description                         |
+| ------------------ | ----------------------------------- |
+| `PackageDirectory` | Path to the isolated package cache  |
+| `Version`          | Package version from env or default |
+
+### PackageTestBase
+
+Base class with convenience methods for package testing.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing.MSBuild;
+
+public class MySdkTests : PackageTestBase<MyPackageFixture>
+{
+    public MySdkTests(MyPackageFixture fixture) : base(fixture) { }
+
+    [Fact]
+    public async Task Library_Compiles()
+    {
+        var result = await BuildLibrary("""
+            namespace Test;
+            public class Sample { }
+            """);
+
+        result.ShouldSucceed();
+    }
+
+    [Fact]
+    public async Task Exe_Runs()
+    {
+        var result = await BuildExe("""
+            Console.WriteLine("Hello!");
+            """);
+
+        result.ShouldSucceed();
+    }
+}
+```
+
+#### Convenience Methods
+
+| Method                         | Description                              |
+| ------------------------------ | ---------------------------------------- |
+| `CreateProject(style?, name?)` | Create PackageProjectBuilder with config |
+| `QuickBuild(code, tfm, props)` | Build library with minimal config        |
+| `BuildLibrary(code, tfm)`      | Build as library                         |
+| `BuildExe(code, tfm)`          | Build as executable                      |
+
+### Complete Package Testing Example
+
+````csharp
+[assembly: AssemblyFixture(typeof(MySdkFixture))]
+
+namespace MySdk.Tests;
+
+public class MySdkFixture : NuGetPackageFixture
+{
+    public const string SdkName = "MyCompany.NET.Sdk";
+}
+
+public class SdkPropertyTests : PackageTestBase<MySdkFixture>
+{
+    public SdkPropertyTests(MySdkFixture fixture) : base(fixture) { }
+
+    [Fact]
+    public async Task Sdk_Enables_Nullable_By_Default()
+    {
+        await using var project = CreateProject()
+            .WithTargetFramework(Tfm.Net100)
+            .AddSource("Code.cs", """
+                #nullable enable
+                public class C { public string? Name { get; set; } }
+                """);
+
+        var result = await project.BuildAsync();
+
+        result.ShouldSucceed();
+        result.ShouldHavePropertyValue("Nullable", "enable");
+    }
+
+    [Theory]
+    [InlineData(PackageImportStyle.SdkElement)]
+    [InlineData(PackageImportStyle.ProjectElement)]
+    [InlineData(PackageImportStyle.SdkElementDirectoryBuildProps)]
+    public async Task All_Import_Styles_Work(PackageImportStyle style)
+    {
+        await using var project = CreateProject(style)
+            .WithTargetFramework(Tfm.Net100)
+            .AddSource("Code.cs", "class C { }");
+
+        var result = await project.BuildAsync();
+
+        result.ShouldSucceed();
+    }
+}
+
 ## Troubleshooting
 
 ### Viewing Build Output
@@ -530,7 +718,7 @@ Pass `ITestOutputHelper` to see all generated files and build commands:
 
 ```csharp
 await using var project = new ProjectBuilder(output);  // Enables verbose logging
-```
+````
 
 ### Inspecting Binary Logs
 

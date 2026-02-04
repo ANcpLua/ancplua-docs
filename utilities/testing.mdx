@@ -850,6 +850,145 @@ await collector.ShouldEventuallySatisfy(
   a custom `timeout` parameter for longer operations.
 </Tip>
 
+## Web Testing
+
+ASP.NET Core integration test base classes with fake logging support.
+
+### IntegrationTestBase
+
+Fast integration test base using in-memory `TestServer` for API tests that don't require real network I/O.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing.WebTesting;
+
+public class MyApiTests : IntegrationTestBase<Program>
+{
+    public MyApiTests(WebApplicationFactory<Program> factory) : base(factory) { }
+
+    [Fact]
+    public async Task GetEndpoint_ReturnsOk()
+    {
+        var response = await Client.GetAsync("/api/items");
+        response.EnsureSuccessStatusCode();
+
+        // Assert on fake logs
+        Logs.ShouldContain("Request started");
+    }
+
+    protected override void ConfigureTestServices(IServiceCollection services)
+    {
+        base.ConfigureTestServices(services);  // Adds fake logging
+        services.AddSingleton<IMyService, FakeMyService>();
+    }
+}
+```
+
+### KestrelTestBase
+
+Real Kestrel test base for HTTP/2, WebSockets, SSE, and Playwright testing with real network I/O.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing.WebTesting;
+
+public class WebSocketTests : KestrelTestBase<Program>
+{
+    public WebSocketTests(WebApplicationFactory<Program> factory) : base(factory) { }
+
+    [Fact]
+    public async Task WebSocket_Connects()
+    {
+        using var ws = new ClientWebSocket();
+        await ws.ConnectAsync(new Uri(BaseAddress, "/ws"), CancellationToken.None);
+        Assert.Equal(WebSocketState.Open, ws.State);
+    }
+}
+```
+
+| Property      | Description                                |
+| ------------- | ------------------------------------------ |
+| `Client`      | HttpClient configured for the test server  |
+| `Logs`        | FakeLogCollector for asserting log output  |
+| `Factory`     | Configured WebApplicationFactory           |
+| `BaseAddress` | Server base address (KestrelTestBase only) |
+
+## Analyzer Infrastructure
+
+Base classes for building Roslyn analyzers and code fixes with common patterns.
+
+### DiagnosticAnalyzerBase
+
+Base class for diagnostic analyzers with concurrent execution and registration helpers.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Analyzers;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class MyAnalyzer : DiagnosticAnalyzerBase
+{
+    public static readonly DiagnosticDescriptor Rule = new(
+        "MY001", "Title", "Message", "Category",
+        DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
+
+    protected override void RegisterAnalysis(AnalysisContext context)
+    {
+        context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.Method);
+    }
+
+    private void AnalyzeSymbol(SymbolAnalysisContext context) { /* ... */ }
+}
+```
+
+### CodeFixProviderBase
+
+Base class for code fix providers with batch fixing and equivalence key support.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.CodeFixes;
+
+[ExportCodeFixProvider(LanguageNames.CSharp)]
+public class MyCodeFix : CodeFixProviderBase<SyntaxNode>
+{
+    public override ImmutableArray<string> FixableDiagnosticIds => ["MY001"];
+
+    protected override string Title => "Fix the issue";
+    protected override string EquivalenceKey => "MyCodeFix";
+
+    protected override async Task<SyntaxNode?> GetTargetNodeAsync(
+        Document document, TextSpan span, CancellationToken ct)
+    {
+        var root = await document.GetSyntaxRootAsync(ct);
+        return root?.FindNode(span);
+    }
+
+    protected override async Task<Document> FixAsync(
+        Document document, SyntaxNode node, CancellationToken ct)
+    {
+        var root = await document.GetSyntaxRootAsync(ct);
+        var newNode = node.WithLeadingTrivia(/* ... */);
+        return document.WithSyntaxRoot(root!.ReplaceNode(node, newNode));
+    }
+}
+```
+
+### SyntaxModifierExtensions
+
+Helpers for syntax transformations in code fixes.
+
+```csharp
+// Add modifier
+var newDecl = methodDecl.AddModifier(SyntaxKind.AsyncKeyword);
+
+// Remove modifier
+var newDecl = methodDecl.RemoveModifier(SyntaxKind.PublicKeyword);
+
+// Replace modifier
+var newDecl = methodDecl.ReplaceModifier(
+    SyntaxKind.PrivateKeyword,
+    SyntaxKind.PublicKeyword);
+```
+
 ## Integration Testing
 
 For testing that requires real MSBuild execution (SDK features, package behavior, build-time code generation), see [MSBuild Testing](/utilities/msbuild-testing).
