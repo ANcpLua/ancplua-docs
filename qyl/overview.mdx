@@ -1,0 +1,112 @@
+---
+title: 'Overview'
+description: 'qyl - Question Your Logs: AI-first observability platform with persistent storage'
+---
+
+# qyl Observability Platform
+
+**Question Your Logs** - observe everything, judge nothing, document perfectly.
+
+qyl is an AI-first observability platform that combines the best of .NET Aspire Dashboard with persistent DuckDB storage and zero-config GenAI instrumentation.
+
+## Why qyl?
+
+| Feature     | Aspire Dashboard            | qyl                              |
+| ----------- | --------------------------- | -------------------------------- |
+| Storage     | In-memory (lost on restart) | Persistent DuckDB                |
+| GenAI Setup | Manual configuration        | Zero-config auto-instrumentation |
+| Deployment  | AppHost required            | Standalone container             |
+| MCP Support | Built-in                    | Full Aspire parity               |
+
+## Architecture
+
+```
+                      +------------------+
+                      |   qyl.dashboard  |
+                      |    (React 19)    |
+                      +--------+---------+
+                               | HTTP
+                               v
++-------------+       +------------------+       +-------------+
+|  qyl.mcp    |------>|  qyl.collector   |<------|    OTLP     |
+| (MCP stdio) | HTTP  |  (ASP.NET Core)  | gRPC  |   Clients   |
++-------------+       +--------+---------+       +-------------+
+                               |
+                               v
+                      +------------------+
+                      |     DuckDB       |
+                      | (columnar store) |
+                      +------------------+
+```
+
+## Quick Start
+
+<CodeGroup>
+
+```bash Docker (Recommended)
+docker run -d \
+  -p 5100:5100 \
+  -p 4317:4317 \
+  -v ~/.qyl:/data \
+  ghcr.io/ancplua/qyl:latest
+```
+
+```bash .NET
+dotnet run --project src/qyl.collector
+```
+
+</CodeGroup>
+
+Then open http://localhost:5100 to view the dashboard.
+
+## Key Features
+
+<CardGroup cols={2}>
+
+<Card title="Persistent Storage" icon="database">
+  DuckDB columnar storage survives restarts. Query historical telemetry.
+</Card>
+
+<Card title="GenAI Analytics" icon="sparkles">
+  Built-in views for LLM calls, token usage, costs, and tool invocations.
+</Card>
+
+<Card title="MCP Server" icon="robot">
+  AI agents can query traces, logs, and metrics via Model Context Protocol.
+</Card>
+
+<Card title="Zero-Config" icon="wand-magic-sparkles">
+  Source generator auto-instruments GenAI calls. No manual setup.
+</Card>
+
+</CardGroup>
+
+## Ports
+
+| Port | Protocol | Purpose                                 |
+| ---- | -------- | --------------------------------------- |
+| 5100 | HTTP     | REST API, SSE streaming, Dashboard      |
+| 4317 | gRPC     | OTLP traces/logs/metrics                |
+| 5173 | HTTP     | Dashboard dev server (development only) |
+
+## Next Steps
+
+<CardGroup cols={2}>
+
+<Card title="Dashboard" href="/qyl/dashboard" icon="chart-line">
+  Explore the dashboard features
+</Card>
+
+<Card title="MCP Server" href="/qyl/mcp" icon="plug">
+  Connect AI agents to your telemetry
+</Card>
+
+<Card title="Configuration" href="/qyl/configuration" icon="gear">
+  Environment variables and options
+</Card>
+
+<Card title="API Reference" href="/api-reference/introduction" icon="code">
+  REST API documentation
+</Card>
+
+</CardGroup>

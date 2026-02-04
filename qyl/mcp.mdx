@@ -1,0 +1,174 @@
+---
+title: 'MCP Server'
+description: 'Model Context Protocol server for AI agent telemetry access'
+---
+
+# qyl MCP Server
+
+The qyl MCP server enables AI agents to query and analyze telemetry data via the Model Context Protocol.
+
+## Installation
+
+The MCP server is included in the qyl package:
+
+```bash
+# Install globally
+dotnet tool install -g qyl.mcp
+
+# Or run from source
+dotnet run --project src/qyl.mcp
+```
+
+## Configuration
+
+Configure your AI tool to use the qyl MCP server:
+
+<Tabs>
+<Tab title="Claude Desktop">
+
+Add to `~/.config/claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "qyl": {
+      "command": "qyl-mcp",
+      "env": {
+        "QYL_COLLECTOR_URL": "http://localhost:5100",
+        "QYL_MCP_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
+</Tab>
+<Tab title="VS Code">
+
+Add to `.vscode/settings.json`:
+
+```json
+{
+  "mcp.servers": {
+    "qyl": {
+      "command": "qyl-mcp",
+      "env": {
+        "QYL_COLLECTOR_URL": "http://localhost:5100"
+      }
+    }
+  }
+}
+```
+
+</Tab>
+</Tabs>
+
+## Authentication
+
+Set `QYL_MCP_TOKEN` to match the collector's `QYL_TOKEN`:
+
+```bash
+# Collector
+export QYL_TOKEN=my-secret-token
+
+# MCP Server
+export QYL_MCP_TOKEN=my-secret-token
+```
+
+The MCP server sends the token via the `x-mcp-api-key` header (Aspire-compatible).
+
+<Warning>
+  If no token is configured, auth is disabled (dev mode). Always set tokens in
+  production.
+</Warning>
+
+## Available Tools
+
+### Trace Tools
+
+| Tool                | Description                            |
+| ------------------- | -------------------------------------- |
+| `qyl.get_trace`     | Get a complete distributed trace by ID |
+| `qyl.list_sessions` | List all telemetry sessions            |
+| `qyl.search_spans`  | Search spans with filters              |
+
+### Log Tools
+
+| Tool                       | Description                    |
+| -------------------------- | ------------------------------ |
+| `qyl.list_structured_logs` | Query OTLP log records         |
+| `qyl.list_trace_logs`      | Get all logs for a trace       |
+| `qyl.search_logs`          | Search logs by pattern         |
+| `qyl.list_console_logs`    | List frontend console messages |
+| `qyl.list_console_errors`  | Quick access to console errors |
+
+### GenAI Tools
+
+| Tool                       | Description                         |
+| -------------------------- | ----------------------------------- |
+| `qyl.get_genai_stats`      | Token usage, costs, latency summary |
+| `qyl.list_genai_spans`     | Query LLM calls with filters        |
+| `qyl.list_models`          | Usage breakdown by AI model         |
+| `qyl.get_token_timeseries` | Token consumption over time         |
+
+### Storage Tools
+
+| Tool                    | Description             |
+| ----------------------- | ----------------------- |
+| `qyl.get_storage_stats` | Database statistics     |
+| `qyl.health_check`      | Collector health status |
+
+### Replay Tools
+
+| Tool               | Description                  |
+| ------------------ | ---------------------------- |
+| `qyl.replay_trace` | Replay a trace to see timing |
+| `qyl.export_trace` | Export trace as JSON         |
+
+## Example Usage
+
+Once configured, AI agents can query your telemetry:
+
+<CodeGroup>
+
+```text User
+What errors occurred in the last hour?
+```
+
+```text Agent (using qyl.search_logs)
+I found 3 errors in the last hour:
+
+1. **NullReferenceException** in OrderService.ProcessPayment
+   - Time: 2026-02-04 10:23:45
+   - Trace ID: abc123...
+
+2. **TimeoutException** in InventoryService.CheckStock
+   - Time: 2026-02-04 10:45:12
+   - Trace ID: def456...
+
+3. **ValidationError** in UserService.Register
+   - Time: 2026-02-04 11:02:33
+   - Trace ID: ghi789...
+```
+
+</CodeGroup>
+
+## Aspire Parity
+
+The qyl MCP server provides equivalent functionality to Aspire's MCP tools:
+
+| Aspire Tool                  | qyl Equivalent                          |
+| ---------------------------- | --------------------------------------- |
+| `list_resources`             | `qyl.list_sessions`, `qyl.health_check` |
+| `list_console_logs`          | `qyl.list_console_logs`                 |
+| `list_structured_logs`       | `qyl.list_structured_logs`              |
+| `list_traces`                | `qyl.get_trace`, `qyl.list_sessions`    |
+| `list_trace_structured_logs` | `qyl.list_trace_logs`                   |
+| `execute_resource_command`   | N/A (qyl is collector-only)             |
+
+## Environment Variables
+
+| Variable            | Default                 | Description                |
+| ------------------- | ----------------------- | -------------------------- |
+| `QYL_COLLECTOR_URL` | `http://localhost:5100` | Collector base URL         |
+| `QYL_MCP_TOKEN`     | (none)                  | API key for authentication |

@@ -1,0 +1,140 @@
+---
+title: 'Configuration'
+description: 'Environment variables and configuration options'
+---
+
+# Configuration
+
+qyl is configured entirely via environment variables, following the 12-factor app methodology.
+
+## Core Settings
+
+| Variable        | Default        | Description                   |
+| --------------- | -------------- | ----------------------------- |
+| `QYL_PORT`      | `5100`         | HTTP API port                 |
+| `QYL_GRPC_PORT` | `4317`         | gRPC OTLP port (0 to disable) |
+| `QYL_DATA_PATH` | `./qyl.duckdb` | DuckDB database file location |
+
+## Authentication
+
+| Variable        | Default | Description                                                      |
+| --------------- | ------- | ---------------------------------------------------------------- |
+| `QYL_TOKEN`     | (none)  | Auth token for API access. If unset, auth is disabled (dev mode) |
+| `QYL_MCP_TOKEN` | (none)  | API key for MCP server authentication                            |
+
+<Warning>
+  Always set `QYL_TOKEN` in production environments. Without it, anyone can
+  access your telemetry.
+</Warning>
+
+## Telemetry Limits
+
+| Variable                       | Default   | Description                      |
+| ------------------------------ | --------- | -------------------------------- |
+| `QYL_MAX_RETENTION_DAYS`       | `30`      | Days to retain telemetry data    |
+| `QYL_MAX_SPAN_COUNT`           | `1000000` | Maximum spans before cleanup     |
+| `QYL_MAX_LOG_COUNT`            | `500000`  | Maximum logs before cleanup      |
+| `QYL_CLEANUP_INTERVAL_SECONDS` | `300`     | Cleanup service interval (5 min) |
+
+The cleanup service runs on the configured interval and removes:
+
+1. Data older than `QYL_MAX_RETENTION_DAYS`
+2. Oldest data when count exceeds limits
+
+## CORS
+
+| Variable                        | Default | Description                       |
+| ------------------------------- | ------- | --------------------------------- |
+| `QYL_OTLP_CORS_ALLOWED_ORIGINS` | `*`     | Allowed origins (comma-separated) |
+
+<Note>
+  When using `*` (wildcard), credentials are automatically disabled per RFC
+  6454.
+</Note>
+
+Example with specific origins:
+
+```bash
+export QYL_OTLP_CORS_ALLOWED_ORIGINS="https://app.example.com,https://admin.example.com"
+```
+
+## OpenTelemetry
+
+Standard OTEL environment variables are supported:
+
+| Variable                      | Default | Description                    |
+| ----------------------------- | ------- | ------------------------------ |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | -       | OTLP exporter endpoint         |
+| `OTEL_SERVICE_NAME`           | -       | Service name for traces        |
+| `OTEL_RESOURCE_ATTRIBUTES`    | -       | Additional resource attributes |
+
+## Docker Configuration
+
+<CodeGroup>
+
+```yaml docker-compose.yml
+services:
+  qyl:
+    image: ghcr.io/ancplua/qyl:latest
+    ports:
+      - '5100:5100' # HTTP API + Dashboard
+      - '4317:4317' # gRPC OTLP
+    volumes:
+      - qyl-data:/data
+    environment:
+      QYL_DATA_PATH: /data/qyl.duckdb
+      QYL_TOKEN: ${QYL_TOKEN}
+      QYL_MAX_RETENTION_DAYS: 7
+      QYL_MAX_SPAN_COUNT: 500000
+
+volumes:
+  qyl-data:
+```
+
+```bash Docker Run
+docker run -d \
+  --name qyl \
+  -p 5100:5100 \
+  -p 4317:4317 \
+  -v qyl-data:/data \
+  -e QYL_DATA_PATH=/data/qyl.duckdb \
+  -e QYL_TOKEN=my-secret-token \
+  ghcr.io/ancplua/qyl:latest
+```
+
+</CodeGroup>
+
+## Railway Deployment
+
+qyl is optimized for Railway's one-click deployment:
+
+1. Click "Deploy on Railway" in the GitHub repo
+2. Set environment variables in Railway dashboard
+3. Railway automatically:
+   - Provisions persistent volume for DuckDB
+   - Exposes ports 5100 and 4317
+   - Sets up health checks
+
+Recommended Railway config:
+
+```bash
+QYL_DATA_PATH=/data/qyl.duckdb
+QYL_TOKEN=${{RAILWAY_SECRET}}
+QYL_MAX_RETENTION_DAYS=7
+```
+
+## Development
+
+For local development:
+
+```bash
+# Collector
+cd src/qyl.collector
+dotnet run
+
+# Dashboard (separate terminal)
+cd src/qyl.dashboard
+npm run dev
+```
+
+The dashboard dev server runs on port 5173 with hot reload.

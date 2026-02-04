@@ -20,7 +20,7 @@
     "twitter:card": "summary_large_image"
   },
   "search": {
-    "prompt": "Search SDK, analyzers, utilities, ErrorOrX..."
+    "prompt": "Search SDK, analyzers, utilities, ErrorOrX, qyl..."
   },
   "seo": {
     "indexing": "navigable"
@@ -155,10 +155,18 @@
         ]
       },
       {
-        "tab": "qyl API",
+        "tab": "qyl",
         "groups": [
           {
-            "group": "Overview",
+            "group": "Getting Started",
+            "pages": ["qyl/overview", "qyl/configuration"]
+          },
+          {
+            "group": "Features",
+            "pages": ["qyl/dashboard", "qyl/mcp"]
+          },
+          {
+            "group": "API Reference",
             "pages": ["api-reference/introduction"]
           }
         ],

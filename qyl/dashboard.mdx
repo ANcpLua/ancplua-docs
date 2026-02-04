@@ -1,0 +1,171 @@
+---
+title: 'Dashboard'
+description: 'React 19 dashboard with real-time telemetry visualization'
+---
+
+# qyl Dashboard
+
+The qyl dashboard is a React 19 SPA that provides real-time visualization of traces, logs, and GenAI telemetry.
+
+## Features
+
+### Theme Selection
+
+<Frame>
+  Switch between light, dark, and system themes using the theme toggle in the
+  top bar.
+</Frame>
+
+| Mode   | Description                               |
+| ------ | ----------------------------------------- |
+| Light  | Light background with dark text           |
+| Dark   | Dark background with light text (default) |
+| System | Follows your OS preference                |
+
+The theme preference is persisted to localStorage and applied immediately without flash.
+
+### Keyboard Shortcuts
+
+Navigate quickly using keyboard shortcuts (press `?` to see all):
+
+| Key      | Action                |
+| -------- | --------------------- |
+| `R`      | Go to Resources/Home  |
+| `T`      | Go to Traces          |
+| `C`      | Go to Console/Logs    |
+| `S`      | Go to Structured Logs |
+| `M`      | Go to Metrics/GenAI   |
+| `,`      | Go to Settings        |
+| `?`      | Show shortcuts help   |
+| `Ctrl+/` | Focus search          |
+| `Esc`    | Close panel           |
+
+<Note>Shortcuts are disabled when typing in input fields.</Note>
+
+### Download Logs
+
+Export your telemetry data for offline analysis:
+
+1. Navigate to any page (Logs, Traces, or GenAI)
+2. Click the download button in the toolbar
+3. Choose format: **JSON** or **CSV**
+4. File downloads with timestamp in filename (e.g., `logs-2026-02-04T10-30-00.json`)
+
+The export includes all visible columns and respects any active filters.
+
+### Health Check Indicator
+
+The health indicator in the top bar shows system status:
+
+| Color     | Status    | Description              |
+| --------- | --------- | ------------------------ |
+| 🟢 Green  | Healthy   | All systems operational  |
+| 🟡 Yellow | Degraded  | Some components impaired |
+| 🔴 Red    | Unhealthy | Critical issues detected |
+
+Click the indicator to see detailed health information:
+
+- DuckDB connection status
+- Disk space usage
+- Memory consumption
+- Last ingestion time
+- Uptime
+
+Health checks auto-refresh every 30 seconds.
+
+### Text Visualizer
+
+Structured content (JSON, XML) is automatically detected and formatted:
+
+<Accordion title="Features">
+
+- **Auto-detection**: Recognizes JSON (`{` or `[`) and XML (`<`)
+- **Syntax highlighting**: Color-coded keys, strings, numbers, booleans
+- **Collapsible**: Large content shows truncated with "expand" option
+- **Tree view**: Interactive expandable tree for JSON
+- **Copy button**: One-click copy to clipboard
+
+</Accordion>
+
+### Pause & Clear Telemetry
+
+Control telemetry ingestion and storage:
+
+**Pause:**
+
+- Click the "LIVE" button to pause real-time updates
+- SSE streaming stops, existing data remains visible
+- Click "PAUSED" to resume
+
+**Clear:**
+
+- Click the trash icon in the top bar
+- Confirm in the dialog
+- Options: Clear all, or by type (spans, logs, sessions)
+- Data is permanently deleted from DuckDB
+
+## GenAI Analytics
+
+The GenAI page provides specialized views for LLM telemetry:
+
+### Token Usage
+
+Track token consumption across all models:
+
+- Input tokens vs output tokens
+- Cost calculations (USD)
+- Model breakdown
+
+### Tool Definitions
+
+View tools available to AI models:
+
+```json
+{
+  "name": "search_documents",
+  "description": "Search the document database",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": { "type": "string" }
+    }
+  }
+}
+```
+
+Tool definitions are extracted from the `gen_ai.tool.definitions` attribute.
+
+### Tool Calls
+
+See tool invocations with:
+
+- Tool name and call ID
+- Arguments passed
+- Results returned
+- Execution time
+
+## Real-Time Streaming
+
+The dashboard uses Server-Sent Events (SSE) for real-time updates:
+
+```typescript
+// Automatic connection to /api/v1/live
+// New spans appear instantly in the UI
+```
+
+Connection status is shown in the top bar:
+
+- **LIVE** (green): Connected and receiving updates
+- **PAUSED** (yellow): Manually paused
+- **DISCONNECTED** (red): Connection lost, will retry
+
+## Tech Stack
+
+| Library          | Purpose                   |
+| ---------------- | ------------------------- |
+| React 19         | UI framework              |
+| TanStack Query 5 | Data fetching and caching |
+| Radix UI         | Accessible components     |
+| Tailwind CSS 4   | Styling                   |
+| Recharts         | Charts and visualizations |
+| Lucide React     | Icons                     |
