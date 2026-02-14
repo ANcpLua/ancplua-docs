@@ -132,6 +132,7 @@
               "utilities/guard",
               "utilities/codegen",
               "utilities/semantic-guard",
+              "utilities/polyfills",
               "utilities/msbuild-properties",
               "utilities/msbuild-testing",
               "utilities/testing"

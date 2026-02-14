@@ -4,7 +4,7 @@ description: 'Modern C# features for netstandard2.0 targets.'
 icon: 'puzzle-piece'
 ---
 
-When targeting `netstandard2.0`, the SDK injects polyfills for modern C# features.
+When targeting `netstandard2.0`, the SDK injects polyfills for modern C# features. The polyfill source files are maintained in [ANcpLua.Roslyn.Utilities](/utilities/polyfills) as the single source of truth.
 
 | Feature                | What it enables                      |
 | ---------------------- | ------------------------------------ |
@@ -12,19 +12,26 @@ When targeting `netstandard2.0`, the SDK injects polyfills for modern C# feature
 | `IsExternalInit`       | `record` types and `init` properties |
 | Nullability attributes | `[NotNull]`, `[MaybeNull]`, etc.     |
 | `TimeProvider`         | Testable time abstraction            |
+| `Lock`                 | `System.Threading.Lock` polyfill     |
 | Trim/AOT attributes    | `[RequiresUnreferencedCode]`, etc.   |
-| String extensions      | `string.Contains(char)` overloads    |
+| String extensions      | `string.Contains(StringComparison)`  |
 
-## Opt-in Polyfills
+## Opt-out Control
 
-Additional polyfills available on request:
+All polyfills are enabled by default. Disable individual categories or all at once:
 
 ```xml
 <PropertyGroup>
-  <InjectLockPolyfill>true</InjectLockPolyfill>
-  <InjectTimeProviderPolyfill>true</InjectTimeProviderPolyfill>
+  <!-- Disable a specific polyfill -->
+  <InjectTimeProviderPolyfill>false</InjectTimeProviderPolyfill>
+  <InjectLockPolyfill>false</InjectLockPolyfill>
+
+  <!-- Disable ALL polyfills -->
+  <InjectAllPolyfillsOnLegacy>false</InjectAllPolyfillsOnLegacy>
 </PropertyGroup>
 ```
+
+See [Polyfills Reference](/utilities/polyfills) for the complete list of available polyfills and opt-out properties.
 
 <Note>
   Polyfills are only injected for `netstandard2.0` / `netstandard2.1` targets.

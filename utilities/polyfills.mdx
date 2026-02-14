@@ -1,0 +1,122 @@
+---
+title: 'Polyfills'
+sidebarTitle: 'Polyfills'
+description: 'Modern C# features for netstandard2.0 targets.'
+icon: 'puzzle-piece'
+---
+
+ANcpLua.Roslyn.Utilities provides comprehensive polyfills that enable modern C# features when targeting `netstandard2.0`. All polyfills are `#if`-gated and compile only on older target frameworks.
+
+## Packages
+
+Two packages include polyfills:
+
+| Package                              | Use case                                                    |
+| ------------------------------------ | ----------------------------------------------------------- |
+| `ANcpLua.Roslyn.Utilities.Sources`   | Analyzers/generators that need both utilities AND polyfills |
+| `ANcpLua.Roslyn.Utilities.Polyfills` | Projects that need polyfills only (no Roslyn dependency)    |
+
+```shell
+# For generators/analyzers
+dotnet add package ANcpLua.Roslyn.Utilities.Sources
+
+# For polyfills only
+dotnet add package ANcpLua.Roslyn.Utilities.Polyfills
+```
+
+## Available Polyfills
+
+### Language Features
+
+| Polyfill                            | Enables                               | Available from |
+| ----------------------------------- | ------------------------------------- | -------------- |
+| `IsExternalInit`                    | `record` types and `init` properties  | .NET 5+        |
+| `RequiredMemberAttribute`           | `required` modifier                   | .NET 7+        |
+| `CompilerFeatureRequiredAttribute`  | Compiler feature gating               | .NET 7+        |
+| `SetsRequiredMembersAttribute`      | Constructor sets all required members | .NET 7+        |
+| `CallerArgumentExpressionAttribute` | Argument name capture                 | .NET 6+        |
+| `ParamCollectionAttribute`          | C# 13 `params` collections            | .NET 9+        |
+
+### Nullable Attributes
+
+| Polyfill                             | Enables                      | Available from |
+| ------------------------------------ | ---------------------------- | -------------- |
+| `AllowNull`, `DisallowNull`          | Nullable input annotations   | .NET Core 3.1+ |
+| `MaybeNull`, `NotNull`               | Nullable output annotations  | .NET Core 3.1+ |
+| `MaybeNullWhen`, `NotNullWhen`       | Conditional null annotations | .NET Core 3.1+ |
+| `NotNullIfNotNull`                   | Linked nullability           | .NET Core 3.1+ |
+| `DoesNotReturn`, `DoesNotReturnIf`   | Unreachable code flow        | .NET Core 3.1+ |
+| `MemberNotNull`, `MemberNotNullWhen` | Member null state            | .NET 5+        |
+
+### Trim/AOT Attributes
+
+| Polyfill                                | Enables              | Available from |
+| --------------------------------------- | -------------------- | -------------- |
+| `DynamicallyAccessedMembersAttribute`   | Trim-safe reflection | .NET 5+        |
+| `DynamicallyAccessedMemberTypes`        | Member type flags    | .NET 5+        |
+| `RequiresUnreferencedCodeAttribute`     | Trim warning         | .NET 5+        |
+| `RequiresDynamicCodeAttribute`          | AOT warning          | .NET 7+        |
+| `UnconditionalSuppressMessageAttribute` | Trim suppression     | .NET 5+        |
+
+### Index and Range
+
+| Polyfill | Enables              | Available from |
+| -------- | -------------------- | -------------- |
+| `Index`  | `array[^1]` syntax   | .NET Core 3.0+ |
+| `Range`  | `array[1..3]` syntax | .NET Core 3.0+ |
+
+### Other
+
+| Polyfill                    | Enables                             | Available from |
+| --------------------------- | ----------------------------------- | -------------- |
+| `StackTraceHiddenAttribute` | Hide from stack traces              | .NET 6+        |
+| `UnreachableException`      | Unreachable code paths              | .NET 7+        |
+| `ExperimentalAttribute`     | Mark APIs as experimental           | .NET 8+        |
+| `TimeProvider`              | Testable time abstraction           | .NET 8+        |
+| `Lock`                      | `System.Threading.Lock`             | .NET 9+        |
+| String extensions           | `string.Contains(StringComparison)` | .NET Core 2.1+ |
+
+## Opt-Out Control
+
+All polyfills are enabled by default. Use MSBuild properties to opt out:
+
+```xml
+<PropertyGroup>
+  <!-- Disable individual categories -->
+  <InjectIsExternalInitOnLegacy>false</InjectIsExternalInitOnLegacy>
+  <InjectNullabilityAttributesOnLegacy>false</InjectNullabilityAttributesOnLegacy>
+  <InjectTrimAttributesOnLegacy>false</InjectTrimAttributesOnLegacy>
+  <InjectIndexRangeOnLegacy>false</InjectIndexRangeOnLegacy>
+  <InjectStackTraceHiddenOnLegacy>false</InjectStackTraceHiddenOnLegacy>
+  <InjectUnreachableExceptionOnLegacy>false</InjectUnreachableExceptionOnLegacy>
+  <InjectExperimentalAttributeOnLegacy>false</InjectExperimentalAttributeOnLegacy>
+  <InjectTimeProviderPolyfill>false</InjectTimeProviderPolyfill>
+  <InjectLockPolyfill>false</InjectLockPolyfill>
+  <InjectStringExtensionsPolyfill>false</InjectStringExtensionsPolyfill>
+  <InjectRequiredMemberOnLegacy>false</InjectRequiredMemberOnLegacy>
+  <InjectCallerAttributesOnLegacy>false</InjectCallerAttributesOnLegacy>
+  <InjectCompilerFeatureRequiredOnLegacy>false</InjectCompilerFeatureRequiredOnLegacy>
+  <InjectSetsRequiredMembersOnLegacy>false</InjectSetsRequiredMembersOnLegacy>
+  <InjectParamCollectionOnLegacy>false</InjectParamCollectionOnLegacy>
+
+  <!-- Or disable ALL polyfills at once -->
+  <InjectAllPolyfillsOnLegacy>false</InjectAllPolyfillsOnLegacy>
+</PropertyGroup>
+```
+
+<Note>
+  Polyfills are only active for `netstandard2.0` and `netstandard2.1` targets.
+  .NET 5+ projects don't need them — the `#if` guards ensure they compile away.
+</Note>
+
+## Conflict Resolution
+
+If another package provides the same polyfills (e.g., PolySharp), disable the overlapping categories to avoid duplicate type definitions:
+
+```xml
+<PropertyGroup>
+  <InjectIsExternalInitOnLegacy>false</InjectIsExternalInitOnLegacy>
+  <InjectNullabilityAttributesOnLegacy>false</InjectNullabilityAttributesOnLegacy>
+  <InjectIndexRangeOnLegacy>false</InjectIndexRangeOnLegacy>
+</PropertyGroup>
+```

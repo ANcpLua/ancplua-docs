@@ -33,22 +33,32 @@ All numeric methods use `[MethodImpl(AggressiveInlining)]` for hot paths.
 ## Install
 
 ```shell
+# For analyzers/generators (source-only, no runtime dependency)
+dotnet add package ANcpLua.Roslyn.Utilities.Sources
+
+# For polyfills only (no Roslyn dependency)
+dotnet add package ANcpLua.Roslyn.Utilities.Polyfills
+
+# For runtime reference
 dotnet add package ANcpLua.Roslyn.Utilities
+
+# For testing
 dotnet add package ANcpLua.Roslyn.Utilities.Testing
 ```
 
 <Warning>
   **Layer 0 Package**: This package cannot depend on ANcpLua.NET.Sdk (circular
-  dependency). Uses `Microsoft.NET.Sdk` and
-  [PolySharp](https://github.com/Sergio0694/PolySharp) for polyfills.
+  dependency). Uses `Microsoft.NET.Sdk` with built-in polyfills.
 </Warning>
 
 ## Packages
 
-| Package                          | Target         | Description       |
-| -------------------------------- | -------------- | ----------------- |
-| ANcpLua.Roslyn.Utilities         | netstandard2.0 | Core library      |
-| ANcpLua.Roslyn.Utilities.Testing | net10.0        | Generator testing |
+| Package                            | Target         | Description                                                |
+| ---------------------------------- | -------------- | ---------------------------------------------------------- |
+| ANcpLua.Roslyn.Utilities           | netstandard2.0 | Core library (DLL reference)                               |
+| ANcpLua.Roslyn.Utilities.Sources   | netstandard2.0 | Source-only (embeds as `internal` in analyzers/generators) |
+| ANcpLua.Roslyn.Utilities.Polyfills | netstandard2.0 | Source-only polyfills (no Roslyn dependency)               |
+| ANcpLua.Roslyn.Utilities.Testing   | net10.0        | Generator testing                                          |
 
 ## Features
 
