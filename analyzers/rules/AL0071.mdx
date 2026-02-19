@@ -1,0 +1,45 @@
+---
+title: 'AL0071 - [Meter] class must be partial static'
+sidebarTitle: 'AL0071'
+description: 'Source generator requires the class to be partial static'
+icon: 'shield-check'
+---
+
+Source: [Al0071MeterClassMustBePartialStaticAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0071MeterClassMustBePartialStaticAnalyzer.cs)
+
+## Description
+
+Classes annotated with `[Meter]` must be `partial static` so the source generator can emit the metric instrument implementations.
+
+## Bad Code
+
+```csharp
+[Meter("MyService")]
+public class MyMetrics
+{
+    [Counter] public static partial void OrderCount();
+}
+```
+
+## Good Code
+
+```csharp
+[Meter("MyService")]
+public static partial class MyMetrics
+{
+    [Counter] public static partial void OrderCount();
+}
+```
+
+## Properties
+
+- **Category**: Metrics
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0071.severity = error
+```

@@ -1,0 +1,39 @@
+---
+title: 'AL0088 - Sensitive data in span attribute'
+sidebarTitle: 'AL0088'
+description: 'Do not leak passwords, tokens, or secrets to telemetry'
+icon: 'shield-check'
+---
+
+Source: [Al0088SensitiveDataInAttributeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0088SensitiveDataInAttributeAnalyzer.cs)
+
+## Description
+
+Span attributes should not contain sensitive data such as passwords, API keys, tokens, or connection strings. Telemetry data is typically stored with fewer access controls than secrets.
+
+## Bad Code
+
+```csharp
+activity?.SetTag("auth.token", bearerToken);
+activity?.SetTag("db.connection_string", connString);
+```
+
+## Good Code
+
+```csharp
+activity?.SetTag("auth.type", "bearer");
+activity?.SetTag("db.system", "postgresql");
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0088.severity = warning
+```

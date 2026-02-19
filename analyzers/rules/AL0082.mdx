@@ -1,0 +1,39 @@
+---
+title: 'AL0082 - Consider using configuration for connection string'
+sidebarTitle: 'AL0082'
+description: 'Do not hardcode connection strings in source code'
+icon: 'shield-check'
+---
+
+Source: [Al0082ConsiderConnectionStringAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0082ConsiderConnectionStringAnalyzer.cs)
+
+## Description
+
+Connection strings should come from configuration (appsettings.json, environment variables, or secrets) rather than being hardcoded in source code.
+
+## Bad Code
+
+```csharp
+var conn = "Server=prod-db;Database=myapp;User=admin;Password=secret";
+builder.Services.AddNpgsql(conn);
+```
+
+## Good Code
+
+```csharp
+var conn = builder.Configuration.GetConnectionString("Default");
+builder.Services.AddNpgsql(conn);
+```
+
+## Properties
+
+- **Category**: Configuration
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0082.severity = suggestion
+```

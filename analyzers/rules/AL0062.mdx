@@ -1,0 +1,39 @@
+---
+title: 'AL0062 - Deprecated semantic convention'
+sidebarTitle: 'AL0062'
+description: 'Attribute name deprecated in OpenTelemetry semantic conventions'
+icon: 'shield-check'
+---
+
+Source: [Al0062DeprecatedSemconvAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0062DeprecatedSemconvAnalyzer.cs)
+
+## Description
+
+An OpenTelemetry semantic convention attribute name has been deprecated and replaced with a newer name. Update to the current convention.
+
+## Bad Code
+
+```csharp
+activity?.SetTag("http.method", "GET");       // deprecated
+activity?.SetTag("http.status_code", 200);    // deprecated
+```
+
+## Good Code
+
+```csharp
+activity?.SetTag("http.request.method", "GET");
+activity?.SetTag("http.response.status_code", 200);
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0062.severity = warning
+```

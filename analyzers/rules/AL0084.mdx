@@ -1,0 +1,39 @@
+---
+title: 'AL0084 - Missing service discovery'
+sidebarTitle: 'AL0084'
+description: 'Use service names instead of hardcoded URLs'
+icon: 'shield-check'
+---
+
+Source: [Al0084MissingServiceDiscoveryAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0084MissingServiceDiscoveryAnalyzer.cs)
+
+## Description
+
+HTTP clients should use service discovery (e.g., `http://order-service`) instead of hardcoded URLs for better resilience in orchestrated environments.
+
+## Bad Code
+
+```csharp
+builder.Services.AddHttpClient("orders", c =>
+    c.BaseAddress = new Uri("https://10.0.1.42:8080"));
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddHttpClient("orders", c =>
+    c.BaseAddress = new Uri("https+http://order-service"));
+```
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0084.severity = warning
+```

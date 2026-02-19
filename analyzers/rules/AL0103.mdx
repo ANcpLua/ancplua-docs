@@ -1,0 +1,50 @@
+---
+title: 'AL0103 - Closed type hierarchy switch exhaustiveness'
+sidebarTitle: 'AL0103'
+description: 'Switch on sealed hierarchy should cover all cases'
+icon: 'shield-check'
+---
+
+Source: [Al0103ClosedTypeHierarchySwitchAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0103ClosedTypeHierarchySwitchAnalyzer.cs)
+
+## Description
+
+When switching over a sealed type hierarchy (abstract class or interface with all implementations in the same assembly), the switch should cover all derived types to catch missing cases at compile time.
+
+## Bad Code
+
+```csharp
+public abstract record Shape;
+public record Circle : Shape;
+public record Square : Shape;
+
+string Describe(Shape s) => s switch
+{
+    Circle c => "circle",
+    _ => "unknown" // Misses Square
+};
+```
+
+## Good Code
+
+```csharp
+string Describe(Shape s) => s switch
+{
+    Circle c => "circle",
+    Square sq => "square",
+    _ => throw new UnreachableException()
+};
+```
+
+## Properties
+
+- **Category**: Design
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0103.severity = warning
+```

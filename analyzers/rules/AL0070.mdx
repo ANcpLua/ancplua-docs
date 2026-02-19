@@ -1,0 +1,39 @@
+---
+title: 'AL0070 - Collector endpoint should use OTLP protocol'
+sidebarTitle: 'AL0070'
+description: 'OTLP provides better performance than legacy protocols'
+icon: 'shield-check'
+---
+
+Source: [Al0070NonOtlpCollectorEndpointAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0070NonOtlpCollectorEndpointAnalyzer.cs)
+
+## Description
+
+Telemetry collector endpoints should use the OTLP protocol for better performance and standardization compared to legacy protocols like Zipkin or Jaeger.
+
+## Bad Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddZipkinExporter());
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddOtlpExporter());
+```
+
+## Properties
+
+- **Category**: Configuration
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0070.severity = warning
+```

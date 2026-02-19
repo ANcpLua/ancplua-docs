@@ -1,0 +1,41 @@
+---
+title: 'AL0091 - Batch export disabled'
+sidebarTitle: 'AL0091'
+description: 'Use batch processors in production for better performance'
+icon: 'shield-check'
+---
+
+Source: [Al0091BatchExportDisabledAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0091BatchExportDisabledAnalyzer.cs)
+
+## Description
+
+Simple (non-batch) export processors send telemetry synchronously on each span/metric, which degrades application performance. Use batch processors in production.
+
+## Bad Code
+
+```csharp
+t.AddOtlpExporter(o => {
+    o.ExportProcessorType = ExportProcessorType.Simple;
+});
+```
+
+## Good Code
+
+```csharp
+t.AddOtlpExporter(o => {
+    o.ExportProcessorType = ExportProcessorType.Batch;
+});
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0091.severity = warning
+```

@@ -1,0 +1,43 @@
+---
+title: 'AL0090 - Uncompressed OTLP export'
+sidebarTitle: 'AL0090'
+description: 'Enable gzip compression for HTTP OTLP export'
+icon: 'shield-check'
+---
+
+Source: [Al0090UncompressedExportAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0090UncompressedExportAnalyzer.cs)
+
+## Description
+
+OTLP export over HTTP should enable gzip compression to reduce bandwidth usage and improve performance.
+
+## Bad Code
+
+```csharp
+t.AddOtlpExporter(o => {
+    o.Protocol = OtlpExportProtocol.HttpProtobuf;
+    // No compression configured
+});
+```
+
+## Good Code
+
+```csharp
+t.AddOtlpExporter(o => {
+    o.Protocol = OtlpExportProtocol.HttpProtobuf;
+    o.HttpClientFactory = () => new HttpClient(new GzipHandler());
+});
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0090.severity = warning
+```

@@ -1,0 +1,43 @@
+---
+title: 'AL0057 - Avoid async void methods'
+sidebarTitle: 'AL0057'
+description: 'async void methods cannot be awaited and exceptions cannot be caught'
+icon: 'shield-check'
+---
+
+Source: [Al0057ToAl0060ThreadingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0057ToAl0060ThreadingAnalyzer.cs)
+
+## Description
+
+`async void` methods cannot be awaited, and any exceptions they throw will crash the process. Use `async Task` instead.
+
+## Bad Code
+
+```csharp
+public async void SendNotification()
+{
+    await httpClient.PostAsync("/notify", content);
+}
+```
+
+## Good Code
+
+```csharp
+public async Task SendNotification()
+{
+    await httpClient.PostAsync("/notify", content);
+}
+```
+
+## Properties
+
+- **Category**: Threading
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0057.severity = warning
+```

@@ -1,0 +1,39 @@
+---
+title: 'AL0073 - [Traced] requires non-empty ActivitySourceName'
+sidebarTitle: 'AL0073'
+description: 'Must identify the span source with a non-empty name'
+icon: 'shield-check'
+---
+
+Source: [Al0073TracedActivitySourceNameAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0073TracedActivitySourceNameAnalyzer.cs)
+
+## Description
+
+The `[Traced]` attribute requires a non-empty `ActivitySourceName` to identify which `ActivitySource` the generated spans belong to.
+
+## Bad Code
+
+```csharp
+[Traced("")] // empty name
+public partial class OrderService { }
+```
+
+## Good Code
+
+```csharp
+[Traced("MyService.Orders")]
+public partial class OrderService { }
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0073.severity = error
+```

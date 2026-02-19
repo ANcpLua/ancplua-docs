@@ -1,0 +1,44 @@
+---
+title: 'AL0051 - Use defined-enum guard helper'
+sidebarTitle: 'AL0051'
+description: 'Use Guard.DefinedEnum() instead of verbose if (!Enum.IsDefined) throw patterns'
+icon: 'shield-check'
+---
+
+Source: [Al0051UseGuardDefinedEnumAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0051UseGuardDefinedEnumAnalyzer.cs)
+
+## Description
+
+Use `Guard.DefinedEnum()` instead of verbose enum-validation and throw patterns.
+
+## Bad Code
+
+```csharp
+public void SetStatus(Status status)
+{
+    if (!Enum.IsDefined(typeof(Status), status))
+        throw new ArgumentOutOfRangeException(nameof(status));
+}
+```
+
+## Good Code
+
+```csharp
+public void SetStatus(Status status)
+{
+    Guard.DefinedEnum(status);
+}
+```
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0051.severity = warning
+```

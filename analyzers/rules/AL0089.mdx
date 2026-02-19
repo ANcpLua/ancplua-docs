@@ -1,0 +1,40 @@
+---
+title: 'AL0089 - Missing OTLP configuration'
+sidebarTitle: 'AL0089'
+description: 'Configure OTLP endpoint explicitly'
+icon: 'shield-check'
+---
+
+Source: [Al0089MissingOtlpConfigurationAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0089MissingOtlpConfigurationAnalyzer.cs)
+
+## Description
+
+OTLP exporter should have its endpoint explicitly configured rather than relying on the default `localhost:4317`, which often does not exist in production.
+
+## Bad Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddOtlpExporter()); // default endpoint
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddOtlpExporter(o =>
+        o.Endpoint = new Uri("https://collector.example.com:4317")));
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0089.severity = warning
+```

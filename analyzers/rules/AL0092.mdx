@@ -1,0 +1,42 @@
+---
+title: 'AL0092 - Consider configuring sampling'
+sidebarTitle: 'AL0092'
+description: 'High-volume services need sampling to control telemetry costs'
+icon: 'shield-check'
+---
+
+Source: [Al0092ConsiderSamplingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0092ConsiderSamplingAnalyzer.cs)
+
+## Description
+
+High-volume services should configure a sampler to control the volume and cost of telemetry data. Without sampling, trace storage costs can grow unbounded.
+
+## Bad Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddOtlpExporter());
+// No sampler configured - defaults to AlwaysOn
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t
+        .SetSampler(new TraceIdRatioBasedSampler(0.1))
+        .AddOtlpExporter());
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0092.severity = suggestion
+```

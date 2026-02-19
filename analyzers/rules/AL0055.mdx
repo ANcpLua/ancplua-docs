@@ -1,0 +1,42 @@
+---
+title: 'AL0055 - Diagnostic missing from release notes'
+sidebarTitle: 'AL0055'
+description: 'Diagnostics should be tracked in release notes'
+icon: 'shield-check'
+---
+
+Source: [Al0054ToAl0056DiagnosticsAlignmentAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0054ToAl0056DiagnosticsAlignmentAnalyzer.cs)
+
+## Description
+
+A diagnostic ID exists in source code but is not listed in AnalyzerReleases.Shipped.md or AnalyzerReleases.Unshipped.md. All diagnostics should be tracked for release management.
+
+## Bad Code
+
+```markdown
+<!-- AnalyzerReleases.Unshipped.md -->
+<!-- AL0099 is missing from this file -->
+```
+
+## Good Code
+
+```markdown
+<!-- AnalyzerReleases.Unshipped.md -->
+
+| Rule ID | Category | Severity | Notes                |
+| ------- | -------- | -------- | -------------------- |
+| AL0099  | Design   | Warning  | New rule description |
+```
+
+## Properties
+
+- **Category**: VersionManagement
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0055.severity = warning
+```

@@ -1,0 +1,42 @@
+---
+title: 'AL0064 - GenAI span missing required attributes'
+sidebarTitle: 'AL0064'
+description: 'GenAI spans must include gen_ai.system, gen_ai.request.model, gen_ai.operation.name'
+icon: 'shield-check'
+---
+
+Source: [Al0064GenAiMissingRequiredAttributesAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0064GenAiMissingRequiredAttributesAnalyzer.cs)
+
+## Description
+
+GenAI semantic conventions require spans to include `gen_ai.system`, `gen_ai.request.model`, and `gen_ai.operation.name` attributes for proper observability.
+
+## Bad Code
+
+```csharp
+using var activity = source.StartActivity("chat");
+activity?.SetTag("gen_ai.system", "openai");
+// Missing gen_ai.request.model and gen_ai.operation.name
+```
+
+## Good Code
+
+```csharp
+using var activity = source.StartActivity("chat");
+activity?.SetTag("gen_ai.system", "openai");
+activity?.SetTag("gen_ai.request.model", "gpt-4");
+activity?.SetTag("gen_ai.operation.name", "chat");
+```
+
+## Properties
+
+- **Category**: GenAI
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0064.severity = warning
+```

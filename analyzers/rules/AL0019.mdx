@@ -1,0 +1,45 @@
+---
+title: 'AL0019 - Undefined version variable'
+sidebarTitle: 'AL0019'
+description: 'Version variable referenced in Directory.Packages.props is not defined in Version.props'
+icon: 'shield-check'
+---
+
+Source: [Al0019UndefinedVersionVariableAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0019UndefinedVersionVariableAnalyzer.cs)
+
+## Description
+
+Version variable referenced in Directory.Packages.props is not defined in Version.props. This causes build failures or unexpected fallback behavior when CPM cannot resolve the variable.
+
+## Bad Code
+
+```xml
+<!-- Directory.Packages.props -->
+<PackageVersion Include="SomePackage" Version="$(UndefinedVar)" />
+<!-- But UndefinedVar is never defined in Version.props -->
+```
+
+## Good Code
+
+```xml
+<!-- Version.props -->
+<PropertyGroup>
+  <SomePackageVersion>13.0.3</SomePackageVersion>
+</PropertyGroup>
+
+<!-- Directory.Packages.props -->
+<PackageVersion Include="SomePackage" Version="$(SomePackageVersion)" />
+```
+
+## Properties
+
+- **Category**: VersionManagement
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0019.severity = warning
+```

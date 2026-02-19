@@ -1,0 +1,41 @@
+---
+title: 'AL0056 - Diagnostic documentation mismatch'
+sidebarTitle: 'AL0056'
+description: 'Title, severity, or category in docs does not match source'
+icon: 'shield-check'
+---
+
+Source: [Al0054ToAl0056DiagnosticsAlignmentAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0054ToAl0056DiagnosticsAlignmentAnalyzer.cs)
+
+## Description
+
+The documentation for a diagnostic rule has a title, severity, or category that does not match the actual values in the analyzer source code. Documentation should stay in sync with the implementation.
+
+## Bad Code
+
+```markdown
+<!-- Documentation says Warning but source has Error -->
+
+| AL0099 | Design | Warning | Some rule |
+```
+
+## Good Code
+
+```markdown
+<!-- Documentation matches source -->
+
+| AL0099 | Design | Error | Some rule |
+```
+
+## Properties
+
+- **Category**: VersionManagement
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0056.severity = warning
+```

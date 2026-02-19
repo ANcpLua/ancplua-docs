@@ -1,0 +1,44 @@
+---
+title: 'AL0046 - Use null-or-whitespace guard helper'
+sidebarTitle: 'AL0046'
+description: 'Use Guard.NotNullOrWhiteSpace() instead of verbose patterns'
+icon: 'shield-check'
+---
+
+Source: [Al0046UseGuardNotNullOrWhiteSpaceAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0046UseGuardNotNullOrWhiteSpaceAnalyzer.cs)
+
+## Description
+
+Use `Guard.NotNullOrWhiteSpace()` instead of verbose null-or-whitespace check and throw patterns.
+
+## Bad Code
+
+```csharp
+public void Process(string name)
+{
+    if (string.IsNullOrWhiteSpace(name))
+        throw new ArgumentException("Cannot be null or whitespace", nameof(name));
+}
+```
+
+## Good Code
+
+```csharp
+public void Process(string name)
+{
+    Guard.NotNullOrWhiteSpace(name);
+}
+```
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0046.severity = warning
+```

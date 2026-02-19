@@ -1,0 +1,37 @@
+---
+title: 'AL0066 - GenAI operation name should follow conventions'
+sidebarTitle: 'AL0066'
+description: "Use 'chat', 'text_completion', or 'embeddings' as operation names"
+icon: 'shield-check'
+---
+
+Source: [Al0066InvalidGenAiOperationNameAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0066InvalidGenAiOperationNameAnalyzer.cs)
+
+## Description
+
+GenAI operation names should follow the semantic conventions: `chat`, `text_completion`, or `embeddings`.
+
+## Bad Code
+
+```csharp
+activity?.SetTag("gen_ai.operation.name", "generate");
+```
+
+## Good Code
+
+```csharp
+activity?.SetTag("gen_ai.operation.name", "chat");
+```
+
+## Properties
+
+- **Category**: GenAI
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0066.severity = warning
+```

@@ -1,0 +1,37 @@
+---
+title: 'AL0074 - Deprecated GenAI semantic convention'
+sidebarTitle: 'AL0074'
+description: 'GenAI attributes have been renamed or deprecated'
+icon: 'shield-check'
+---
+
+Source: [Al0074DeprecatedGenAiAttributeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0074DeprecatedGenAiAttributeAnalyzer.cs)
+
+## Description
+
+Some GenAI semantic convention attributes have been renamed or deprecated. Update to current attribute names.
+
+## Bad Code
+
+```csharp
+activity?.SetTag("gen_ai.prompt", userMessage);
+```
+
+## Good Code
+
+```csharp
+activity?.SetTag("gen_ai.request.input", userMessage);
+```
+
+## Properties
+
+- **Category**: GenAI
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0074.severity = warning
+```

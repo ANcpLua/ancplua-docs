@@ -1,0 +1,42 @@
+---
+title: 'AL0063 - ActivitySource should be registered with AddSource()'
+sidebarTitle: 'AL0063'
+description: 'Unregistered ActivitySources will not emit spans'
+icon: 'shield-check'
+---
+
+Source: [Al0063UnregisteredActivitySourceAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0063UnregisteredActivitySourceAnalyzer.cs)
+
+## Description
+
+An `ActivitySource` that is not registered via `AddSource()` in the tracing configuration will silently drop all spans.
+
+## Bad Code
+
+```csharp
+private static readonly ActivitySource Source = new("MyService");
+// But tracing setup never calls .AddSource("MyService")
+```
+
+## Good Code
+
+```csharp
+private static readonly ActivitySource Source = new("MyService");
+
+// In startup:
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddSource("MyService"));
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0063.severity = warning
+```

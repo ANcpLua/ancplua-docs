@@ -1,0 +1,45 @@
+---
+title: 'AL0072 - Metric method must be partial'
+sidebarTitle: 'AL0072'
+description: 'Source generator requires metric methods to be partial'
+icon: 'shield-check'
+---
+
+Source: [Al0072MetricMethodMustBePartialAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0072MetricMethodMustBePartialAnalyzer.cs)
+
+## Description
+
+Methods annotated with metric attributes (`[Counter]`, `[Histogram]`, etc.) must be `partial` so the source generator can provide the implementation.
+
+## Bad Code
+
+```csharp
+[Meter("MyService")]
+public static partial class MyMetrics
+{
+    [Counter] public static void OrderCount() { }
+}
+```
+
+## Good Code
+
+```csharp
+[Meter("MyService")]
+public static partial class MyMetrics
+{
+    [Counter] public static partial void OrderCount();
+}
+```
+
+## Properties
+
+- **Category**: Metrics
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0072.severity = error
+```

@@ -1,0 +1,44 @@
+---
+title: 'AL0058 - Avoid lock on this'
+sidebarTitle: 'AL0058'
+description: 'Locking on this exposes the lock target to external code, risking deadlocks'
+icon: 'shield-check'
+---
+
+Source: [Al0057ToAl0060ThreadingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0057ToAl0060ThreadingAnalyzer.cs)
+
+## Description
+
+Locking on `this` exposes the synchronization target to any code that holds a reference to the instance, creating deadlock risks.
+
+## Bad Code
+
+```csharp
+public void Update()
+{
+    lock (this) { _count++; }
+}
+```
+
+## Good Code
+
+```csharp
+private readonly Lock _syncRoot = new();
+public void Update()
+{
+    lock (_syncRoot) { _count++; }
+}
+```
+
+## Properties
+
+- **Category**: Threading
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0058.severity = warning
+```

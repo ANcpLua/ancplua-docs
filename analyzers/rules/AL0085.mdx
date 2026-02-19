@@ -1,0 +1,37 @@
+---
+title: 'AL0085 - Invalid attribute value'
+sidebarTitle: 'AL0085'
+description: 'Attribute values must conform to semantic convention format'
+icon: 'shield-check'
+---
+
+Source: [Al0085InvalidAttributeValueAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0085InvalidAttributeValueAnalyzer.cs)
+
+## Description
+
+Span or metric attribute values must conform to the expected format defined by OpenTelemetry semantic conventions (e.g., HTTP methods must be uppercase).
+
+## Bad Code
+
+```csharp
+activity?.SetTag("http.request.method", "get"); // should be uppercase
+```
+
+## Good Code
+
+```csharp
+activity?.SetTag("http.request.method", "GET");
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0085.severity = error
+```

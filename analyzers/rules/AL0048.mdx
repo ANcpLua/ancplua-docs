@@ -1,0 +1,44 @@
+---
+title: 'AL0048 - Use non-negative guard helper'
+sidebarTitle: 'AL0048'
+description: 'Use Guard.NotNegative() instead of verbose if (x < 0) throw patterns'
+icon: 'shield-check'
+---
+
+Source: [Al0048UseGuardNotNegativeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0048UseGuardNotNegativeAnalyzer.cs)
+
+## Description
+
+Use `Guard.NotNegative()` instead of verbose negative-check and throw patterns.
+
+## Bad Code
+
+```csharp
+public void SetCount(int count)
+{
+    if (count < 0)
+        throw new ArgumentOutOfRangeException(nameof(count));
+}
+```
+
+## Good Code
+
+```csharp
+public void SetCount(int count)
+{
+    Guard.NotNegative(count);
+}
+```
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0048.severity = warning
+```

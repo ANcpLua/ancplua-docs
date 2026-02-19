@@ -1,0 +1,43 @@
+---
+title: 'AL0076 - Missing OpenTelemetry configuration'
+sidebarTitle: 'AL0076'
+description: 'Ensure AddOpenTelemetry() is called in service configuration'
+icon: 'shield-check'
+---
+
+Source: [Al0076MissingOTelConfigurationAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0076MissingOTelConfigurationAnalyzer.cs)
+
+## Description
+
+Projects that use `ActivitySource` or `Meter` should call `AddOpenTelemetry()` in their service configuration to ensure telemetry is exported.
+
+## Bad Code
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+// Uses ActivitySource but never configures OpenTelemetry
+var app = builder.Build();
+```
+
+## Good Code
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddSource("MyService"))
+    .WithMetrics(m => m.AddMeter("MyService"));
+var app = builder.Build();
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0076.severity = warning
+```

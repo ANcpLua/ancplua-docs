@@ -1,0 +1,39 @@
+---
+title: 'AL0068 - Metric name should follow naming conventions'
+sidebarTitle: 'AL0068'
+description: 'Use dot-separated namespaces and snake_case for metric names'
+icon: 'shield-check'
+---
+
+Source: [Al0068InvalidMetricNameAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0068InvalidMetricNameAnalyzer.cs)
+
+## Description
+
+Metric names should use dot-separated namespaces and snake_case to follow OpenTelemetry naming conventions.
+
+## Bad Code
+
+```csharp
+var counter = meter.CreateCounter<long>("OrderCount");
+var histogram = meter.CreateHistogram<double>("request-duration");
+```
+
+## Good Code
+
+```csharp
+var counter = meter.CreateCounter<long>("myservice.order.count");
+var histogram = meter.CreateHistogram<double>("http.server.request.duration");
+```
+
+## Properties
+
+- **Category**: Metrics
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0068.severity = warning
+```

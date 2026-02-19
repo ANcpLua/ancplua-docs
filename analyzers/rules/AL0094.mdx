@@ -1,0 +1,40 @@
+---
+title: "AL0094 - Avoid 'dynamic' keyword in AOT"
+sidebarTitle: 'AL0094'
+description: 'dynamic requires Reflection.Emit which is not available in AOT'
+icon: 'shield-check'
+---
+
+Source: [Al0094AvoidDynamicKeywordAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0094AvoidDynamicKeywordAnalyzer.cs)
+
+## Description
+
+The `dynamic` keyword relies on `Reflection.Emit` which is unavailable in Native AOT. Use strongly-typed alternatives.
+
+## Bad Code
+
+```csharp
+dynamic obj = GetResponse();
+Console.WriteLine(obj.Name);
+```
+
+## Good Code
+
+```csharp
+var obj = GetResponse();
+Console.WriteLine(obj.Name);
+// Or use JsonElement / strongly-typed deserialization
+```
+
+## Properties
+
+- **Category**: AOT Testing
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0094.severity = warning
+```

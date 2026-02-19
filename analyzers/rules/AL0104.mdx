@@ -1,0 +1,45 @@
+---
+title: "AL0104 - Prefer 'await using' for IAsyncDisposable"
+sidebarTitle: 'AL0104'
+description: "'using' calls sync Dispose() instead of DisposeAsync()"
+icon: 'shield-check'
+---
+
+Source: [Al0104PreferAwaitUsingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0104PreferAwaitUsingAnalyzer.cs)
+
+## Description
+
+When a type implements `IAsyncDisposable`, using `using` instead of `await using` calls the synchronous `Dispose()` method, potentially blocking or skipping async cleanup.
+
+## Bad Code
+
+```csharp
+async Task Process()
+{
+    using var conn = new SqlConnection(connString);
+    await conn.OpenAsync();
+}
+```
+
+## Good Code
+
+```csharp
+async Task Process()
+{
+    await using var conn = new SqlConnection(connString);
+    await conn.OpenAsync();
+}
+```
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0104.severity = warning
+```

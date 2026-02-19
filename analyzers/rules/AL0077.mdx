@@ -1,0 +1,44 @@
+---
+title: 'AL0077 - Duplicate instrumentation detected'
+sidebarTitle: 'AL0077'
+description: 'Both auto and manual instrumentation creates duplicate spans'
+icon: 'shield-check'
+---
+
+Source: [Al0077DuplicateInstrumentationAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0077DuplicateInstrumentationAnalyzer.cs)
+
+## Description
+
+Using both automatic instrumentation (e.g., `AddAspNetCoreInstrumentation()`) and manual spans for the same operation creates duplicate traces.
+
+## Bad Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t
+        .AddAspNetCoreInstrumentation()
+        .AddSource("MyService"));
+// Then also manually creating spans in middleware for HTTP requests
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t
+        .AddAspNetCoreInstrumentation()
+        .AddSource("MyService.Custom")); // Only custom spans
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0077.severity = warning
+```

@@ -1,0 +1,39 @@
+---
+title: 'AL0083 - Insecure endpoint'
+sidebarTitle: 'AL0083'
+description: 'Use HTTPS for production endpoints'
+icon: 'shield-check'
+---
+
+Source: [Al0083InsecureEndpointAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0083InsecureEndpointAnalyzer.cs)
+
+## Description
+
+Endpoints configured with `http://` should use `https://` in production to ensure encrypted communication.
+
+## Bad Code
+
+```csharp
+builder.Services.AddHttpClient("api", c =>
+    c.BaseAddress = new Uri("http://api.example.com"));
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddHttpClient("api", c =>
+    c.BaseAddress = new Uri("https://api.example.com"));
+```
+
+## Properties
+
+- **Category**: Configuration
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0083.severity = warning
+```

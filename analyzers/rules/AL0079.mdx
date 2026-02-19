@@ -1,0 +1,45 @@
+---
+title: 'AL0079 - Manual span recommended'
+sidebarTitle: 'AL0079'
+description: 'Complex async patterns benefit from manual spans for better tracing'
+icon: 'shield-check'
+---
+
+Source: [Al0079ManualSpanRecommendedAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0079ManualSpanRecommendedAnalyzer.cs)
+
+## Description
+
+Complex async patterns such as parallel tasks, fan-out/fan-in, or background processing benefit from manual spans to accurately capture the execution flow.
+
+## Bad Code
+
+```csharp
+public async Task ProcessBatch(IEnumerable<Order> orders)
+{
+    await Task.WhenAll(orders.Select(ProcessOrder));
+    // No span to group the parallel work
+}
+```
+
+## Good Code
+
+```csharp
+public async Task ProcessBatch(IEnumerable<Order> orders)
+{
+    using var activity = source.StartActivity("ProcessBatch");
+    await Task.WhenAll(orders.Select(ProcessOrder));
+}
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0079.severity = suggestion
+```

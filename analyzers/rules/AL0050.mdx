@@ -1,0 +1,44 @@
+---
+title: 'AL0050 - Use empty-guid guard helper'
+sidebarTitle: 'AL0050'
+description: 'Use Guard.NotEmpty() instead of verbose if (guid == Guid.Empty) throw patterns'
+icon: 'shield-check'
+---
+
+Source: [Al0050UseGuardNotEmptyGuidAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0050UseGuardNotEmptyGuidAnalyzer.cs)
+
+## Description
+
+Use `Guard.NotEmpty()` instead of verbose empty-GUID check and throw patterns.
+
+## Bad Code
+
+```csharp
+public void Load(Guid id)
+{
+    if (id == Guid.Empty)
+        throw new ArgumentException("GUID cannot be empty", nameof(id));
+}
+```
+
+## Good Code
+
+```csharp
+public void Load(Guid id)
+{
+    Guard.NotEmpty(id);
+}
+```
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0050.severity = warning
+```

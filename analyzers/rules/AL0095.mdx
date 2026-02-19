@@ -1,0 +1,39 @@
+---
+title: 'AL0095 - Avoid Expression.Compile() in AOT'
+sidebarTitle: 'AL0095'
+description: 'Expression.Compile() falls back to slow interpreted mode in AOT'
+icon: 'shield-check'
+---
+
+Source: [Al0095AvoidExpressionCompileAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0095AvoidExpressionCompileAnalyzer.cs)
+
+## Description
+
+`Expression.Compile()` uses `Reflection.Emit` which is unavailable in AOT, falling back to a significantly slower interpreted mode.
+
+## Bad Code
+
+```csharp
+Expression<Func<int, int>> expr = x => x * 2;
+var func = expr.Compile();
+```
+
+## Good Code
+
+```csharp
+Func<int, int> func = x => x * 2;
+// Or use source-generated alternatives
+```
+
+## Properties
+
+- **Category**: AOT Testing
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0095.severity = warning
+```

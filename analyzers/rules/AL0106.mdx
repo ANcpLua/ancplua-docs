@@ -1,0 +1,43 @@
+---
+title: 'AL0106 - Avoid Task.Run in ASP.NET Core handlers'
+sidebarTitle: 'AL0106'
+description: 'ASP.NET Core already runs on the thread pool, Task.Run adds overhead'
+icon: 'shield-check'
+---
+
+Source: [Al0106AvoidTaskRunInAspNetCoreAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0106AvoidTaskRunInAspNetCoreAnalyzer.cs)
+
+## Description
+
+ASP.NET Core request handlers already execute on the thread pool. Using `Task.Run()` adds unnecessary overhead by scheduling work to another thread pool thread.
+
+## Bad Code
+
+```csharp
+app.MapGet("/orders", async () =>
+{
+    return await Task.Run(() => db.Orders.ToList());
+});
+```
+
+## Good Code
+
+```csharp
+app.MapGet("/orders", async (AppDbContext db) =>
+{
+    return await db.Orders.ToListAsync();
+});
+```
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0106.severity = warning
+```

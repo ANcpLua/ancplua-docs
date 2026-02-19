@@ -1,0 +1,44 @@
+---
+title: 'AL0102 - Type.GetType with dynamic name is not AOT-safe'
+sidebarTitle: 'AL0102'
+description: 'Prevents static trimming analysis'
+icon: 'shield-check'
+---
+
+Source: [Al0102AvoidTypeGetTypeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0102AvoidTypeGetTypeAnalyzer.cs)
+
+## Description
+
+`Type.GetType()` with a dynamically constructed type name prevents the AOT compiler from performing static analysis, potentially trimming required types.
+
+## Bad Code
+
+```csharp
+var typeName = $"MyApp.{entityName}Repository";
+var type = Type.GetType(typeName);
+```
+
+## Good Code
+
+```csharp
+// Use a dictionary or switch for known types
+var type = entityName switch
+{
+    "Order" => typeof(OrderRepository),
+    "Product" => typeof(ProductRepository),
+    _ => throw new NotSupportedException()
+};
+```
+
+## Properties
+
+- **Category**: AOT Testing
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0102.severity = warning
+```

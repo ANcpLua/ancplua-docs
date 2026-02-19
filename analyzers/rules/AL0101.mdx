@@ -1,0 +1,38 @@
+---
+title: 'AL0101 - Activator.CreateInstance is not AOT-safe'
+sidebarTitle: 'AL0101'
+description: 'Activator.CreateInstance uses reflection for instantiation'
+icon: 'shield-check'
+---
+
+Source: [Al0101AvoidActivatorCreateInstanceAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0101AvoidActivatorCreateInstanceAnalyzer.cs)
+
+## Description
+
+`Activator.CreateInstance()` relies on reflection to create instances, which is not compatible with Native AOT trimming. Use direct construction or factory patterns.
+
+## Bad Code
+
+```csharp
+var service = Activator.CreateInstance(typeof(OrderService));
+```
+
+## Good Code
+
+```csharp
+var service = new OrderService();
+// Or use DI: serviceProvider.GetRequiredService<OrderService>()
+```
+
+## Properties
+
+- **Category**: AOT Testing
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0101.severity = warning
+```

@@ -1,0 +1,43 @@
+---
+title: 'AL0081 - Missing health checks'
+sidebarTitle: 'AL0081'
+description: 'Health checks are essential for container orchestration'
+icon: 'shield-check'
+---
+
+Source: [Al0081MissingHealthChecksAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0081MissingHealthChecksAnalyzer.cs)
+
+## Description
+
+Services should register health checks for liveness and readiness probes used by container orchestrators like Kubernetes.
+
+## Bad Code
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+// No health checks configured
+```
+
+## Good Code
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy());
+var app = builder.Build();
+app.MapHealthChecks("/health");
+```
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0081.severity = warning
+```

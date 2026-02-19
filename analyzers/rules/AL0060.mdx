@@ -1,0 +1,44 @@
+---
+title: 'AL0060 - Avoid lock on string'
+sidebarTitle: 'AL0060'
+description: 'String interning creates cross-assembly synchronization, risking deadlocks'
+icon: 'shield-check'
+---
+
+Source: [Al0057ToAl0060ThreadingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0057ToAl0060ThreadingAnalyzer.cs)
+
+## Description
+
+Interned strings are shared across the entire AppDomain. Locking on a string literal can deadlock with unrelated code.
+
+## Bad Code
+
+```csharp
+public void Update()
+{
+    lock ("myLock") { _count++; }
+}
+```
+
+## Good Code
+
+```csharp
+private readonly Lock _syncRoot = new();
+public void Update()
+{
+    lock (_syncRoot) { _count++; }
+}
+```
+
+## Properties
+
+- **Category**: Threading
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0060.severity = warning
+```

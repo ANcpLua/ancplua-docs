@@ -1,0 +1,40 @@
+---
+title: 'AL0065 - Use gen_ai.client.token.usage histogram'
+sidebarTitle: 'AL0065'
+description: 'Token metrics should use the standard histogram'
+icon: 'shield-check'
+---
+
+Source: [Al0065UseTokenUsageHistogramAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0065UseTokenUsageHistogramAnalyzer.cs)
+
+## Description
+
+Token usage metrics should use the `gen_ai.client.token.usage` histogram name defined in OpenTelemetry GenAI semantic conventions.
+
+## Bad Code
+
+```csharp
+var counter = meter.CreateCounter<long>("token_count");
+counter.Add(response.Usage.TotalTokens);
+```
+
+## Good Code
+
+```csharp
+var histogram = meter.CreateHistogram<long>("gen_ai.client.token.usage");
+histogram.Record(response.Usage.TotalTokens,
+    new("gen_ai.token.type", "total"));
+```
+
+## Properties
+
+- **Category**: GenAI
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0065.severity = warning
+```

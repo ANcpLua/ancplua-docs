@@ -4,7 +4,7 @@ description: Complete reference for all ANcpLua.Analyzers diagnostic rules
 icon: 'shield-check'
 ---
 
-ANcpLua.Analyzers provides 44 diagnostic rules and 2 refactorings for C# code quality, organized by category.
+ANcpLua.Analyzers provides 102 diagnostic rules and 2 refactorings for C# code quality, organized by category.
 
 ## Design Rules
 
@@ -14,12 +14,14 @@ ANcpLua.Analyzers provides 44 diagnostic rules and 2 refactorings for C# code qu
 | [AL0002](/analyzers/rules/AL0002) | Warning  | Don't repeat negated patterns                           |
 | [AL0006](/analyzers/rules/AL0006) | Warning  | Field name conflicts with primary constructor parameter |
 | [AL0010](/analyzers/rules/AL0010) | Info     | Type should be partial for source generator support     |
+| [AL0103](/analyzers/rules/AL0103) | Warning  | Closed type hierarchy switch exhaustiveness             |
 
 ## Reliability Rules
 
-| Rule                              | Severity | Description                   |
-| --------------------------------- | -------- | ----------------------------- |
-| [AL0003](/analyzers/rules/AL0003) | Error    | Don't divide by constant zero |
+| Rule                              | Severity | Description                               |
+| --------------------------------- | -------- | ----------------------------------------- |
+| [AL0003](/analyzers/rules/AL0003) | Error    | Don't divide by constant zero             |
+| [AL0104](/analyzers/rules/AL0104) | Warning  | Prefer 'await using' for IAsyncDisposable |
 
 ## Usage Rules
 
@@ -31,21 +33,43 @@ ANcpLua.Analyzers provides 44 diagnostic rules and 2 refactorings for C# code qu
 | [AL0008](/analyzers/rules/AL0008) | Error    | GetSchema must return null and not be abstract     |
 | [AL0009](/analyzers/rules/AL0009) | Error    | Don't call IXmlSerializable.GetSchema              |
 | [AL0025](/analyzers/rules/AL0025) | Warning  | Anonymous function can be made static              |
-| [AL0026](/analyzers/rules/AL0026) | Warning  | Avoid DateTime.Now/UtcNow, use TimeProvider        |
-| [AL0027](/analyzers/rules/AL0027) | Warning  | Avoid Newtonsoft.Json, use System.Text.Json        |
+| [AL0026](/analyzers/rules/AL0026) | Warning  | Avoid legacy time APIs, use TimeProvider           |
+| [AL0027](/analyzers/rules/AL0027) | Warning  | Avoid legacy JSON APIs, use System.Text.Json       |
 
 ## Threading Rules
 
 | Rule                              | Severity | Description                                    |
 | --------------------------------- | -------- | ---------------------------------------------- |
 | [AL0011](/analyzers/rules/AL0011) | Warning  | Avoid lock keyword on non-Lock types (.NET 9+) |
+| [AL0057](/analyzers/rules/AL0057) | Warning  | Avoid async void methods                       |
+| [AL0058](/analyzers/rules/AL0058) | Warning  | Avoid lock on 'this'                           |
+| [AL0059](/analyzers/rules/AL0059) | Warning  | Avoid lock on typeof(T)                        |
+| [AL0060](/analyzers/rules/AL0060) | Warning  | Avoid lock on string                           |
+| [AL0105](/analyzers/rules/AL0105) | Warning  | Avoid blocking calls in async methods          |
 
 ## OpenTelemetry Rules
 
-| Rule                              | Severity | Description                                   |
-| --------------------------------- | -------- | --------------------------------------------- |
-| [AL0012](/analyzers/rules/AL0012) | Warning  | Deprecated OTel semantic convention attribute |
-| [AL0013](/analyzers/rules/AL0013) | Info     | Missing telemetry schema URL                  |
+| Rule                              | Severity | Description                                          |
+| --------------------------------- | -------- | ---------------------------------------------------- |
+| [AL0012](/analyzers/rules/AL0012) | Warning  | Deprecated OTel semantic convention attribute        |
+| [AL0013](/analyzers/rules/AL0013) | Info     | Missing telemetry schema URL                         |
+| [AL0061](/analyzers/rules/AL0061) | Warning  | Activity/Span missing semantic convention attributes |
+| [AL0062](/analyzers/rules/AL0062) | Warning  | Deprecated semantic convention                       |
+| [AL0063](/analyzers/rules/AL0063) | Warning  | ActivitySource should be registered with AddSource() |
+| [AL0073](/analyzers/rules/AL0073) | Error    | [Traced] requires non-empty ActivitySourceName       |
+| [AL0076](/analyzers/rules/AL0076) | Warning  | Missing OpenTelemetry configuration                  |
+| [AL0077](/analyzers/rules/AL0077) | Warning  | Duplicate instrumentation detected                   |
+| [AL0078](/analyzers/rules/AL0078) | Error    | Invalid ActivitySource name                          |
+| [AL0079](/analyzers/rules/AL0079) | Info     | Manual span recommended                              |
+| [AL0085](/analyzers/rules/AL0085) | Error    | Invalid attribute value                              |
+| [AL0086](/analyzers/rules/AL0086) | Warning  | Incorrect attribute type                             |
+| [AL0087](/analyzers/rules/AL0087) | Info     | Prefer constant attribute                            |
+| [AL0088](/analyzers/rules/AL0088) | Warning  | Sensitive data in span attribute                     |
+| [AL0089](/analyzers/rules/AL0089) | Warning  | Missing OTLP configuration                           |
+| [AL0090](/analyzers/rules/AL0090) | Warning  | Uncompressed OTLP export                             |
+| [AL0091](/analyzers/rules/AL0091) | Warning  | Batch export disabled                                |
+| [AL0092](/analyzers/rules/AL0092) | Info     | Consider configuring sampling                        |
+| [AL0093](/analyzers/rules/AL0093) | Warning  | Missing resource attributes                          |
 
 ## Style Rules
 
@@ -61,6 +85,10 @@ ANcpLua.Analyzers provides 44 diagnostic rules and 2 refactorings for C# code qu
 | --------------------------------- | -------- | ----------------------------------------------------- |
 | [AL0017](/analyzers/rules/AL0017) | Warning  | Hardcoded package version in Directory.Packages.props |
 | [AL0018](/analyzers/rules/AL0018) | Warning  | Version.props not imported in Directory.Build.props   |
+| [AL0019](/analyzers/rules/AL0019) | Warning  | Undefined version variable                            |
+| [AL0054](/analyzers/rules/AL0054) | Warning  | Diagnostic missing from documentation                 |
+| [AL0055](/analyzers/rules/AL0055) | Warning  | Diagnostic missing from release notes                 |
+| [AL0056](/analyzers/rules/AL0056) | Warning  | Diagnostic documentation mismatch                     |
 
 ## ASP.NET Core Rules
 
@@ -71,6 +99,10 @@ ANcpLua.Analyzers provides 44 diagnostic rules and 2 refactorings for C# code qu
 | [AL0022](/analyzers/rules/AL0022) | Error    | Mixed IFormCollection and DTO form binding unsupported          |
 | [AL0023](/analyzers/rules/AL0023) | Error    | Type cannot be form-bound (abstract, interface, no constructor) |
 | [AL0024](/analyzers/rules/AL0024) | Error    | [FromForm] and [FromBody] conflict on same method               |
+| [AL0080](/analyzers/rules/AL0080) | Warning  | Missing resilience configuration                                |
+| [AL0081](/analyzers/rules/AL0081) | Warning  | Missing health checks                                           |
+| [AL0084](/analyzers/rules/AL0084) | Warning  | Missing service discovery                                       |
+| [AL0106](/analyzers/rules/AL0106) | Warning  | Avoid Task.Run in ASP.NET Core handlers                         |
 
 ## Roslyn Utilities Rules
 
@@ -89,6 +121,42 @@ ANcpLua.Analyzers provides 44 diagnostic rules and 2 refactorings for C# code qu
 | [AL0038](/analyzers/rules/AL0038) | Warning  | Use GetOrNull/GetOrDefault instead of TryGetValue           |
 | [AL0039](/analyzers/rules/AL0039) | Warning  | Use EqualsIgnoreCase/StartsWithOrdinal extensions           |
 | [AL0040](/analyzers/rules/AL0040) | Warning  | Use GetConstructorArgument/GetNamedArgument extensions      |
+| [AL0045](/analyzers/rules/AL0045) | Warning  | Use Guard.NotNullOrEmpty()                                  |
+| [AL0046](/analyzers/rules/AL0046) | Warning  | Use Guard.NotNullOrWhiteSpace()                             |
+| [AL0047](/analyzers/rules/AL0047) | Warning  | Use Guard.NotZero()                                         |
+| [AL0048](/analyzers/rules/AL0048) | Warning  | Use Guard.NotNegative()                                     |
+| [AL0049](/analyzers/rules/AL0049) | Warning  | Use Guard.Positive()                                        |
+| [AL0050](/analyzers/rules/AL0050) | Warning  | Use Guard.NotEmpty() for Guid                               |
+| [AL0051](/analyzers/rules/AL0051) | Warning  | Use Guard.DefinedEnum()                                     |
+
+## GenAI Rules
+
+| Rule                              | Severity | Description                                    |
+| --------------------------------- | -------- | ---------------------------------------------- |
+| [AL0064](/analyzers/rules/AL0064) | Warning  | GenAI span missing required attributes         |
+| [AL0065](/analyzers/rules/AL0065) | Warning  | Use gen_ai.client.token.usage histogram        |
+| [AL0066](/analyzers/rules/AL0066) | Warning  | GenAI operation name should follow conventions |
+| [AL0074](/analyzers/rules/AL0074) | Warning  | Deprecated GenAI semantic convention           |
+
+## Metrics Rules
+
+| Rule                              | Severity | Description                                  |
+| --------------------------------- | -------- | -------------------------------------------- |
+| [AL0067](/analyzers/rules/AL0067) | Warning  | Meter should be registered with AddMeter()   |
+| [AL0068](/analyzers/rules/AL0068) | Warning  | Metric name should follow naming conventions |
+| [AL0071](/analyzers/rules/AL0071) | Error    | [Meter] class must be partial static         |
+| [AL0072](/analyzers/rules/AL0072) | Error    | Metric method must be partial                |
+| [AL0075](/analyzers/rules/AL0075) | Warning  | High-cardinality tag on metric               |
+
+## Configuration Rules
+
+| Rule                              | Severity | Description                                        |
+| --------------------------------- | -------- | -------------------------------------------------- |
+| [AL0069](/analyzers/rules/AL0069) | Warning  | ServiceDefaults configuration incomplete           |
+| [AL0070](/analyzers/rules/AL0070) | Warning  | Collector endpoint should use OTLP protocol        |
+| [AL0082](/analyzers/rules/AL0082) | Info     | Consider using configuration for connection string |
+| [AL0083](/analyzers/rules/AL0083) | Warning  | Insecure endpoint                                  |
+| [AL0096](/analyzers/rules/AL0096) | Warning  | Enable EventSourceSupport for AOT with telemetry   |
 
 ## AOT/Trim Safety Rules
 
@@ -98,6 +166,10 @@ ANcpLua.Analyzers provides 44 diagnostic rules and 2 refactorings for C# code qu
 | [AL0042](/analyzers/rules/AL0042) | Warning  | [AotTest]/[TrimTest] should return 100 on success        |
 | [AL0043](/analyzers/rules/AL0043) | Warning  | [TrimSafe] code must not call [RequiresUnreferencedCode] |
 | [AL0044](/analyzers/rules/AL0044) | Warning  | [AotSafe] code must not call [RequiresDynamicCode]       |
+| [AL0094](/analyzers/rules/AL0094) | Warning  | Avoid 'dynamic' keyword in AOT                           |
+| [AL0095](/analyzers/rules/AL0095) | Warning  | Avoid Expression.Compile() in AOT                        |
+| [AL0101](/analyzers/rules/AL0101) | Warning  | Activator.CreateInstance is not AOT-safe                 |
+| [AL0102](/analyzers/rules/AL0102) | Warning  | Type.GetType with dynamic name is not AOT-safe           |
 
 ## Refactorings
 

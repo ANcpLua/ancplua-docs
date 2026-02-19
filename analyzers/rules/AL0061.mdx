@@ -1,0 +1,40 @@
+---
+title: 'AL0061 - Activity/Span missing semantic convention attributes'
+sidebarTitle: 'AL0061'
+description: 'Spans should include semantic convention attributes for observability'
+icon: 'shield-check'
+---
+
+Source: [Al0061ActivityMissingSemconvAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0061ActivityMissingSemconvAnalyzer.cs)
+
+## Description
+
+Activities (spans) should include OpenTelemetry semantic convention attributes to ensure consistent observability across services.
+
+## Bad Code
+
+```csharp
+using var activity = source.StartActivity("ProcessOrder");
+activity?.SetTag("order", orderId); // non-standard attribute name
+```
+
+## Good Code
+
+```csharp
+using var activity = source.StartActivity("ProcessOrder");
+activity?.SetTag("enduser.id", userId);
+activity?.SetTag("order.id", orderId);
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0061.severity = warning
+```

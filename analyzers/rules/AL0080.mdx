@@ -1,0 +1,40 @@
+---
+title: 'AL0080 - Missing resilience configuration'
+sidebarTitle: 'AL0080'
+description: 'HTTP clients should have resilience policies configured'
+icon: 'shield-check'
+---
+
+Source: [Al0080MissingResilienceConfigurationAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0080MissingResilienceConfigurationAnalyzer.cs)
+
+## Description
+
+HTTP clients registered via `AddHttpClient()` should have resilience policies (retry, circuit breaker, timeout) to handle transient failures.
+
+## Bad Code
+
+```csharp
+builder.Services.AddHttpClient("orders", c =>
+    c.BaseAddress = new Uri("https://api.example.com"));
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddHttpClient("orders", c =>
+    c.BaseAddress = new Uri("https://api.example.com"))
+    .AddStandardResilienceHandler();
+```
+
+## Properties
+
+- **Category**: ASP.NET Core
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0080.severity = warning
+```

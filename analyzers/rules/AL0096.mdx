@@ -1,0 +1,39 @@
+---
+title: 'AL0096 - Enable EventSourceSupport for AOT with telemetry'
+sidebarTitle: 'AL0096'
+description: 'AOT trims EventSource by default, breaking telemetry'
+icon: 'shield-check'
+---
+
+Source: [Al0096EnableEventSourceSupportAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0096EnableEventSourceSupportAnalyzer.cs)
+
+## Description
+
+Native AOT trims `EventSource` by default. If your application uses OpenTelemetry or other EventSource-based diagnostics, you must enable `EventSourceSupport` in the project file.
+
+## Bad Code
+
+```xml
+<PublishAot>true</PublishAot>
+<!-- EventSourceSupport not set, EventSource is trimmed -->
+```
+
+## Good Code
+
+```xml
+<PublishAot>true</PublishAot>
+<EventSourceSupport>true</EventSourceSupport>
+```
+
+## Properties
+
+- **Category**: Configuration
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0096.severity = warning
+```

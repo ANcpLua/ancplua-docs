@@ -1,0 +1,37 @@
+---
+title: 'AL0086 - Incorrect attribute type'
+sidebarTitle: 'AL0086'
+description: 'Use correct types for OpenTelemetry attributes'
+icon: 'shield-check'
+---
+
+Source: [Al0086IncorrectAttributeTypeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0086IncorrectAttributeTypeAnalyzer.cs)
+
+## Description
+
+OpenTelemetry attributes should use the correct value types as defined by semantic conventions. Using a string where an int is expected degrades query performance.
+
+## Bad Code
+
+```csharp
+activity?.SetTag("http.response.status_code", "200"); // string instead of int
+```
+
+## Good Code
+
+```csharp
+activity?.SetTag("http.response.status_code", 200);
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0086.severity = warning
+```

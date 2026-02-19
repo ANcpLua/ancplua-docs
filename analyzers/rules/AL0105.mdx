@@ -1,0 +1,45 @@
+---
+title: 'AL0105 - Avoid blocking calls in async methods'
+sidebarTitle: 'AL0105'
+description: '.Result/.Wait()/.GetAwaiter().GetResult() can deadlock in async code'
+icon: 'shield-check'
+---
+
+Source: [Al0105AvoidBlockingCallsInAsyncAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0105AvoidBlockingCallsInAsyncAnalyzer.cs)
+
+## Description
+
+Calling `.Result`, `.Wait()`, or `.GetAwaiter().GetResult()` inside an async method can cause deadlocks, especially in contexts with a `SynchronizationContext`.
+
+## Bad Code
+
+```csharp
+async Task<string> GetData()
+{
+    var result = httpClient.GetStringAsync("/api").Result;
+    return result;
+}
+```
+
+## Good Code
+
+```csharp
+async Task<string> GetData()
+{
+    var result = await httpClient.GetStringAsync("/api");
+    return result;
+}
+```
+
+## Properties
+
+- **Category**: Threading
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0105.severity = warning
+```

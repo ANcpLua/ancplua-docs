@@ -1,0 +1,44 @@
+---
+title: 'AL0047 - Use zero-guard helper'
+sidebarTitle: 'AL0047'
+description: 'Use Guard.NotZero() instead of verbose if (x == 0) throw patterns'
+icon: 'shield-check'
+---
+
+Source: [Al0047UseGuardNotZeroAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0047UseGuardNotZeroAnalyzer.cs)
+
+## Description
+
+Use `Guard.NotZero()` instead of verbose zero-check and throw patterns.
+
+## Bad Code
+
+```csharp
+public void Divide(int divisor)
+{
+    if (divisor == 0)
+        throw new ArgumentException("Cannot be zero", nameof(divisor));
+}
+```
+
+## Good Code
+
+```csharp
+public void Divide(int divisor)
+{
+    Guard.NotZero(divisor);
+}
+```
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0047.severity = warning
+```

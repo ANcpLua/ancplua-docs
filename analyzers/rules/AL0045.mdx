@@ -1,0 +1,44 @@
+---
+title: 'AL0045 - Use null-or-empty guard helper'
+sidebarTitle: 'AL0045'
+description: 'Use Guard.NotNullOrEmpty() instead of verbose if (string.IsNullOrEmpty(...)) throw patterns'
+icon: 'shield-check'
+---
+
+Source: [Al0045UseGuardNotNullOrEmptyAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0045UseGuardNotNullOrEmptyAnalyzer.cs)
+
+## Description
+
+Use `Guard.NotNullOrEmpty()` instead of verbose null-or-empty check and throw patterns. The guard helper is more concise and consistent.
+
+## Bad Code
+
+```csharp
+public void Process(string name)
+{
+    if (string.IsNullOrEmpty(name))
+        throw new ArgumentException("Cannot be null or empty", nameof(name));
+}
+```
+
+## Good Code
+
+```csharp
+public void Process(string name)
+{
+    Guard.NotNullOrEmpty(name);
+}
+```
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0045.severity = warning
+```

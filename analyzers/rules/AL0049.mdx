@@ -1,0 +1,44 @@
+---
+title: 'AL0049 - Use positive-guard helper'
+sidebarTitle: 'AL0049'
+description: 'Use Guard.Positive() instead of verbose if (x <= 0) throw patterns'
+icon: 'shield-check'
+---
+
+Source: [Al0049UseGuardPositiveAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0049UseGuardPositiveAnalyzer.cs)
+
+## Description
+
+Use `Guard.Positive()` instead of verbose positive-check and throw patterns.
+
+## Bad Code
+
+```csharp
+public void SetPageSize(int size)
+{
+    if (size <= 0)
+        throw new ArgumentOutOfRangeException(nameof(size));
+}
+```
+
+## Good Code
+
+```csharp
+public void SetPageSize(int size)
+{
+    Guard.Positive(size);
+}
+```
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0049.severity = warning
+```

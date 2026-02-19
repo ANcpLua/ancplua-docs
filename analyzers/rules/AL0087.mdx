@@ -1,0 +1,39 @@
+---
+title: 'AL0087 - Prefer constant attribute'
+sidebarTitle: 'AL0087'
+description: 'Use constant fields instead of string literals for attribute names'
+icon: 'shield-check'
+---
+
+Source: [Al0087PreferConstantAttributeAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0087PreferConstantAttributeAnalyzer.cs)
+
+## Description
+
+Attribute names used in `SetTag()` calls should reference constant fields instead of string literals to prevent typos and enable refactoring.
+
+## Bad Code
+
+```csharp
+activity?.SetTag("http.request.method", method);
+activity?.SetTag("http.response.status_code", statusCode);
+```
+
+## Good Code
+
+```csharp
+activity?.SetTag(SemanticConventions.HttpRequestMethod, method);
+activity?.SetTag(SemanticConventions.HttpResponseStatusCode, statusCode);
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0087.severity = suggestion
+```

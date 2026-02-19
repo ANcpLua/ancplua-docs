@@ -1,0 +1,41 @@
+---
+title: 'AL0054 - Diagnostic missing from documentation'
+sidebarTitle: 'AL0054'
+description: 'Diagnostics defined in code should be documented'
+icon: 'shield-check'
+---
+
+Source: [Al0054ToAl0056DiagnosticsAlignmentAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0054ToAl0056DiagnosticsAlignmentAnalyzer.cs)
+
+## Description
+
+A diagnostic ID is defined in the analyzer source code but has no corresponding documentation page. All diagnostics should be documented for discoverability.
+
+## Bad Code
+
+```csharp
+// DiagnosticIds.cs defines AL0099
+public const string MyRule = "AL0099";
+// But no docs/rules/AL0099.md exists
+```
+
+## Good Code
+
+```csharp
+// DiagnosticIds.cs defines AL0099
+public const string MyRule = "AL0099";
+// And docs/rules/AL0099.md exists with proper documentation
+```
+
+## Properties
+
+- **Category**: VersionManagement
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0054.severity = warning
+```

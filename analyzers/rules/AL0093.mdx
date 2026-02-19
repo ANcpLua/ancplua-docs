@@ -1,0 +1,42 @@
+---
+title: 'AL0093 - Missing resource attributes'
+sidebarTitle: 'AL0093'
+description: 'service.name and service.version are required resource attributes'
+icon: 'shield-check'
+---
+
+Source: [Al0093MissingResourceAttributesAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0093MissingResourceAttributesAnalyzer.cs)
+
+## Description
+
+OpenTelemetry resources should include `service.name` and `service.version` attributes to identify the service in observability backends.
+
+## Bad Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddOtlpExporter());
+// No resource attributes configured
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(r => r
+        .AddService("order-service", serviceVersion: "1.0.0"))
+    .WithTracing(t => t.AddOtlpExporter());
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0093.severity = warning
+```

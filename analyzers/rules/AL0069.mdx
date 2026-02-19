@@ -1,0 +1,42 @@
+---
+title: 'AL0069 - ServiceDefaults configuration incomplete'
+sidebarTitle: 'AL0069'
+description: 'ServiceDefaults should include tracing, metrics, and logging'
+icon: 'shield-check'
+---
+
+Source: [Al0069IncompleteServiceDefaultsAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0069IncompleteServiceDefaultsAnalyzer.cs)
+
+## Description
+
+ServiceDefaults configuration should include all three observability pillars: tracing, metrics, and logging. Missing any one reduces observability coverage.
+
+## Bad Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddAspNetCoreInstrumentation());
+// Missing WithMetrics and logging configuration
+```
+
+## Good Code
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t.AddAspNetCoreInstrumentation())
+    .WithMetrics(m => m.AddAspNetCoreInstrumentation());
+builder.Logging.AddOpenTelemetry();
+```
+
+## Properties
+
+- **Category**: Configuration
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0069.severity = warning
+```

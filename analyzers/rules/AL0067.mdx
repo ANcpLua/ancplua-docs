@@ -1,0 +1,42 @@
+---
+title: 'AL0067 - Meter should be registered with AddMeter()'
+sidebarTitle: 'AL0067'
+description: 'Unregistered meters will not export metrics'
+icon: 'shield-check'
+---
+
+Source: [Al0067UnregisteredMeterAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0067UnregisteredMeterAnalyzer.cs)
+
+## Description
+
+A `Meter` that is not registered via `AddMeter()` in the metrics configuration will silently drop all recorded measurements.
+
+## Bad Code
+
+```csharp
+private static readonly Meter MyMeter = new("MyService.Orders");
+// But metrics setup never calls .AddMeter("MyService.Orders")
+```
+
+## Good Code
+
+```csharp
+private static readonly Meter MyMeter = new("MyService.Orders");
+
+// In startup:
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(m => m.AddMeter("MyService.Orders"));
+```
+
+## Properties
+
+- **Category**: Metrics
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0067.severity = warning
+```

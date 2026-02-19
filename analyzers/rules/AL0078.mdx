@@ -1,0 +1,37 @@
+---
+title: 'AL0078 - Invalid ActivitySource name'
+sidebarTitle: 'AL0078'
+description: 'ActivitySource names should follow reverse-DNS convention'
+icon: 'shield-check'
+---
+
+Source: [Al0078InvalidActivitySourceNameAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0078InvalidActivitySourceNameAnalyzer.cs)
+
+## Description
+
+`ActivitySource` names should follow the reverse-DNS naming convention (e.g., `MyCompany.MyService`) to avoid collisions and enable filtering.
+
+## Bad Code
+
+```csharp
+private static readonly ActivitySource Source = new("orders");
+```
+
+## Good Code
+
+```csharp
+private static readonly ActivitySource Source = new("MyCompany.OrderService");
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0078.severity = error
+```

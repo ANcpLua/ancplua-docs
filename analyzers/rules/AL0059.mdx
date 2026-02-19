@@ -1,0 +1,44 @@
+---
+title: 'AL0059 - Avoid lock on typeof(T)'
+sidebarTitle: 'AL0059'
+description: 'Type objects are global singletons, risking cross-assembly deadlocks'
+icon: 'shield-check'
+---
+
+Source: [Al0057ToAl0060ThreadingAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0057ToAl0060ThreadingAnalyzer.cs)
+
+## Description
+
+`typeof(T)` returns a globally shared `Type` object. Locking on it creates cross-assembly deadlock risks.
+
+## Bad Code
+
+```csharp
+public void Update()
+{
+    lock (typeof(MyService)) { _count++; }
+}
+```
+
+## Good Code
+
+```csharp
+private static readonly object s_lock = new();
+public void Update()
+{
+    lock (s_lock) { _count++; }
+}
+```
+
+## Properties
+
+- **Category**: Threading
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0059.severity = warning
+```
