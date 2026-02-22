@@ -17,3 +17,5 @@ llms.txt
 
 # MDX files with JSX components that prettier breaks
 erroror/overview.mdx
+datzi/gateway/configuration.mdx
+datzi/gateway/configuration-reference.mdx
