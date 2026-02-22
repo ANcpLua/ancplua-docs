@@ -119,7 +119,7 @@ When validation fails:
     }
     ```
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Choose and configure models">
     Set the primary model and optional fallbacks:
@@ -147,7 +147,7 @@ When validation fails:
     * See [Models CLI](/concepts/models) for switching models in chat and [Model Failover](/concepts/model-failover) for auth rotation and fallback behavior.
     * For custom/self-hosted providers, see [Custom providers](/gateway/configuration-reference#custom-providers-and-base-urls) in the reference.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Control who can message the bot">
     DM access is controlled per channel via `dmPolicy`:
@@ -161,7 +161,7 @@ When validation fails:
 
     See the [full reference](/gateway/configuration-reference#dm-and-group-access) for per-channel details.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Set up group chat mention gating">
     Group messages default to **require mention**. Configure patterns per agent:
@@ -190,7 +190,7 @@ When validation fails:
     * **Text patterns**: regex patterns in `mentionPatterns`
     * See [full reference](/gateway/configuration-reference#group-chat-mention-gating) for per-channel overrides and self-chat mode.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Configure sessions and resets">
     Sessions control conversation continuity and isolation:
@@ -217,7 +217,7 @@ When validation fails:
     * See [Session Management](/concepts/session) for scoping, identity links, and send policy.
     * See [full reference](/gateway/configuration-reference#session) for all fields.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Enable sandboxing">
     Run agent sessions in isolated Docker containers:
@@ -239,7 +239,7 @@ When validation fails:
 
     See [Sandboxing](/gateway/sandboxing) for the full guide and [full reference](/gateway/configuration-reference#sandbox) for all options.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Set up heartbeat (periodic check-ins)">
     ```json5
@@ -259,7 +259,7 @@ When validation fails:
     * `target`: `last` | `whatsapp` | `telegram` | `discord` | `none`
     * See [Heartbeat](/gateway/heartbeat) for the full guide.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Configure cron jobs">
     ```json5
@@ -274,7 +274,7 @@ When validation fails:
 
     See [Cron jobs](/automation/cron-jobs) for the feature overview and CLI examples.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Set up webhooks (hooks)">
     Enable HTTP webhook endpoints on the Gateway:
@@ -302,7 +302,7 @@ When validation fails:
 
     See [full reference](/gateway/configuration-reference#hooks) for all mapping options and Gmail integration.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Configure multi-agent routing">
     Run multiple isolated agents with separate workspaces and sessions:
@@ -324,7 +324,7 @@ When validation fails:
 
     See [Multi-Agent](/concepts/multi-agent) and [full reference](/gateway/configuration-reference#multi-agent-routing) for binding rules and per-agent access profiles.
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="Split config into multiple files ($include)">
     Use `$include` to organize large configs:
@@ -347,7 +347,7 @@ When validation fails:
     * **Relative paths**: resolved relative to the including file
     * **Error handling**: clear errors for missing files, parse errors, and circular includes
 
-  </Accordion>
+</Accordion>
 </AccordionGroup>
 
 ## Config hot reload
@@ -430,7 +430,7 @@ Most fields hot-apply without downtime. In `hybrid` mode, restart-required chang
     }'
     ```
 
-  </Accordion>
+</Accordion>
 
   <Accordion title="config.patch (partial update)">
     Merges a partial update into the existing config (JSON merge patch semantics):
@@ -454,7 +454,7 @@ Most fields hot-apply without downtime. In `hybrid` mode, restart-required chang
     }'
     ```
 
-  </Accordion>
+</Accordion>
 </AccordionGroup>
 
 ## Environment variables
@@ -521,7 +521,7 @@ Rules:
 - Escape with `$${VAR}` for literal output
 - Works inside `$include` files
 - Inline substitution: `"${BASE}/v1"` → `"https://api.example.com/v1"`
-  </Accordion>
+</Accordion>
 
 See [Environment](/help/environment) for full precedence and sources.
 
