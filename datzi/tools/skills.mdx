@@ -3,12 +3,12 @@ id: DATZI-274
 category: tools
 slug: skills
 title: Skills (Datzi)
-summary: Covers the Datzi skills system including load locations, precedence, per-agent vs shared skills, plugin integration, ClawHub registry, SKILL.md format, gating/filtering, config overrides, environment injection, session snapshots, remote macOS nodes, and token impact.
+summary: Covers the Datzi skills system including load locations, precedence, per-agent vs shared skills, plugin integration, DatziHub registry, SKILL.md format, gating/filtering, config overrides, environment injection, session snapshots, remote macOS nodes, and token impact.
 tags:
   [
     skills,
     agentskills,
-    clawhub,
+    datzihub,
     workspace,
     plugins,
     gating,
@@ -61,22 +61,22 @@ You can gate them via `metadata.datzi.requires.config` on the plugin's config
 entry. See [Plugins](/tools/plugin) for discovery/config and [Tools](/tools) for the
 tool surface those skills teach.
 
-## ClawHub (install + sync)
+## DatziHub (install + sync)
 
-ClawHub is the public skills registry for Datzi. Browse at
-[https://clawhub.com](https://clawhub.com). Use it to discover, install, update, and back up skills.
-Full guide: [ClawHub](/tools/clawhub).
+DatziHub is the public skills registry for Datzi. Browse at
+[https://datzihub.com](https://datzihub.com). Use it to discover, install, update, and back up skills.
+Full guide: [DatziHub](/tools/datzihub).
 
 Common flows:
 
 - Install a skill into your workspace:
-  - `clawhub install <skill-slug>`
+  - `datzihub install <skill-slug>`
 - Update all installed skills:
-  - `clawhub update --all`
+  - `datzihub update --all`
 - Sync (scan + publish updates):
-  - `clawhub sync --all`
+  - `datzihub sync --all`
 
-By default, `clawhub` installs into `./skills` under your current working
+By default, `datzihub` installs into `./skills` under your current working
 directory (or falls back to the configured Datzi workspace). Datzi picks
 that up as `<workspace>/skills` on the next session.
 
@@ -319,6 +319,6 @@ See [Skills config](/tools/skills-config) for the full configuration schema.
 
 ## Looking for more skills?
 
-Browse [https://clawhub.com](https://clawhub.com).
+Browse [https://datzihub.com](https://datzihub.com).
 
 ---
