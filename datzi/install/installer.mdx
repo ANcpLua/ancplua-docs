@@ -165,16 +165,16 @@ The script exits with code `2` for invalid method selection or invalid `--instal
   <Accordion title="Environment variables reference">
     | Variable                                    | Description                                   |
     | ------------------------------------------- | --------------------------------------------- |
-    | `OPENCLAW_INSTALL_METHOD=git\|npm`          | Install method                                |
-    | `OPENCLAW_VERSION=latest\|next\|<semver>`   | npm version or dist-tag                       |
-    | `OPENCLAW_BETA=0\|1`                        | Use beta if available                         |
-    | `OPENCLAW_GIT_DIR=<path>`                   | Checkout directory                            |
-    | `OPENCLAW_GIT_UPDATE=0\|1`                  | Toggle git updates                            |
-    | `OPENCLAW_NO_PROMPT=1`                      | Disable prompts                               |
-    | `OPENCLAW_NO_ONBOARD=1`                     | Skip onboarding                               |
-    | `OPENCLAW_DRY_RUN=1`                        | Dry run mode                                  |
-    | `OPENCLAW_VERBOSE=1`                        | Debug mode                                    |
-    | `OPENCLAW_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                 |
+    | `DATZI_INSTALL_METHOD=git\|npm`          | Install method                                |
+    | `DATZI_VERSION=latest\|next\|<semver>`   | npm version or dist-tag                       |
+    | `DATZI_BETA=0\|1`                        | Use beta if available                         |
+    | `DATZI_GIT_DIR=<path>`                   | Checkout directory                            |
+    | `DATZI_GIT_UPDATE=0\|1`                  | Toggle git updates                            |
+    | `DATZI_NO_PROMPT=1`                      | Disable prompts                               |
+    | `DATZI_NO_ONBOARD=1`                     | Skip onboarding                               |
+    | `DATZI_DRY_RUN=1`                        | Dry run mode                                  |
+    | `DATZI_VERBOSE=1`                        | Debug mode                                    |
+    | `DATZI_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                 |
     | `SHARP_IGNORE_GLOBAL_LIBVIPS=0\|1`          | Control sharp/libvips behavior (default: `1`) |
   </Accordion>
 </AccordionGroup>
@@ -248,12 +248,12 @@ The script exits with code `2` for invalid method selection or invalid `--instal
   <Accordion title="Environment variables reference">
     | Variable                                    | Description                                                                       |
     | ------------------------------------------- | --------------------------------------------------------------------------------- |
-    | `OPENCLAW_PREFIX=<path>`                    | Install prefix                                                                    |
-    | `OPENCLAW_VERSION=<ver>`                    | Datzi version or dist-tag                                                      |
-    | `OPENCLAW_NODE_VERSION=<ver>`               | Node version                                                                      |
-    | `OPENCLAW_NO_ONBOARD=1`                     | Skip onboarding                                                                   |
-    | `OPENCLAW_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                                                     |
-    | `OPENCLAW_GIT_DIR=<path>`                   | Legacy cleanup lookup path (used when removing old `Peekaboo` submodule checkout) |
+    | `DATZI_PREFIX=<path>`                    | Install prefix                                                                    |
+    | `DATZI_VERSION=<ver>`                    | Datzi version or dist-tag                                                      |
+    | `DATZI_NODE_VERSION=<ver>`               | Node version                                                                      |
+    | `DATZI_NO_ONBOARD=1`                     | Skip onboarding                                                                   |
+    | `DATZI_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                                                     |
+    | `DATZI_GIT_DIR=<path>`                   | Legacy cleanup lookup path (used when removing old `Peekaboo` submodule checkout) |
     | `SHARP_IGNORE_GLOBAL_LIBVIPS=0\|1`          | Control sharp/libvips behavior (default: `1`)                                     |
   </Accordion>
 </AccordionGroup>
@@ -333,11 +333,11 @@ The script exits with code `2` for invalid method selection or invalid `--instal
   <Accordion title="Environment variables reference">
     | Variable                           | Description        |
     | ---------------------------------- | ------------------ |
-    | `OPENCLAW_INSTALL_METHOD=git\|npm` | Install method     |
-    | `OPENCLAW_GIT_DIR=<path>`          | Checkout directory |
-    | `OPENCLAW_NO_ONBOARD=1`            | Skip onboarding    |
-    | `OPENCLAW_GIT_UPDATE=0`            | Disable git pull   |
-    | `OPENCLAW_DRY_RUN=1`               | Dry run mode       |
+    | `DATZI_INSTALL_METHOD=git\|npm` | Install method     |
+    | `DATZI_GIT_DIR=<path>`          | Checkout directory |
+    | `DATZI_NO_ONBOARD=1`            | Skip onboarding    |
+    | `DATZI_GIT_UPDATE=0`            | Disable git pull   |
+    | `DATZI_DRY_RUN=1`               | Dry run mode       |
   </Accordion>
 </AccordionGroup>
 
@@ -360,7 +360,7 @@ Use non-interactive flags/env vars for predictable runs.
   </Tab>
 
 <Tab title="install.sh (non-interactive git)">
-  ```bash OPENCLAW_INSTALL_METHOD=git OPENCLAW_NO_PROMPT=1 \ curl -fsSL --proto
+  ```bash DATZI_INSTALL_METHOD=git DATZI_NO_PROMPT=1 \ curl -fsSL --proto
   '=https' --tlsv1.2 https://datzi.ai/install.sh | bash ```
 </Tab>
 

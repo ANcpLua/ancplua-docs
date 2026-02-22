@@ -44,8 +44,8 @@ reach other host locations unless sandboxing is enabled. See
 
 ## Paths (quick map)
 
-- Config: `~/.datzi/datzi.json` (or `OPENCLAW_CONFIG_PATH`)
-- State dir: `~/.datzi` (or `OPENCLAW_STATE_DIR`)
+- Config: `~/.datzi/datzi.json` (or `DATZI_CONFIG_PATH`)
+- State dir: `~/.datzi` (or `DATZI_STATE_DIR`)
 - Workspace: `~/.datzi/workspace` (or `~/.datzi/workspace-<agentId>`)
 - Agent dir: `~/.datzi/agents/<agentId>/agent` (or `agents.list[].agentDir`)
 - Sessions: `~/.datzi/agents/<agentId>/sessions`
@@ -56,7 +56,7 @@ If you do nothing, Datzi runs a single agent:
 
 - `agentId` defaults to **`main`**.
 - Sessions are keyed as `agent:main:<mainKey>`.
-- Workspace defaults to `~/.datzi/workspace` (or `~/.datzi/workspace-<profile>` when `OPENCLAW_PROFILE` is set).
+- Workspace defaults to `~/.datzi/workspace` (or `~/.datzi/workspace-<profile>` when `DATZI_PROFILE` is set).
 - State defaults to `~/.datzi/agents/main/agent`.
 
 ## Agent helper

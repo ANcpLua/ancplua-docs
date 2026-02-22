@@ -16,8 +16,8 @@ need stronger isolation or redundancy (e.g., a rescue bot), run separate Gateway
 
 ## Isolation checklist (required)
 
-- `OPENCLAW_CONFIG_PATH` — per-instance config file
-- `OPENCLAW_STATE_DIR` — per-instance sessions, creds, caches
+- `DATZI_CONFIG_PATH` — per-instance config file
+- `DATZI_STATE_DIR` — per-instance sessions, creds, caches
 - `agents.defaults.workspace` — per-instance workspace root
 - `gateway.port` (or `--port`) — unique per instance
 - Derived ports (browser/canvas) must not overlap
@@ -26,7 +26,7 @@ If these are shared, you will hit config races and port conflicts.
 
 ## Recommended: profiles (`--profile`)
 
-Profiles auto-scope `OPENCLAW_STATE_DIR` + `OPENCLAW_CONFIG_PATH` and suffix service names.
+Profiles auto-scope `DATZI_STATE_DIR` + `DATZI_CONFIG_PATH` and suffix service names.
 
 ```bash
 # main
@@ -80,7 +80,7 @@ datzi --profile rescue gateway install
 
 ## Port mapping (derived)
 
-Base port = `gateway.port` (or `OPENCLAW_GATEWAY_PORT` / `--port`).
+Base port = `gateway.port` (or `DATZI_GATEWAY_PORT` / `--port`).
 
 - browser control service port = base + 2 (loopback only)
 - canvas host is served on the Gateway HTTP server (same port as `gateway.port`)
@@ -98,12 +98,12 @@ If you override any of these in config or env, you must keep them unique per ins
 ## Manual env example
 
 ```bash
-OPENCLAW_CONFIG_PATH=~/.datzi/main.json \
-OPENCLAW_STATE_DIR=~/.datzi-main \
+DATZI_CONFIG_PATH=~/.datzi/main.json \
+DATZI_STATE_DIR=~/.datzi-main \
 datzi gateway --port 18789
 
-OPENCLAW_CONFIG_PATH=~/.datzi/rescue.json \
-OPENCLAW_STATE_DIR=~/.datzi-rescue \
+DATZI_CONFIG_PATH=~/.datzi/rescue.json \
+DATZI_STATE_DIR=~/.datzi-rescue \
 datzi gateway --port 19001
 ```
 

@@ -354,7 +354,7 @@ in the summary. Keep that tab open; if it didn't launch, copy/paste the printed 
 **Localhost (same machine):**
 
 - Open `http://127.0.0.1:18789/`.
-- If it asks for auth, paste the token from `gateway.auth.token` (or `OPENCLAW_GATEWAY_TOKEN`) into Control UI settings.
+- If it asks for auth, paste the token from `gateway.auth.token` (or `DATZI_GATEWAY_TOKEN`) into Control UI settings.
 - Retrieve it from the gateway host: `datzi config get gateway.auth.token` (or generate one:
   `datzi doctor --generate-gateway-token`).
 
@@ -432,7 +432,7 @@ keeps your bot "exactly the same" (memory, session history, auth, and channel
 state) as long as you copy **both** locations:
 
 1. Install Datzi on the new machine.
-2. Copy `$OPENCLAW_STATE_DIR` (default: `~/.datzi`) from the old machine.
+2. Copy `$DATZI_STATE_DIR` (default: `~/.datzi`) from the old machine.
 3. Copy your workspace (default: `~/.datzi/workspace`).
 4. Run `datzi doctor` and restart the Gateway service.
 
@@ -1061,7 +1061,7 @@ The wizard explicitly supports Anthropic setup-token and OpenAI Codex OAuth and 
 Precedence:
 
 ```
---port > OPENCLAW_GATEWAY_PORT > gateway.port > default 18789
+--port > DATZI_GATEWAY_PORT > gateway.port > default 18789
 ```
 
 ### Why does datzi gateway status say Runtime running but RPC probe failed
@@ -1077,7 +1077,7 @@ Use `datzi gateway status` and trust these lines:
 
 ### Why does datzi gateway status show Config cli and Config service different
 
-You're editing one config file while the service is running another (often a `--profile` / `OPENCLAW_STATE_DIR`
+You're editing one config file while the service is running another (often a `--profile` / `DATZI_STATE_DIR`
 mismatch).
 
 Fix:
@@ -1130,7 +1130,7 @@ Fix:
 - Fastest: `datzi dashboard` (prints + copies the dashboard URL, tries to open; shows SSH hint if headless).
 - If you don't have a token yet: `datzi doctor --generate-gateway-token`.
 - If remote, tunnel first: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/`.
-- Set `gateway.auth.token` (or `OPENCLAW_GATEWAY_TOKEN`) on the gateway host.
+- Set `gateway.auth.token` (or `DATZI_GATEWAY_TOKEN`) on the gateway host.
 - In the Control UI settings, paste the same token.
 - Still stuck? Run `datzi status --all` and follow [Troubleshooting](/gateway/troubleshooting).
   See [Dashboard](/web/dashboard) for auth details.
@@ -1154,8 +1154,8 @@ redundancy (ex: rescue bot) or hard isolation.
 
 Yes, but you must isolate:
 
-- `OPENCLAW_CONFIG_PATH` (per-instance config)
-- `OPENCLAW_STATE_DIR` (per-instance state)
+- `DATZI_CONFIG_PATH` (per-instance config)
+- `DATZI_STATE_DIR` (per-instance state)
 - `agents.defaults.workspace` (workspace isolation)
 - `gateway.port` (unique ports)
 
@@ -1216,7 +1216,7 @@ datzi logs --follow
 
 Service/supervisor logs (when the gateway runs via launchd/systemd):
 
-- macOS: `$OPENCLAW_STATE_DIR/logs/gateway.log` and `gateway.err.log` (default: `~/.datzi/logs/...`; profiles use
+- macOS: `$DATZI_STATE_DIR/logs/gateway.log` and `gateway.err.log` (default: `~/.datzi/logs/...`; profiles use
   `~/.datzi-<profile>/logs/...`)
 - Linux: `journalctl --user -u datzi-gateway[-<profile>].service -n 200 --no-pager`
 - Windows: `schtasks /Query /TN "Datzi Gateway (<profile>)" /V /FO LIST`

@@ -15,7 +15,7 @@ This guide migrates a Datzi Gateway from one machine to another **without redoin
 
 The migration is simple conceptually:
 
-- Copy the **state directory** (`$OPENCLAW_STATE_DIR`, default: `~/.datzi/`) — this includes config, auth, sessions,
+- Copy the **state directory** (`$DATZI_STATE_DIR`, default: `~/.datzi/`) — this includes config, auth, sessions,
   and channel state.
 - Copy your **workspace** (`~/.datzi/workspace/` by default) — this includes your agent files (memory, prompts,
   etc.).
@@ -33,7 +33,7 @@ Most installs use the default:
 But it may be different if you use:
 
 - `--profile <name>` (often becomes `~/.datzi-<profile>/`)
-- `OPENCLAW_STATE_DIR=/some/path`
+- `DATZI_STATE_DIR=/some/path`
 
 If you're not sure, run on the **old** machine:
 
@@ -41,7 +41,7 @@ If you're not sure, run on the **old** machine:
 datzi status
 ```
 
-Look for mentions of `OPENCLAW_STATE_DIR` / profile in the output. If you run multiple gateways, repeat for each
+Look for mentions of `DATZI_STATE_DIR` / profile in the output. If you run multiple gateways, repeat for each
 profile.
 
 ### 2) Identify your workspace
@@ -69,7 +69,7 @@ If you copy **only** the workspace (e.g., via Git), you do **not** preserve:
 - credentials
 - channel logins
 
-Those live under `$OPENCLAW_STATE_DIR`.
+Those live under `$DATZI_STATE_DIR`.
 
 ## Migration steps (recommended)
 
@@ -105,7 +105,7 @@ At this stage, it's OK if onboarding creates a fresh `~/.datzi/` — you will ov
 
 Copy **both**:
 
-- `$OPENCLAW_STATE_DIR` (default `~/.datzi/`)
+- `$DATZI_STATE_DIR` (default `~/.datzi/`)
 - your workspace (default `~/.datzi/workspace/`)
 
 Common approaches:
@@ -140,7 +140,7 @@ datzi status
 
 ### Footgun: profile / state-dir mismatch
 
-If you ran the old gateway with a profile (or `OPENCLAW_STATE_DIR`), and the new gateway uses a different one, you'll
+If you ran the old gateway with a profile (or `DATZI_STATE_DIR`), and the new gateway uses a different one, you'll
 see symptoms like:
 
 - config changes not taking effect
@@ -157,10 +157,10 @@ datzi doctor
 
 `datzi.json` is not enough. Many providers store state under:
 
-- `$OPENCLAW_STATE_DIR/credentials/`
-- `$OPENCLAW_STATE_DIR/agents/<agentId>/...`
+- `$DATZI_STATE_DIR/credentials/`
+- `$DATZI_STATE_DIR/agents/<agentId>/...`
 
-Always migrate the entire `$OPENCLAW_STATE_DIR` folder.
+Always migrate the entire `$DATZI_STATE_DIR` folder.
 
 ### Footgun: permissions / ownership
 
@@ -177,7 +177,7 @@ If you're in remote mode, migrate the **gateway host**.
 
 ### Footgun: secrets in backups
 
-`$OPENCLAW_STATE_DIR` contains secrets (API keys, OAuth tokens, WhatsApp creds). Treat backups like production secrets:
+`$DATZI_STATE_DIR` contains secrets (API keys, OAuth tokens, WhatsApp creds). Treat backups like production secrets:
 
 - store encrypted
 - avoid sharing over insecure channels
