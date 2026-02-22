@@ -1,0 +1,34 @@
+---
+id: DATZI-196
+category: platforms
+slug: platforms/mac/skills
+title: Skills (macOS)
+summary: Describes how the macOS app surfaces Datzi skills via the Gateway, including install actions, API key storage, and remote mode behavior.
+tags: [macos, skills, gateway, install, api-keys, remote]
+---
+
+# Skills (macOS)
+
+The macOS app surfaces Datzi skills via the gateway; it does not parse skills locally.
+
+## Data source
+
+- `skills.status` (gateway) returns all skills plus eligibility and missing requirements
+  (including allowlist blocks for bundled skills).
+- Requirements are derived from `metadata.datzi.requires` in each `SKILL.md`.
+
+## Install actions
+
+- `metadata.datzi.install` defines install options (brew/node/go/uv).
+- The app calls `skills.install` to run installers on the gateway host.
+- The gateway surfaces only one preferred installer when multiple are provided
+  (brew when available, otherwise node manager from `skills.install`, default npm).
+
+## Env/API keys
+
+- The app stores keys in `~/.datzi/datzi.json` under `skills.entries.<skillKey>`.
+- `skills.update` patches `enabled`, `apiKey`, and `env`.
+
+## Remote mode
+
+- Install + config updates happen on the gateway host (not the local Mac).

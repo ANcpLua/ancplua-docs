@@ -1,0 +1,88 @@
+---
+id: DATZI-110
+category: gateway
+slug: gateway/authentication
+title: Authentication
+summary: Covers how the Gateway authenticates requests using API keys and token-based mechanisms.
+tags: ['authentication', 'api-keys', 'security', 'gateway']
+---
+
+Source: https://docs.datzi.ai/gateway/authentication
+
+# Authentication
+
+Datzi supports OAuth and API keys for model providers. For Anthropic
+accounts, we recommend using an **API key**. For Claude subscription access,
+use the long‑lived token created by `claude setup-token`.
+
+See [/concepts/oauth](/concepts/oauth) for the full OAuth flow and storage
+layout.
+
+## Checking model auth status
+
+```bash
+datzi models status
+datzi doctor
+```
+
+## API key rotation behavior (gateway)
+
+Some providers support retrying a request with alternative keys when an API call
+hits a provider rate limit.
+
+- Priority order:
+  - `OPENCLAW_LIVE_<PROVIDER>_KEY` (single override)
+  - `<PROVIDER>_API_KEYS`
+  - `<PROVIDER>_API_KEY`
+  - `<PROVIDER>_API_KEY_*`
+- Google providers also include `GOOGLE_API_KEY` as an additional fallback.
+- The same key list is deduplicated before use.
+- Datzi retries with the next key only for rate-limit errors (for example
+  `429`, `rate_limit`, `quota`, `resource exhausted`).
+- Non-rate-limit errors are not retried with alternate keys.
+- If all keys fail, the final error from the last attempt is returned.
+
+## Controlling which credential is used
+
+### Per-session (chat command)
+
+Use `/model <alias-or-id>@<profileId>` to pin a specific provider credential for the current session (example profile
+ids: `anthropic:default`, `anthropic:work`).
+
+Use `/model` (or `/model list`) for a compact picker; use `/model status` for the full view (candidates + next auth
+profile, plus provider endpoint details when configured).
+
+### Per-agent (CLI override)
+
+Set an explicit auth profile order override for an agent (stored in that agent’s `auth-profiles.json`):
+
+```bash
+datzi models auth order get --provider anthropic
+datzi models auth order set --provider anthropic anthropic:default
+datzi models auth order clear --provider anthropic
+```
+
+Use `--agent <id>` to target a specific agent; omit it to use the configured default agent.
+
+## Troubleshooting
+
+### “No credentials found”
+
+If the Anthropic token profile is missing, run `claude setup-token` on the
+**gateway host**, then re-check:
+
+```bash
+datzi models status
+```
+
+### Token expiring/expired
+
+Run `datzi models status` to confirm which profile is expiring. If the profile
+is missing, rerun `claude setup-token` and paste the token again.
+
+## Requirements
+
+- Claude Max or Pro subscription (for `claude setup-token`)
+- Claude Code CLI installed (`claude` command available)
+
+# Background Exec and Process Tool

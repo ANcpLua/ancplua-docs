@@ -1,0 +1,168 @@
+---
+id: DATZI-211
+category: providers
+slug: providers/litellm
+title: LiteLLM
+summary: Explains how to route Datzi through a LiteLLM proxy for unified cost tracking, model routing, virtual keys, and automatic failover across 100+ LLM backends.
+tags:
+  [
+    providers,
+    litellm,
+    proxy,
+    openai,
+    model-routing,
+    cost-tracking,
+    virtual-keys
+  ]
+---
+
+# LiteLLM
+
+[LiteLLM](https://litellm.ai) is an open-source LLM gateway that provides a unified API to 100+ model providers. Route
+Datzi through LiteLLM to get centralized cost tracking, logging, and the flexibility to switch backends without changing
+your Datzi config.
+
+## Why use LiteLLM with Datzi?
+
+- **Cost tracking** — See exactly what Datzi spends across all models
+- **Model routing** — Switch between Claude, GPT-4, Gemini, Bedrock without config changes
+- **Virtual keys** — Create keys with spend limits for Datzi
+- **Logging** — Full request/response logs for debugging
+- **Fallbacks** — Automatic failover if your primary provider is down
+
+## Quick start
+
+### Via onboarding
+
+```bash
+datzi onboard --auth-choice litellm-api-key
+```
+
+### Manual setup
+
+1. Start LiteLLM Proxy:
+
+```bash
+pip install 'litellm[proxy]'
+litellm --model ollama/qwen3-coder:32b
+```
+
+2. Point Datzi to LiteLLM:
+
+```bash
+export LITELLM_API_KEY="your-litellm-key"
+
+datzi
+```
+
+That's it. Datzi now routes through LiteLLM.
+
+## Configuration
+
+### Environment variables
+
+```bash
+export LITELLM_API_KEY="sk-litellm-key"
+```
+
+### Config file
+
+```json5
+{
+  models: {
+    providers: {
+      litellm: {
+        baseUrl: 'http://localhost:4000',
+        apiKey: '${LITELLM_API_KEY}',
+        api: 'openai-completions',
+        models: [
+          {
+            id: 'qwen3-coder:32b',
+            name: 'Claude Opus 4.6',
+            reasoning: true,
+            input: ['text', 'image'],
+            contextWindow: 200000,
+            maxTokens: 64000
+          },
+          {
+            id: 'deepseek-r1:32b',
+            name: 'GPT-4o',
+            reasoning: false,
+            input: ['text', 'image'],
+            contextWindow: 128000,
+            maxTokens: 8192
+          }
+        ]
+      }
+    }
+  },
+  agents: {
+    defaults: {
+      model: {
+        primary: 'litellm/ollama_chat/qwen3-coder:32b'
+      }
+    }
+  }
+}
+```
+
+## Virtual keys
+
+Create a dedicated key for Datzi with spend limits:
+
+```bash
+curl -X POST "http://localhost:4000/key/generate" \
+  -H "Authorization: Bearer $LITELLM_MASTER_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "key_alias": "datzi",
+    "max_budget": 50.00,
+    "budget_duration": "monthly"
+  }'
+```
+
+Use the generated key as `LITELLM_API_KEY`.
+
+## Model routing
+
+LiteLLM can route model requests to different backends. Configure in your LiteLLM `config.yaml`:
+
+```yaml
+model_list:
+  - model_name: qwen3-coder-32b
+    litellm_params:
+      model: ollama/qwen3-coder:32b
+      api_base: http://localhost:11434
+
+  - model_name: deepseek-r1-32b
+    litellm_params:
+      model: ollama/deepseek-r1:32b
+      api_base: http://localhost:11434
+```
+
+Datzi keeps requesting `qwen3-coder-32b` — LiteLLM handles the routing.
+
+## Viewing usage
+
+Check LiteLLM's dashboard or API:
+
+```bash
+# Key info
+curl "http://localhost:4000/key/info" \
+  -H "Authorization: Bearer sk-litellm-key"
+
+# Spend logs
+curl "http://localhost:4000/spend/logs" \
+  -H "Authorization: Bearer $LITELLM_MASTER_KEY"
+```
+
+## Notes
+
+- LiteLLM runs on `http://localhost:4000` by default
+- Datzi connects via the OpenAI-compatible `/v1/chat/completions` endpoint
+- All Datzi features work through LiteLLM — no limitations
+
+## See also
+
+- [LiteLLM Docs](https://docs.litellm.ai)
+- [Model Providers](/concepts/model-providers)

@@ -1,0 +1,275 @@
+---
+id: DATZI-031
+category: channels
+slug: whatsapp
+title: WhatsApp (Web channel)
+summary: Setup and configuration guide for the WhatsApp channel via Baileys including QR pairing, access policies, group handling, media, ack reactions, and multi-account support.
+tags:
+  [
+    whatsapp,
+    baileys,
+    qr-pairing,
+    groups,
+    mention-gating,
+    media,
+    ack-reaction,
+    multi-account,
+    personal-number
+  ]
+---
+
+# WhatsApp
+
+Source: https://docs.datzi.ai/channels/whatsapp
+
+# WhatsApp (Web channel)
+
+Status: production-ready via WhatsApp Web (Baileys). Gateway owns linked session(s).
+
+## Quick setup
+
+<Steps>
+  <Step title="Configure WhatsApp access policy">
+    ```json5
+    {
+      channels: {
+        whatsapp: {
+          dmPolicy: "pairing",
+          allowFrom: ["+15551234567"],
+          groupPolicy: "allowlist",
+          groupAllowFrom: ["+15551234567"],
+        },
+      },
+    }
+    ```
+  </Step>
+
+  <Step title="Link WhatsApp (QR)">
+    ```bash
+    datzi channels login --channel whatsapp
+    ```
+
+    For a specific account:
+
+    ```bash
+    datzi channels login --channel whatsapp --account work
+    ```
+
+  </Step>
+
+<Step title="Start the gateway">```bash datzi gateway ```</Step>
+
+  <Step title="Approve first pairing request (if using pairing mode)">
+    ```bash
+    datzi pairing list whatsapp
+    datzi pairing approve whatsapp <CODE>
+    ```
+
+    Pairing requests expire after 1 hour. Pending requests are capped at 3 per channel.
+
+  </Step>
+</Steps>
+
+## Deployment patterns
+
+### Dedicated number (recommended)
+
+This is the cleanest operational mode:
+
+- separate WhatsApp identity for Datzi
+- clearer DM allowlists and routing boundaries
+- lower chance of self-chat confusion
+
+Minimal policy pattern:
+
+```json5
+{
+  channels: {
+    whatsapp: {
+      dmPolicy: 'allowlist',
+      allowFrom: ['+15551234567']
+    }
+  }
+}
+```
+
+### Personal-number fallback
+
+Onboarding supports personal-number mode and writes a self-chat-friendly baseline:
+
+- `dmPolicy: "allowlist"`
+- `allowFrom` includes your personal number
+- `selfChatMode: true`
+
+In runtime, self-chat protections key off the linked self number and `allowFrom`.
+
+## Runtime model
+
+- Gateway owns the WhatsApp socket and reconnect loop.
+- Outbound sends require an active WhatsApp listener for the target account.
+- Status and broadcast chats are ignored (`@status`, `@broadcast`).
+- Direct chats use DM session rules (`session.dmScope`; default `main` collapses DMs to the agent main session).
+- Group sessions are isolated (`agent:<agentId>:whatsapp:group:<jid>`).
+
+## Access control and activation
+
+`channels.whatsapp.dmPolicy` controls direct chat access:
+
+- `pairing` (default)
+- `allowlist`
+- `open` (requires `allowFrom` to include `"*"`)
+- `disabled`
+
+`allowFrom` accepts E.164-style numbers (normalized internally).
+
+Group access has two layers:
+
+1. **Group membership allowlist** (`channels.whatsapp.groups`)
+   - if `groups` is omitted, all groups are eligible
+   - if `groups` is present, it acts as a group allowlist (`"*"` allowed)
+
+2. **Group sender policy** (`channels.whatsapp.groupPolicy` + `groupAllowFrom`)
+   - `open`: sender allowlist bypassed
+   - `allowlist`: sender must match `groupAllowFrom` (or `*`)
+   - `disabled`: block all group inbound
+
+Group replies require mention by default.
+
+Mention detection includes:
+
+- explicit WhatsApp mentions of the bot identity
+- configured mention regex patterns (`agents.list[].groupChat.mentionPatterns`, fallback `messages.groupChat.mentionPatterns`)
+- implicit reply-to-bot detection
+
+Session-level activation command:
+
+- `/activation mention`
+- `/activation always`
+
+## Personal-number and self-chat behavior
+
+When the linked self number is also present in `allowFrom`, WhatsApp self-chat safeguards activate:
+
+- skip read receipts for self-chat turns
+- ignore mention-JID auto-trigger behavior that would otherwise ping yourself
+- if `messages.responsePrefix` is unset, self-chat replies default to `[{identity.name}]` or `[datzi]`
+
+## Message normalization and context
+
+Incoming WhatsApp messages are wrapped in the shared inbound envelope. If a quoted reply exists, context is appended:
+
+```text
+[Replying to <sender> id:<stanzaId>]
+<quoted body or media placeholder>
+[/Replying]
+```
+
+Media-only inbound messages are normalized with placeholders such as:
+
+- `<media:image>`
+- `<media:video>`
+- `<media:audio>`
+- `<media:document>`
+- `<media:sticker>`
+
+For groups, unprocessed messages can be buffered and injected as context when the bot is finally triggered.
+
+- default limit: `50`
+- config: `channels.whatsapp.historyLimit`
+
+Injection markers:
+
+- `[Chat messages since your last reply - for context]`
+- `[Current message - respond to this]`
+
+Read receipts are enabled by default for accepted inbound WhatsApp messages.
+
+Disable globally:
+
+```json5
+{
+  channels: {
+    whatsapp: {
+      sendReadReceipts: false
+    }
+  }
+}
+```
+
+## Delivery, chunking, and media
+
+- default chunk limit: `channels.whatsapp.textChunkLimit = 4000`
+- `channels.whatsapp.chunkMode = "length" | "newline"`
+- `newline` mode prefers paragraph boundaries (blank lines), then falls back to length-safe chunking
+- supports image, video, audio (PTT voice-note), and document payloads
+- inbound media save cap: `channels.whatsapp.mediaMaxMb` (default `50`)
+- outbound media cap for auto-replies: `agents.defaults.mediaMaxMb` (default `5MB`)
+- images are auto-optimized (resize/quality sweep) to fit limits
+
+## Acknowledgment reactions
+
+WhatsApp supports immediate ack reactions on inbound receipt via `channels.whatsapp.ackReaction`.
+
+```json5
+{
+  channels: {
+    whatsapp: {
+      ackReaction: {
+        emoji: '👀',
+        direct: true,
+        group: 'mentions'
+        // always | mentions | never
+      }
+    }
+  }
+}
+```
+
+Behavior notes:
+
+- sent immediately after inbound is accepted (pre-reply)
+- failures are logged but do not block normal reply delivery
+- group mode `mentions` reacts on mention-triggered turns
+
+## Multi-account and credentials
+
+- account ids come from `channels.whatsapp.accounts`
+- default account selection: `default` if present, otherwise first configured account id (sorted)
+- current auth path: `~/.datzi/credentials/whatsapp/<accountId>/creds.json`
+
+`datzi channels logout --channel whatsapp [--account <id>]` clears WhatsApp auth state for that account.
+
+## Tools, actions, and config writes
+
+- Agent tool support includes WhatsApp reaction action (`react`).
+- Action gates:
+  - `channels.whatsapp.actions.reactions`
+  - `channels.whatsapp.actions.polls`
+- Channel-initiated config writes are enabled by default (disable via `channels.whatsapp.configWrites=false`).
+
+## Troubleshooting
+
+- **Not linked (QR required)**: run `datzi channels login --channel whatsapp`.
+- **Linked but disconnected / reconnect loop**: run `datzi doctor` and `datzi logs --follow`. If needed, re-link.
+- **No active listener when sending**: make sure gateway is running and the account is linked.
+- **Group messages unexpectedly ignored**: check in order: `groupPolicy`, `groupAllowFrom` / `allowFrom`, `groups` allowlist, mention gating, duplicate keys in `datzi.json`.
+- **Bun runtime warning**: WhatsApp gateway runtime should use Node. Bun is flagged as incompatible.
+
+## Configuration reference pointers
+
+- [Configuration reference - WhatsApp](/gateway/configuration-reference#whatsapp)
+
+High-signal WhatsApp fields:
+
+- access: `dmPolicy`, `allowFrom`, `groupPolicy`, `groupAllowFrom`, `groups`
+- delivery: `textChunkLimit`, `chunkMode`, `mediaMaxMb`, `sendReadReceipts`, `ackReaction`
+- multi-account: `accounts.<id>.enabled`, `accounts.<id>.authDir`, account-level overrides
+- operations: `configWrites`, `debounceMs`, `web.enabled`, `web.heartbeatSeconds`, `web.reconnect.*`
+- session behavior: `session.dmScope`, `historyLimit`, `dmHistoryLimit`, `dms.<id>.historyLimit`
+
+## Related
+
+- [Pairing](/channels/pairing)
+- [Channel routing](/channels/channel-routing)
+- [Multi-agent routing](/concepts/multi-agent)
+- [Troubleshooting](/channels/troubleshooting)

@@ -1,0 +1,81 @@
+---
+id: DATZI-041
+category: cli
+slug: agents
+title: `datzi agents`
+summary: Manage isolated agents (workspaces + auth + routing).
+tags: ["cli", "agents"]
+---
+
+Source: https://docs.datzi.ai/cli/agents
+
+# `datzi agents`
+
+Manage isolated agents (workspaces + auth + routing).
+
+Related:
+
+- Multi-agent routing: [Multi-Agent Routing](/concepts/multi-agent)
+- Agent workspace: [Agent workspace](/concepts/agent-workspace)
+
+## Examples
+
+```bash
+datzi agents list
+datzi agents add work --workspace ~/.datzi/workspace-work
+datzi agents set-identity --workspace ~/.datzi/workspace --from-identity
+datzi agents set-identity --agent main --avatar avatars/datzi.png
+datzi agents delete work
+```
+
+## Identity files
+
+Each agent workspace can include an `IDENTITY.md` at the workspace root:
+
+- Example path: `~/.datzi/workspace/IDENTITY.md`
+- `set-identity --from-identity` reads from the workspace root (or an explicit `--identity-file`)
+
+Avatar paths resolve relative to the workspace root.
+
+## Set identity
+
+`set-identity` writes fields into `agents.list[].identity`:
+
+- `name`
+- `theme`
+- `emoji`
+- `avatar` (workspace-relative path, http(s) URL, or data URI)
+
+Load from `IDENTITY.md`:
+
+```bash
+datzi agents set-identity --workspace ~/.datzi/workspace --from-identity
+```
+
+Override fields explicitly:
+
+```bash
+datzi agents set-identity --agent main --name "Datzi" --emoji "🦞" --avatar avatars/datzi.png
+```
+
+Config sample:
+
+```json5
+{
+  agents: {
+    list: [
+      {
+        id: 'main',
+        identity: {
+          name: 'Datzi',
+          theme: 'space lobster',
+          emoji: '🦞',
+          avatar: 'avatars/datzi.png'
+        }
+      }
+    ]
+  }
+}
+```
+
+# approvals

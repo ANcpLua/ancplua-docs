@@ -1,0 +1,27 @@
+---
+id: DATZI-054
+category: cli
+slug: health
+title: `datzi health`
+summary: Fetch health from the running Gateway.
+tags: ["cli", "health"]
+---
+
+Source: https://docs.datzi.ai/cli/health
+
+# `datzi health`
+
+Fetch health from the running Gateway.
+
+```bash
+datzi health
+datzi health --json
+datzi health --verbose
+```
+
+Notes:
+
+- `--verbose` runs live probes and prints per-account timings when multiple accounts are configured.
+- Output includes per-agent session stores when multiple agents are configured.
+
+# hooks

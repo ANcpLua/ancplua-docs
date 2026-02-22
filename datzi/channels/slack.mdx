@@ -1,0 +1,359 @@
+---
+id: DATZI-028
+category: channels
+slug: slack
+title: Slack
+summary: Setup and configuration guide for the Slack channel covering Socket Mode and HTTP Events API, DM/channel policies, slash commands, threading, streaming, and manifest examples.
+tags:
+  [
+    slack,
+    bolt,
+    socket-mode,
+    http-events,
+    slash-commands,
+    threading,
+    streaming,
+    pairing,
+    workspace
+  ]
+---
+
+# Slack
+
+Source: https://docs.datzi.ai/channels/slack
+
+# Slack
+
+Status: production-ready for DMs + channels via Slack app integrations. Default mode is Socket Mode; HTTP Events API
+mode is also supported.
+
+## Quick setup
+
+<Tabs>
+  <Tab title="Socket Mode (default)">
+    <Steps>
+      <Step title="Create Slack app and tokens">
+        In Slack app settings:
+
+        * enable **Socket Mode**
+        * create **App Token** (`xapp-...`) with `connections:write`
+        * install app and copy **Bot Token** (`xoxb-...`)
+      </Step>
+
+      <Step title="Configure Datzi">
+        ```json5
+        {
+          channels: {
+            slack: {
+              enabled: true,
+              mode: "socket",
+              appToken: "xapp-...",
+              botToken: "xoxb-...",
+            },
+          },
+        }
+        ```
+
+        Env fallback (default account only):
+
+        ```bash
+        SLACK_APP_TOKEN=xapp-...
+        SLACK_BOT_TOKEN=xoxb-...
+        ```
+      </Step>
+
+      <Step title="Subscribe app events">
+        Subscribe bot events for:
+
+        * `app_mention`
+        * `message.channels`, `message.groups`, `message.im`, `message.mpim`
+        * `reaction_added`, `reaction_removed`
+        * `member_joined_channel`, `member_left_channel`
+        * `channel_rename`
+        * `pin_added`, `pin_removed`
+
+        Also enable App Home **Messages Tab** for DMs.
+      </Step>
+
+      <Step title="Start gateway">
+        ```bash
+        datzi gateway
+        ```
+      </Step>
+    </Steps>
+
+  </Tab>
+
+  <Tab title="HTTP Events API mode">
+    <Steps>
+      <Step title="Configure Slack app for HTTP">
+        * set mode to HTTP (`channels.slack.mode="http"`)
+        * copy Slack **Signing Secret**
+        * set Event Subscriptions + Interactivity + Slash command Request URL to the same webhook path (default `/slack/events`)
+      </Step>
+
+      <Step title="Configure Datzi HTTP mode">
+        ```json5
+        {
+          channels: {
+            slack: {
+              enabled: true,
+              mode: "http",
+              botToken: "xoxb-...",
+              signingSecret: "your-signing-secret",
+              webhookPath: "/slack/events",
+            },
+          },
+        }
+        ```
+      </Step>
+
+      <Step title="Use unique webhook paths for multi-account HTTP">
+        Per-account HTTP mode is supported.
+
+        Give each account a distinct `webhookPath` so registrations do not collide.
+      </Step>
+    </Steps>
+
+  </Tab>
+</Tabs>
+
+## Token model
+
+- `botToken` + `appToken` are required for Socket Mode.
+- HTTP mode requires `botToken` + `signingSecret`.
+- Config tokens override env fallback.
+- `SLACK_BOT_TOKEN` / `SLACK_APP_TOKEN` env fallback applies only to the default account.
+- `userToken` (`xoxp-...`) is config-only (no env fallback) and defaults to read-only behavior (
+  `userTokenReadOnly: true`).
+- Optional: add `chat:write.customize` if you want outgoing messages to use the active agent identity (custom `username`
+  and icon). `icon_emoji` uses `:emoji_name:` syntax.
+
+## Access control and routing
+
+`channels.slack.dmPolicy` controls DM access (legacy: `channels.slack.dm.policy`):
+
+- `pairing` (default)
+- `allowlist`
+- `open` (requires `channels.slack.allowFrom` to include `"*"`; legacy: `channels.slack.dm.allowFrom`)
+- `disabled`
+
+`channels.slack.groupPolicy` controls channel handling:
+
+- `open`
+- `allowlist`
+- `disabled`
+
+Channel allowlist lives under `channels.slack.channels`.
+
+Channel messages are mention-gated by default.
+
+Mention sources:
+
+- explicit app mention (`<@botId>`)
+- mention regex patterns (`agents.list[].groupChat.mentionPatterns`, fallback `messages.groupChat.mentionPatterns`)
+- implicit reply-to-bot thread behavior
+
+Per-channel controls (`channels.slack.channels.<id|name>`):
+
+- `requireMention`
+- `users` (allowlist)
+- `allowBots`
+- `skills`
+- `systemPrompt`
+- `tools`, `toolsBySender`
+
+## Commands and slash behavior
+
+- Native command auto-mode is **off** for Slack (`commands.native: "auto"` does not enable Slack native commands).
+- Enable native Slack command handlers with `channels.slack.commands.native: true` (or global `commands.native: true`).
+- When native commands are enabled, register matching slash commands in Slack (`/<command>` names).
+- If native commands are not enabled, you can run a single configured slash command via `channels.slack.slashCommand`.
+
+Default slash command settings:
+
+- `enabled: false`
+- `name: "datzi"`
+- `sessionPrefix: "slack:slash"`
+- `ephemeral: true`
+
+## Threading, sessions, and reply tags
+
+- DMs route as `direct`; channels as `channel`; MPIMs as `group`.
+- With default `session.dmScope=main`, Slack DMs collapse to agent main session.
+- Channel sessions: `agent:<agentId>:slack:channel:<channelId>`.
+- Thread replies can create thread session suffixes (`:thread:<threadTs>`) when applicable.
+
+Reply threading controls:
+
+- `channels.slack.replyToMode`: `off|first|all` (default `off`)
+- `channels.slack.replyToModeByChatType`: per `direct|group|channel`
+
+Manual reply tags are supported:
+
+- `[[reply_to_current]]`
+- `[[reply_to:<id>]]`
+
+## Media, chunking, and delivery
+
+- text chunks use `channels.slack.textChunkLimit` (default 4000)
+- `channels.slack.chunkMode="newline"` enables paragraph-first splitting
+- file sends use Slack upload APIs and can include thread replies (`thread_ts`)
+- outbound media cap follows `channels.slack.mediaMaxMb` when configured
+
+Preferred explicit delivery targets:
+
+- `user:<id>` for DMs
+- `channel:<id>` for channels
+
+## Actions and gates
+
+Slack actions are controlled by `channels.slack.actions.*`.
+
+Available action groups in current Slack tooling:
+
+| Group      | Default |
+| ---------- | ------- |
+| messages   | enabled |
+| reactions  | enabled |
+| pins       | enabled |
+| memberInfo | enabled |
+| emojiList  | enabled |
+
+## Events and operational behavior
+
+- Message edits/deletes/thread broadcasts are mapped into system events.
+- Reaction add/remove events are mapped into system events.
+- Member join/leave, channel created/renamed, and pin add/remove events are mapped into system events.
+- Block actions and modal interactions emit structured `Slack interaction: ...` system events.
+
+## Ack reactions
+
+`ackReaction` sends an acknowledgement emoji while Datzi is processing an inbound message.
+
+Resolution order:
+
+- `channels.slack.accounts.<accountId>.ackReaction`
+- `channels.slack.ackReaction`
+- `messages.ackReaction`
+- agent identity emoji fallback (`agents.list[].identity.emoji`, else "👀")
+
+Notes:
+
+- Slack expects shortcodes (for example `"eyes"`).
+- Use `""` to disable the reaction for a channel or account.
+
+## Manifest and scope checklist
+
+```json
+{
+  "display_information": {
+    "name": "Datzi",
+    "description": "Slack connector for Datzi"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Datzi",
+      "always_online": false
+    },
+    "app_home": {
+      "messages_tab_enabled": true,
+      "messages_tab_read_only_enabled": false
+    },
+    "slash_commands": [
+      {
+        "command": "/datzi",
+        "description": "Send a message to Datzi",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "chat:write",
+        "channels:history",
+        "channels:read",
+        "groups:history",
+        "im:history",
+        "mpim:history",
+        "users:read",
+        "app_mentions:read",
+        "assistant:write",
+        "reactions:read",
+        "reactions:write",
+        "pins:read",
+        "pins:write",
+        "emoji:read",
+        "commands",
+        "files:read",
+        "files:write"
+      ]
+    }
+  },
+  "settings": {
+    "socket_mode_enabled": true,
+    "event_subscriptions": {
+      "bot_events": [
+        "app_mention",
+        "message.channels",
+        "message.groups",
+        "message.im",
+        "message.mpim",
+        "reaction_added",
+        "reaction_removed",
+        "member_joined_channel",
+        "member_left_channel",
+        "channel_rename",
+        "pin_added",
+        "pin_removed"
+      ]
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+- **No replies in channels**: check `groupPolicy`, channel allowlist, `requireMention`, per-channel `users` allowlist.
+- **DM messages ignored**: check `channels.slack.dm.enabled`, `channels.slack.dmPolicy`, pairing approvals.
+- **Socket mode not connecting**: validate bot + app tokens and Socket Mode enablement in Slack app settings.
+- **HTTP mode not receiving events**: validate signing secret, webhook path, and Slack Request URLs.
+- **Native/slash commands not firing**: verify `channels.slack.commands.native: true` and matching slash commands registered in Slack.
+
+## Text streaming
+
+Datzi supports Slack native text streaming via the Agents and AI Apps API.
+
+`channels.slack.streaming` controls live preview behavior:
+
+- `off`: disable live preview streaming.
+- `partial` (default): replace preview text with the latest partial output.
+- `block`: append chunked preview updates.
+- `progress`: show progress status text while generating, then send final text.
+
+`channels.slack.nativeStreaming` controls Slack's native streaming API (`chat.startStream` / `chat.appendStream` /
+`chat.stopStream`) when `streaming` is `partial` (default: `true`).
+
+Disable native Slack streaming (keep draft preview behavior):
+
+```yaml
+channels:
+  slack:
+    streaming: partial
+    nativeStreaming: false
+```
+
+### Requirements
+
+1. Enable **Agents and AI Apps** in your Slack app settings.
+2. Ensure the app has the `assistant:write` scope.
+3. A reply thread must be available for that message.
+
+## Related
+
+- [Pairing](/channels/pairing)
+- [Channel routing](/channels/channel-routing)
+- [Troubleshooting](/channels/troubleshooting)
+- [Configuration](/gateway/configuration)
+- [Slash commands](/tools/slash-commands)

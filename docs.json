@@ -215,6 +215,155 @@
         ]
       },
       {
+        "tab": "Datzi 🐟",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "datzi/overview",
+              "datzi/start/getting-started",
+              "datzi/start/onboarding",
+              "datzi/start/wizard",
+              "datzi/start/bootstrapping"
+            ]
+          },
+          {
+            "group": "Channels",
+            "pages": [
+              "datzi/channels/index",
+              "datzi/channels/whatsapp",
+              "datzi/channels/telegram",
+              "datzi/channels/discord",
+              "datzi/channels/imessage",
+              "datzi/channels/slack",
+              "datzi/channels/channel-routing",
+              "datzi/channels/groups",
+              "datzi/channels/broadcast-groups",
+              "datzi/channels/pairing",
+              "datzi/channels/troubleshooting"
+            ]
+          },
+          {
+            "group": "Gateway",
+            "pages": [
+              "datzi/gateway/index",
+              "datzi/gateway/configuration",
+              "datzi/gateway/configuration-reference",
+              "datzi/gateway/configuration-examples",
+              "datzi/gateway/heartbeat",
+              "datzi/gateway/authentication",
+              "datzi/gateway/sandboxing",
+              "datzi/gateway/local-models",
+              "datzi/gateway/remote",
+              "datzi/gateway/health",
+              "datzi/gateway/logging",
+              "datzi/gateway/troubleshooting"
+            ]
+          },
+          {
+            "group": "Automation",
+            "pages": [
+              "datzi/automation/cron-jobs",
+              "datzi/automation/cron-vs-heartbeat",
+              "datzi/automation/webhook",
+              "datzi/automation/hooks",
+              "datzi/automation/poll",
+              "datzi/automation/gmail-pubsub",
+              "datzi/automation/auth-monitoring",
+              "datzi/automation/troubleshooting"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "datzi/concepts/agent",
+              "datzi/concepts/memory",
+              "datzi/concepts/session",
+              "datzi/concepts/agent-workspace",
+              "datzi/concepts/multi-agent",
+              "datzi/concepts/model-providers",
+              "datzi/concepts/models",
+              "datzi/concepts/context",
+              "datzi/concepts/agent-loop",
+              "datzi/concepts/compaction",
+              "datzi/concepts/model-failover"
+            ]
+          },
+          {
+            "group": "Tools",
+            "pages": [
+              "datzi/tools/index",
+              "datzi/tools/browser",
+              "datzi/tools/exec",
+              "datzi/tools/web",
+              "datzi/tools/skills",
+              "datzi/tools/subagents",
+              "datzi/tools/slash-commands",
+              "datzi/tools/elevated",
+              "datzi/tools/thinking",
+              "datzi/tools/reactions"
+            ]
+          },
+          {
+            "group": "Platforms",
+            "pages": [
+              "datzi/platforms/macos",
+              "datzi/platforms/ios",
+              "datzi/platforms/android",
+              "datzi/platforms/mac/menu-bar",
+              "datzi/platforms/mac/permissions",
+              "datzi/platforms/mac/voice-overlay",
+              "datzi/platforms/mac/voicewake",
+              "datzi/platforms/mac/peekaboo",
+              "datzi/platforms/mac/canvas"
+            ]
+          },
+          {
+            "group": "Install",
+            "pages": [
+              "datzi/install/index",
+              "datzi/install/installer",
+              "datzi/install/updating",
+              "datzi/install/migrating",
+              "datzi/install/uninstall"
+            ]
+          },
+          {
+            "group": "Nodes",
+            "pages": [
+              "datzi/nodes/index",
+              "datzi/nodes/audio",
+              "datzi/nodes/camera",
+              "datzi/nodes/talk",
+              "datzi/nodes/voicewake",
+              "datzi/nodes/troubleshooting"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "datzi/reference/templates/SOUL",
+              "datzi/reference/templates/AGENTS",
+              "datzi/reference/templates/USER",
+              "datzi/reference/templates/HEARTBEAT",
+              "datzi/reference/templates/MEMORY",
+              "datzi/reference/templates/TOOLS",
+              "datzi/reference/session-management-compaction",
+              "datzi/reference/token-use"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "datzi/help/faq",
+              "datzi/help/debugging",
+              "datzi/help/troubleshooting",
+              "datzi/help/environment"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "qyl",
         "groups": [
           {

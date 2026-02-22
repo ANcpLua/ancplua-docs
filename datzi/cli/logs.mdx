@@ -1,0 +1,33 @@
+---
+id: DATZI-056
+category: cli
+slug: logs
+title: `datzi logs`
+summary: Tail Gateway file logs over RPC (works in remote mode).
+tags: ["cli", "logs"]
+---
+
+Source: https://docs.datzi.ai/cli/logs
+
+# `datzi logs`
+
+Tail Gateway file logs over RPC (works in remote mode).
+
+Related:
+
+- Logging overview: [Logging](/logging)
+
+## Examples
+
+```bash
+datzi logs
+datzi logs --follow
+datzi logs --json
+datzi logs --limit 500
+datzi logs --local-time
+datzi logs --follow --local-time
+```
+
+Use `--local-time` to render timestamps in your local timezone.
+
+# memory

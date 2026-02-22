@@ -1,0 +1,507 @@
+---
+id: DATZI-022
+category: channels
+slug: discord
+title: Discord (Bot API)
+summary: Setup and configuration guide for the Discord Bot API channel including bot creation, guild policies, interactive components, voice channels, and troubleshooting.
+tags:
+  [
+    discord,
+    bot,
+    guild,
+    slash-commands,
+    pairing,
+    components,
+    voice,
+    threading,
+    streaming
+  ]
+---
+
+# Discord
+
+Source: https://docs.datzi.ai/channels/discord
+
+# Discord (Bot API)
+
+Status: ready for DMs and guild channels via the official Discord gateway.
+
+<CardGroup>
+  <Card title="Pairing" icon="link" href="/channels/pairing">
+    Discord DMs default to pairing mode.
+  </Card>
+
+<Card title="Slash commands" icon="terminal" href="/tools/slash-commands">
+  Native command behavior and command catalog.
+</Card>
+
+  <Card title="Channel troubleshooting" icon="wrench" href="/channels/troubleshooting">
+    Cross-channel diagnostics and repair flow.
+  </Card>
+</CardGroup>
+
+## Quick setup
+
+You will need to create a new application with a bot, add the bot to your server, and pair it to Datzi. We recommend
+adding your bot to your own private server. If you don't have one
+yet, [create one first](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (choose **Create My Own > For me and my friends**).
+
+<Steps>
+  <Step title="Create a Discord application and bot">
+    Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application**. Name it something like "Datzi".
+
+    Click **Bot** on the sidebar. Set the **Username** to whatever you call your Datzi agent.
+
+  </Step>
+
+  <Step title="Enable privileged intents">
+    Still on the **Bot** page, scroll down to **Privileged Gateway Intents** and enable:
+
+    * **Message Content Intent** (required)
+    * **Server Members Intent** (recommended; required for role allowlists and name-to-ID matching)
+    * **Presence Intent** (optional; only needed for presence updates)
+
+  </Step>
+
+  <Step title="Copy your bot token">
+    Scroll back up on the **Bot** page and click **Reset Token**.
+
+    Copy the token and save it somewhere. This is your **Bot Token** and you will need it shortly.
+
+  </Step>
+
+  <Step title="Generate an invite URL and add the bot to your server">
+    Click **OAuth2** on the sidebar. You'll generate an invite URL with the right permissions to add the bot to your server.
+
+    Scroll down to **OAuth2 URL Generator** and enable:
+
+    * `bot`
+    * `applications.commands`
+
+    A **Bot Permissions** section will appear below. Enable:
+
+    * View Channels
+    * Send Messages
+    * Read Message History
+    * Embed Links
+    * Attach Files
+    * Add Reactions (optional)
+
+    Copy the generated URL at the bottom, paste it into your browser, select your server, and click **Continue** to connect. You should now see your bot in the Discord server.
+
+  </Step>
+
+  <Step title="Enable Developer Mode and collect your IDs">
+    Back in the Discord app, you need to enable Developer Mode so you can copy internal IDs.
+
+    1. Click **User Settings** (gear icon next to your avatar) -> **Advanced** -> toggle on **Developer Mode**
+    2. Right-click your **server icon** in the sidebar -> **Copy Server ID**
+    3. Right-click your **own avatar** -> **Copy User ID**
+
+    Save your **Server ID** and **User ID** alongside your Bot Token.
+
+  </Step>
+
+  <Step title="Allow DMs from server members">
+    For pairing to work, Discord needs to allow your bot to DM you. Right-click your **server icon** -> **Privacy Settings** -> toggle on **Direct Messages**.
+
+  </Step>
+
+  <Step title="Step 0: Set your bot token securely (do not send it in chat)">
+    Your Discord bot token is a secret (like a password). Set it on the machine running Datzi before messaging your agent.
+
+    ```bash
+    datzi config set channels.discord.token '"YOUR_BOT_TOKEN"' --json
+    datzi config set channels.discord.enabled true --json
+    datzi gateway
+    ```
+
+    If Datzi is already running as a background service, use `datzi gateway restart` instead.
+
+  </Step>
+
+  <Step title="Configure Datzi and pair">
+    <Tabs>
+      <Tab title="Ask your agent">
+        Chat with your Datzi agent on any existing channel (e.g. Telegram) and tell it. If Discord is your first channel, use the CLI / config tab instead.
+
+        > "I already set my Discord bot token in config. Please finish Discord setup with User ID `<user_id>` and Server ID `<server_id>`."
+      </Tab>
+
+      <Tab title="CLI / config">
+        If you prefer file-based config, set:
+
+        ```json5
+        {
+          channels: {
+            discord: {
+              enabled: true,
+              token: "YOUR_BOT_TOKEN",
+            },
+          },
+        }
+        ```
+
+        Env fallback for the default account:
+
+        ```bash
+        DISCORD_BOT_TOKEN=...
+        ```
+      </Tab>
+    </Tabs>
+
+  </Step>
+
+  <Step title="Approve first DM pairing">
+    Wait until the gateway is running, then DM your bot in Discord. It will respond with a pairing code.
+
+    <Tabs>
+      <Tab title="Ask your agent">
+        Send the pairing code to your agent on your existing channel:
+
+        > "Approve this Discord pairing code: `<CODE>`"
+      </Tab>
+
+      <Tab title="CLI">
+        ```bash
+        datzi pairing list discord
+        datzi pairing approve discord <CODE>
+        ```
+      </Tab>
+    </Tabs>
+
+    Pairing codes expire after 1 hour.
+
+    You should now be able to chat with your agent in Discord via DM.
+
+  </Step>
+</Steps>
+
+## Recommended: Set up a guild workspace
+
+Once DMs are working, you can set up your Discord server as a full workspace where each channel gets its own agent
+session with its own context.
+
+<Steps>
+  <Step title="Add your server to the guild allowlist">
+    <Tabs>
+      <Tab title="Ask your agent">
+        > "Add my Discord Server ID `<server_id>` to the guild allowlist"
+      </Tab>
+
+      <Tab title="Config">
+        ```json5
+        {
+          channels: {
+            discord: {
+              groupPolicy: "allowlist",
+              guilds: {
+                YOUR_SERVER_ID: {
+                  requireMention: true,
+                  users: ["YOUR_USER_ID"],
+                },
+              },
+            },
+          },
+        }
+        ```
+      </Tab>
+    </Tabs>
+
+  </Step>
+
+  <Step title="Allow responses without @mention">
+    <Tabs>
+      <Tab title="Ask your agent">
+        > "Allow my agent to respond on this server without having to be @mentioned"
+      </Tab>
+
+      <Tab title="Config">
+        Set `requireMention: false` in your guild config:
+
+        ```json5
+        {
+          channels: {
+            discord: {
+              guilds: {
+                YOUR_SERVER_ID: {
+                  requireMention: false,
+                },
+              },
+            },
+          },
+        }
+        ```
+      </Tab>
+    </Tabs>
+
+  </Step>
+</Steps>
+
+## Runtime model
+
+- Gateway owns the Discord connection.
+- Reply routing is deterministic: Discord inbound replies back to Discord.
+- By default (`session.dmScope=main`), direct chats share the agent main session (`agent:main:main`).
+- Guild channels are isolated session keys (`agent:<agentId>:discord:channel:<channelId>`).
+- Group DMs are ignored by default (`channels.discord.dm.groupEnabled=false`).
+- Native slash commands run in isolated command sessions (`agent:<agentId>:discord:slash:<userId>`), while still
+  carrying `CommandTargetSessionKey` to the routed conversation session.
+
+## Forum channels
+
+Discord forum and media channels only accept thread posts. Datzi supports two ways to create them:
+
+- Send a message to the forum parent (`channel:<forumId>`) to auto-create a thread.
+- Use `datzi message thread create` to create a thread directly.
+
+Example: send to forum parent to create a thread
+
+```bash
+datzi message send --channel discord --target channel:<forumId> \
+  --message "Topic title\nBody of the post"
+```
+
+Example: create a forum thread explicitly
+
+```bash
+datzi message thread create --channel discord --target channel:<forumId> \
+  --thread-name "Topic title" --message "Body of the post"
+```
+
+## Interactive components
+
+Datzi supports Discord components v2 containers for agent messages. Use the message tool with a `components` payload.
+
+Supported blocks:
+
+- `text`, `section`, `separator`, `actions`, `media-gallery`, `file`
+- Action rows allow up to 5 buttons or a single select menu
+- Select types: `string`, `user`, `role`, `mentionable`, `channel`
+
+By default, components are single use. Set `components.reusable=true` to allow buttons, selects, and forms to be used
+multiple times until they expire.
+
+To restrict who can click a button, set `allowedUsers` on that button (Discord user IDs, tags, or `*`).
+
+Example:
+
+```json5
+{
+  channel: 'discord',
+  action: 'send',
+  to: 'channel:123456789012345678',
+  message: 'Optional fallback text',
+  components: {
+    reusable: true,
+    text: 'Choose a path',
+    blocks: [
+      {
+        type: 'actions',
+        buttons: [
+          {
+            label: 'Approve',
+            style: 'success',
+            allowedUsers: ['123456789012345678']
+          },
+          {
+            label: 'Decline',
+            style: 'danger'
+          }
+        ]
+      },
+      {
+        type: 'actions',
+        select: {
+          type: 'string',
+          placeholder: 'Pick an option',
+          options: [
+            {
+              label: 'Option A',
+              value: 'a'
+            },
+            {
+              label: 'Option B',
+              value: 'b'
+            }
+          ]
+        }
+      }
+    ],
+    modal: {
+      title: 'Details',
+      triggerLabel: 'Open form',
+      fields: [
+        {
+          type: 'text',
+          label: 'Requester'
+        },
+        {
+          type: 'select',
+          label: 'Priority',
+          options: [
+            {
+              label: 'Low',
+              value: 'low'
+            },
+            {
+              label: 'High',
+              value: 'high'
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## Access control and routing
+
+`channels.discord.dmPolicy` controls DM access:
+
+- `pairing` (default)
+- `allowlist`
+- `open` (requires `channels.discord.allowFrom` to include `"*"`)
+- `disabled`
+
+Guild handling is controlled by `channels.discord.groupPolicy`:
+
+- `open`
+- `allowlist`
+- `disabled`
+
+Secure baseline when `channels.discord` exists is `allowlist`.
+
+Example guild allowlist:
+
+```json5
+{
+  channels: {
+    discord: {
+      groupPolicy: 'allowlist',
+      guilds: {
+        '123456789012345678': {
+          requireMention: true,
+          users: ['987654321098765432'],
+          roles: ['123456789012345678'],
+          channels: {
+            general: { allow: true },
+            help: { allow: true, requireMention: true }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Role-based agent routing
+
+Use `bindings[].match.roles` to route Discord guild members to different agents by role ID:
+
+```json5
+{
+  bindings: [
+    {
+      agentId: 'opus',
+      match: {
+        channel: 'discord',
+        guildId: '123456789012345678',
+        roles: ['111111111111111111']
+      }
+    },
+    {
+      agentId: 'sonnet',
+      match: {
+        channel: 'discord',
+        guildId: '123456789012345678'
+      }
+    }
+  ]
+}
+```
+
+## Native commands and command auth
+
+- `commands.native` defaults to `"auto"` and is enabled for Discord.
+- Per-channel override: `channels.discord.commands.native`.
+- `commands.native=false` explicitly clears previously registered Discord native commands.
+- Native command auth uses the same Discord allowlists/policies as normal message handling.
+
+See [Slash commands](/tools/slash-commands) for command catalog and behavior.
+
+## Voice channels
+
+Datzi can join Discord voice channels for realtime, continuous conversations.
+
+Requirements:
+
+- Enable native commands (`commands.native` or `channels.discord.commands.native`).
+- Configure `channels.discord.voice`.
+- The bot needs Connect + Speak permissions in the target voice channel.
+
+Use the Discord-only native command `/vc join|leave|status` to control sessions.
+
+Auto-join example:
+
+```json5
+{
+  channels: {
+    discord: {
+      voice: {
+        enabled: true,
+        autoJoin: [
+          {
+            guildId: '123456789012345678',
+            channelId: '234567890123456789'
+          }
+        ],
+        tts: {
+          provider: 'openai',
+          openai: {
+            voice: 'alloy'
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Voice messages
+
+Discord voice messages show a waveform preview and require OGG/Opus audio plus metadata. Datzi generates the waveform
+automatically, but it needs `ffmpeg` and `ffprobe` available on the gateway host.
+
+Requirements and constraints:
+
+- Provide a **local file path** (URLs are rejected).
+- Omit text content (Discord does not allow text + voice message in the same payload).
+- Any audio format is accepted; Datzi converts to OGG/Opus when needed.
+
+## Tools and action gates
+
+Default gate behavior:
+
+| Action group                                                                                                                                                             | Default  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| reactions, messages, threads, pins, polls, search, memberInfo, roleInfo, channelInfo, channels, voiceStatus, events, stickers, emojiUploads, stickerUploads, permissions | enabled  |
+| roles                                                                                                                                                                    | disabled |
+| moderation                                                                                                                                                               | disabled |
+| presence                                                                                                                                                                 | disabled |
+
+## Troubleshooting
+
+- `datzi doctor` + `datzi channels status --probe` for most issues.
+- Enable Message Content Intent and Server Members Intent in the bot settings.
+- Verify `groupPolicy` and guild allowlist if guild messages are blocked.
+- Check `requireMention` is configured under `channels.discord.guilds`, not at the top level.
+
+## Related
+
+- [Pairing](/channels/pairing)
+- [Channel routing](/channels/channel-routing)
+- [Multi-agent routing](/concepts/multi-agent)
+- [Troubleshooting](/channels/troubleshooting)
+- [Slash commands](/tools/slash-commands)

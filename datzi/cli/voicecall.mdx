@@ -1,0 +1,39 @@
+---
+id: DATZI-075
+category: cli
+slug: voicecall
+title: `datzi voicecall`
+summary: voicecall is a plugin-provided command. It only appears if the voice-call plugin is installed and enabled.
+tags: ["cli", "voicecall"]
+---
+
+Source: https://docs.datzi.ai/cli/voicecall
+
+# `datzi voicecall`
+
+`voicecall` is a plugin-provided command. It only appears if the voice-call plugin is installed and enabled.
+
+Primary doc:
+
+- Voice-call plugin: [Voice Call](/plugins/voice-call)
+
+## Common commands
+
+```bash
+datzi voicecall status --call-id <id>
+datzi voicecall call --to "+15555550123" --message "Hello" --mode notify
+datzi voicecall continue --call-id <id> --message "Any questions?"
+datzi voicecall end --call-id <id>
+```
+
+## Exposing webhooks (Tailscale)
+
+```bash
+datzi voicecall expose --mode serve
+datzi voicecall expose --mode funnel
+datzi voicecall unexpose
+```
+
+Security note: only expose the webhook endpoint to networks you trust. Prefer Tailscale Serve over Funnel when possible.
+
+# Markdown Formatting

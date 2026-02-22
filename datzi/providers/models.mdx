@@ -1,0 +1,54 @@
+---
+id: DATZI-212
+category: providers
+slug: providers/models
+title: Model Providers
+summary: Starter reference for supported Datzi model providers with a two-step quick-start for authentication and default model configuration.
+tags: [providers, models, llm, configuration, venice, ollama]
+---
+
+# Model Providers
+
+Datzi can use many LLM providers. Pick one, authenticate, then set the default
+model as `provider/model`.
+
+## Highlight: Venice (Venice AI)
+
+Venice is our recommended Venice AI setup for privacy-first inference with an option to use Opus for the hardest tasks.
+
+- Default: `venice/llama-3.3-70b`
+- Best overall: `venice/llama-3.3-70b`
+
+See [Venice AI](/providers/venice).
+
+## Quick start (two steps)
+
+1. Authenticate with the provider (usually via `datzi onboard`).
+2. Set the default model:
+
+```json5
+{
+  agents: {
+    defaults: {
+      model: {
+        primary: 'ollama/qwen3-coder:32b'
+      }
+    }
+  }
+}
+```
+
+## Supported providers (starter set)
+
+- [Vercel AI Gateway](/providers/vercel-ai-gateway)
+- [Cloudflare AI Gateway](/providers/cloudflare-ai-gateway)
+- [Moonshot AI (Kimi + Kimi Coding)](/providers/moonshot)
+- [Synthetic](/providers/synthetic)
+- [OpenCode Zen](/providers/opencode)
+- [Z.AI](/providers/zai)
+- [GLM models](/providers/glm)
+- [MiniMax](/providers/minimax)
+- [Venice (Venice AI)](/providers/venice)
+- [Qianfan](/providers/qianfan)
+
+For the full provider catalog and advanced configuration, see [Model providers](/concepts/model-providers).

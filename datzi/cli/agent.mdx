@@ -1,0 +1,30 @@
+---
+id: DATZI-040
+category: cli
+slug: agent
+title: `datzi agent`
+summary: Run an agent turn via the Gateway (use --local for embedded).
+tags: ["cli", "agent"]
+---
+
+Source: https://docs.datzi.ai/cli/agent
+
+# `datzi agent`
+
+Run an agent turn via the Gateway (use `--local` for embedded).
+Use `--agent <id>` to target a configured agent directly.
+
+Related:
+
+- Agent send tool: [Agent send](/tools/agent-send)
+
+## Examples
+
+```bash
+datzi agent --to +15555550123 --message "status update" --deliver
+datzi agent --agent ops --message "Summarize logs"
+datzi agent --session-id 1234 --message "Summarize inbox" --thinking medium
+datzi agent --agent ops --message "Generate report" --deliver --reply-channel slack --reply-to "#reports"
+```
+
+# agents

@@ -1,0 +1,116 @@
+---
+id: DATZI-043
+category: cli
+slug: browser
+title: `datzi browser`
+summary: Manage Datzi’s browser control server and run browser actions (tabs, snapshots, screenshots, navigation, clicks.
+tags: ["cli", "browser"]
+---
+
+Source: https://docs.datzi.ai/cli/browser
+
+# `datzi browser`
+
+Manage Datzi’s browser control server and run browser actions (tabs, snapshots, screenshots, navigation, clicks,
+typing).
+
+Related:
+
+- Browser tool + API: [Browser tool](/tools/browser)
+- Chrome extension relay: [Chrome extension](/tools/chrome-extension)
+
+## Common flags
+
+- `--url <gatewayWsUrl>`: Gateway WebSocket URL (defaults to config).
+- `--token <token>`: Gateway token (if required).
+- `--timeout <ms>`: request timeout (ms).
+- `--browser-profile <name>`: choose a browser profile (default from config).
+- `--json`: machine-readable output (where supported).
+
+## Quick start (local)
+
+```bash
+datzi browser --browser-profile chrome tabs
+datzi browser --browser-profile datzi start
+datzi browser --browser-profile datzi open https://example.com
+datzi browser --browser-profile datzi snapshot
+```
+
+## Profiles
+
+Profiles are named browser routing configs. In practice:
+
+- `datzi`: launches/attaches to a dedicated Datzi-managed Chrome instance (isolated user data dir).
+- `chrome`: controls your existing Chrome tab(s) via the Chrome extension relay.
+
+```bash
+datzi browser profiles
+datzi browser create-profile --name work --color "#FF5A36"
+datzi browser delete-profile --name work
+```
+
+Use a specific profile:
+
+```bash
+datzi browser --browser-profile work tabs
+```
+
+## Tabs
+
+```bash
+datzi browser tabs
+datzi browser open https://docs.datzi.ai
+datzi browser focus <targetId>
+datzi browser close <targetId>
+```
+
+## Snapshot / screenshot / actions
+
+Snapshot:
+
+```bash
+datzi browser snapshot
+```
+
+Screenshot:
+
+```bash
+datzi browser screenshot
+```
+
+Navigate/click/type (ref-based UI automation):
+
+```bash
+datzi browser navigate https://example.com
+datzi browser click <ref>
+datzi browser type <ref> "hello"
+```
+
+## Chrome extension relay (attach via toolbar button)
+
+This mode lets the agent control an existing Chrome tab that you attach manually (it does not auto-attach).
+
+Install the unpacked extension to a stable path:
+
+```bash
+datzi browser extension install
+datzi browser extension path
+```
+
+Then Chrome → `chrome://extensions` → enable “Developer mode” → “Load unpacked” → select the printed folder.
+
+Full guide: [Chrome extension](/tools/chrome-extension)
+
+## Remote browser control (node host proxy)
+
+If the Gateway runs on a different machine than the browser, run a **node host** on the machine that has
+Chrome/Brave/Edge/Chromium. The Gateway will proxy browser actions to that node (no separate browser control server
+required).
+
+Use `gateway.nodes.browser.mode` to control auto-routing and `gateway.nodes.browser.node` to pin a specific node if
+multiple are connected.
+
+Security + remote
+setup: [Browser tool](/tools/browser), [Remote access](/gateway/remote), [Tailscale](/gateway/tailscale), [Security](/gateway/security)
+
+# channels

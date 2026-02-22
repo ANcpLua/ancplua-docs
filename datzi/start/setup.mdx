@@ -1,0 +1,168 @@
+---
+id: DATZI-246
+category: start
+slug: setup
+title: Setup
+summary: Step-by-step setup instructions for installing and configuring Datzi.
+tags: [setup, install, configuration]
+---
+
+Source: https://docs.datzi.ai/start/setup
+
+# Setup
+
+<Note>
+  If you are setting up for the first time, start with [Getting
+  Started](/start/getting-started). For wizard details, see [Onboarding
+  Wizard](/start/wizard).
+</Note>
+
+Last updated: 2026-01-01
+
+## TL;DR
+
+- **Tailoring lives outside the repo:** `~/.datzi/workspace` (workspace) + `~/.datzi/datzi.json` (config).
+- **Stable workflow:** install the macOS app; let it run the bundled Gateway.
+- **Bleeding edge workflow:** run the Gateway yourself via `pnpm gateway:watch`, then let the macOS app attach in Local
+  mode.
+
+## Prereqs (from source)
+
+- Node `>=22`
+- `pnpm`
+- Docker (optional; only for containerized setup/e2e — see [Docker](/install/docker))
+
+## Tailoring strategy (so updates don’t hurt)
+
+If you want “100% tailored to me” _and_ easy updates, keep your customization in:
+
+- **Config:** `~/.datzi/datzi.json` (JSON/JSON5-ish)
+- **Workspace:** `~/.datzi/workspace` (skills, prompts, memories; make it a private git repo)
+
+Bootstrap once:
+
+```bash
+datzi setup
+```
+
+From inside this repo, use the local CLI entry:
+
+```bash
+datzi setup
+```
+
+If you don’t have a global install yet, run it via `pnpm datzi setup`.
+
+## Run the Gateway from this repo
+
+After `pnpm build`, you can run the packaged CLI directly:
+
+```bash
+node datzi.mjs gateway --port 18789 --verbose
+```
+
+## Stable workflow (macOS app first)
+
+1. Install + launch **Datzi\.app** (menu bar).
+2. Complete the onboarding/permissions checklist (TCC prompts).
+3. Ensure Gateway is **Local** and running (the app manages it).
+4. Link surfaces (example: WhatsApp):
+
+```bash
+datzi channels login
+```
+
+5. Sanity check:
+
+```bash
+datzi health
+```
+
+If onboarding is not available in your build:
+
+- Run `datzi setup`, then `datzi channels login`, then start the Gateway manually (`datzi gateway`).
+
+## Bleeding edge workflow (Gateway in a terminal)
+
+Goal: work on the TypeScript Gateway, get hot reload, keep the macOS app UI attached.
+
+### 0) (Optional) Run the macOS app from source too
+
+If you also want the macOS app on the bleeding edge:
+
+```bash
+./scripts/restart-mac.sh
+```
+
+### 1) Start the dev Gateway
+
+```bash
+pnpm install
+pnpm gateway:watch
+```
+
+`gateway:watch` runs the gateway in watch mode and reloads on TypeScript changes.
+
+### 2) Point the macOS app at your running Gateway
+
+In **Datzi\.app**:
+
+- Connection Mode: **Local**
+  The app will attach to the running gateway on the configured port.
+
+### 3) Verify
+
+- In-app Gateway status should read **“Using existing gateway …”**
+- Or via CLI:
+
+```bash
+datzi health
+```
+
+### Common footguns
+
+- **Wrong port:** Gateway WS defaults to `ws://127.0.0.1:18789`; keep app + CLI on the same port.
+- **Where state lives:**
+  - Credentials: `~/.datzi/credentials/`
+  - Sessions: `~/.datzi/agents/<agentId>/sessions/`
+  - Logs: `/tmp/datzi/`
+
+## Credential storage map
+
+Use this when debugging auth or deciding what to back up:
+
+- **WhatsApp**: `~/.datzi/credentials/whatsapp/<accountId>/creds.json`
+- **Telegram bot token**: config/env or `channels.telegram.tokenFile`
+- **Discord bot token**: config/env (token file not yet supported)
+- **Slack tokens**: config/env (`channels.slack.*`)
+- **Pairing allowlists**: `~/.datzi/credentials/<channel>-allowFrom.json`
+- **Model auth profiles**: `~/.datzi/agents/<agentId>/agent/auth-profiles.json`
+- **Legacy OAuth import**: `~/.datzi/credentials/oauth.json`
+  More detail: [Security](/gateway/security#credential-storage-map).
+
+## Updating (without wrecking your setup)
+
+- Keep `~/.datzi/workspace` and `~/.datzi/` as “your stuff”; don’t put personal prompts/config into the `datzi`
+  repo.
+- Updating source: `git pull` + `pnpm install` (when lockfile changed) + keep using `pnpm gateway:watch`.
+
+## Linux (systemd user service)
+
+Linux installs use a systemd **user** service. By default, systemd stops user
+services on logout/idle, which kills the Gateway. Onboarding attempts to enable
+lingering for you (may prompt for sudo). If it’s still off, run:
+
+```bash
+sudo loginctl enable-linger $USER
+```
+
+For always-on or multi-user servers, consider a **system** service instead of a
+user service (no lingering needed). See [Gateway runbook](/gateway) for the systemd notes.
+
+## Related docs
+
+- [Gateway runbook](/gateway) (flags, supervision, ports)
+- [Gateway configuration](/gateway/configuration) (config schema + examples)
+- [Discord](/channels/discord) and [Telegram](/channels/telegram) (reply tags + replyToMode settings)
+- [Datzi assistant setup](/start/datzi)
+- [macOS app](/platforms/macos) (gateway lifecycle
