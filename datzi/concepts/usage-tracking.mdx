@@ -7,8 +7,6 @@ summary: for the **current model provider** when available.
 tags: ['concepts', 'usage', 'tracking']
 ---
 
-Source: https://docs.datzi.ai/concepts/usage-tracking
-
 # Usage tracking
 
 ## What it is
@@ -28,12 +26,8 @@ Source: https://docs.datzi.ai/concepts/usage-tracking
 
 ## Providers + credentials
 
-- **GitHub Copilot**: OAuth tokens in auth profiles.
-- **Gemini CLI**: OAuth tokens in auth profiles.
-- **Antigravity**: OAuth tokens in auth profiles.
-- **OpenAI Codex**: OAuth tokens in auth profiles (accountId used when present).
-- **MiniMax**: API key (coding plan key; `MINIMAX_CODE_PLAN_KEY` or `MINIMAX_API_KEY`); uses the 5‑hour coding plan
-  window.
-- **z.ai**: API key via env/config/auth store.
+- **Ollama** (local): no credentials needed.
 
-Usage is hidden if no matching OAuth/API credentials exist.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
+
+Usage is hidden if no matching credentials exist.

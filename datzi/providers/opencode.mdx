@@ -17,21 +17,18 @@ Zen is currently in beta.
 
 ```bash
 datzi onboard --auth-choice opencode-zen
-# or non-interactive
-datzi onboard --opencode-zen-api-key "$OPENCODE_API_KEY"
 ```
 
 ## Config snippet
 
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
+
 ```json5
 {
-  env: {
-    OPENCODE_API_KEY: 'sk-...'
-  },
   agents: {
     defaults: {
       model: {
-        primary: 'ollama/qwen3-coder:32b'
+        primary: 'ollama/qwen3-coder:14b'
       }
     }
   }
@@ -40,6 +37,4 @@ datzi onboard --opencode-zen-api-key "$OPENCODE_API_KEY"
 
 ## Notes
 
-- `OPENCODE_ZEN_API_KEY` is also supported.
-- You sign in to Zen, add billing details, and copy your API key.
-- OpenCode Zen bills per request; check the OpenCode dashboard for details.
+- OpenCode Zen is a paid service. Datzi runs fully local with Ollama instead.

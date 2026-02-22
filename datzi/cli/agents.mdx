@@ -7,8 +7,6 @@ summary: Manage isolated agents (workspaces + auth + routing).
 tags: ["cli", "agents"]
 ---
 
-Source: https://docs.datzi.ai/cli/agents
-
 # `datzi agents`
 
 Manage isolated agents (workspaces + auth + routing).
@@ -55,7 +53,7 @@ datzi agents set-identity --workspace ~/.datzi/workspace --from-identity
 Override fields explicitly:
 
 ```bash
-datzi agents set-identity --agent main --name "Datzi" --emoji "🦞" --avatar avatars/datzi.png
+datzi agents set-identity --agent main --name "Datzi" --emoji "🐟" --avatar avatars/datzi.png
 ```
 
 Config sample:
@@ -68,8 +66,8 @@ Config sample:
         id: 'main',
         identity: {
           name: 'Datzi',
-          theme: 'space lobster',
-          emoji: '🦞',
+          theme: 'goldfish pond',
+          emoji: '🐟',
           avatar: 'avatars/datzi.png'
         }
       }

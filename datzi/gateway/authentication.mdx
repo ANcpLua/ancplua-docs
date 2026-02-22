@@ -7,16 +7,11 @@ summary: Covers how the Gateway authenticates requests using API keys and token-
 tags: ['authentication', 'api-keys', 'security', 'gateway']
 ---
 
-Source: https://docs.datzi.ai/gateway/authentication
-
 # Authentication
 
-Datzi supports OAuth and API keys for model providers. For Anthropic
-accounts, we recommend using an **API key**. For Claude subscription access,
-use the long‑lived token created by `claude setup-token`.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
 
-See [/concepts/oauth](/concepts/oauth) for the full OAuth flow and storage
-layout.
+Datzi supports local model providers via Ollama. No external API keys or OAuth are needed.
 
 ## Checking model auth status
 
@@ -25,22 +20,7 @@ datzi models status
 datzi doctor
 ```
 
-## API key rotation behavior (gateway)
-
-Some providers support retrying a request with alternative keys when an API call
-hits a provider rate limit.
-
-- Priority order:
-  - `DATZI_LIVE_<PROVIDER>_KEY` (single override)
-  - `<PROVIDER>_API_KEYS`
-  - `<PROVIDER>_API_KEY`
-  - `<PROVIDER>_API_KEY_*`
-- Google providers also include `GOOGLE_API_KEY` as an additional fallback.
-- The same key list is deduplicated before use.
-- Datzi retries with the next key only for rate-limit errors (for example
-  `429`, `rate_limit`, `quota`, `resource exhausted`).
-- Non-rate-limit errors are not retried with alternate keys.
-- If all keys fail, the final error from the last attempt is returned.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
 
 ## Controlling which credential is used
 
@@ -64,25 +44,9 @@ datzi models auth order clear --provider anthropic
 
 Use `--agent <id>` to target a specific agent; omit it to use the configured default agent.
 
-## Troubleshooting
-
-### “No credentials found”
-
-If the Anthropic token profile is missing, run `claude setup-token` on the
-**gateway host**, then re-check:
-
-```bash
-datzi models status
-```
-
-### Token expiring/expired
-
-Run `datzi models status` to confirm which profile is expiring. If the profile
-is missing, rerun `claude setup-token` and paste the token again.
-
 ## Requirements
 
-- Claude Max or Pro subscription (for `claude setup-token`)
-- Claude Code CLI installed (`claude` command available)
+- Ollama installed and running locally
+- Model pulled: `ollama pull qwen3-coder:14b`
 
 # Background Exec and Process Tool

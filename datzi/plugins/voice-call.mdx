@@ -7,8 +7,6 @@ summary: Covers the voice-call plugin for outbound and inbound voice calls via T
 tags: [voice, calls, twilio, telnyx, plivo, tts, plugin, telephony]
 ---
 
-Source: https://docs.datzi.ai/plugins/voice-call
-
 # Voice Call (plugin)
 
 Voice calls for Datzi via a plugin. Supports outbound notifications and
@@ -251,7 +249,7 @@ Override to ElevenLabs just for calls (keep core default elsewhere):
 }
 ```
 
-Override only the OpenAI model for calls (deep‑merge example):
+Override the TTS model for calls (deep‑merge example):
 
 ```json5
 {
@@ -260,8 +258,8 @@ Override only the OpenAI model for calls (deep‑merge example):
       'voice-call': {
         config: {
           tts: {
-            openai: {
-              model: 'gpt-4o-mini-tts',
+            ollama: {
+              model: 'ollama/qwen3-coder:14b',
               voice: 'marin'
             }
           }

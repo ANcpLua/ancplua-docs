@@ -7,8 +7,6 @@ summary: Frequently asked questions about Datzi features, configuration, and com
 tags: ['faq', 'frequently-asked-questions', 'help']
 ---
 
-Source: https://docs.datzi.ai/help/faq
-
 # FAQ
 
 Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS, multi-agent, OAuth/API keys, model
@@ -28,7 +26,6 @@ see [Configuration](/gateway/configuration).
   - [It is stuck on "wake up my friend" / onboarding will not hatch. What now?](#it-is-stuck-on-wake-up-my-friend-onboarding-will-not-hatch-what-now)
   - [Can I migrate my setup to a new machine (Mac mini) without redoing onboarding?](#can-i-migrate-my-setup-to-a-new-machine-mac-mini-without-redoing-onboarding)
   - [Where do I see what is new in the latest version?](#where-do-i-see-what-is-new-in-the-latest-version)
-  - [I can't access docs.datzi.ai (SSL error). What now?](#i-cant-access-docsdatziai-ssl-error-what-now)
   - [What's the difference between stable and beta?](#whats-the-difference-between-stable-and-beta)
   - [How do I install the beta version, and what's the difference between beta and dev?](#how-do-i-install-the-beta-version-and-whats-the-difference-between-beta-and-dev)
   - [How do I try the latest bits?](#how-do-i-try-the-latest-bits)
@@ -159,7 +156,7 @@ see [Configuration](/gateway/configuration).
   - [What does this error mean?](#what-does-this-error-mean)
   - [Fix checklist for
     `No credentials found for profile "anthropic:default"`](#fix-checklist-for-no-credentials-found-for-profile-anthropicdefault)
-  - [Why did it also try Google Gemini and fail?](#why-did-it-also-try-google-gemini-and-fail)
+  - [Why did it also try another provider and fail?](#why-did-it-also-try-another-provider-and-fail)
 - [Auth profiles: what they are and how to manage them](#auth-profiles-what-they-are-and-how-to-manage-them)
   - [What is an auth profile?](#what-is-an-auth-profile)
   - [What are typical profile IDs?](#what-are-typical-profile-ids)
@@ -458,8 +455,6 @@ section is the latest shipped version. Entries are grouped by **Highlights**, **
 
 ### I can't access docs.datzi\.ai SSL error What now
 
-Some Comcast/Xfinity connections incorrectly block `docs.datzi.ai` via Xfinity
-Advanced Security. Disable it or allowlist `docs.datzi.ai`, then retry. More
 detail: [Troubleshooting](/help/troubleshooting#docsdatziai-shows-an-ssl-error-comcastxfinity).
 Please help us unblock it by reporting
 here: [https://spa.xfinity.com/check_url_status](https://spa.xfinity.com/check_url_status).
@@ -747,13 +742,9 @@ Docs: [Models](/concepts/models), [Configure](/cli/configure), [Config](/cli/con
 Use the `/model` command as a standalone message:
 
 ```
-/model sonnet
-/model haiku
-/model opus
-/model gpt
+/model ollama/qwen3-coder:14b
 /model ollama/qwen3-coder:32b
-/model gemini
-/model gemini-flash
+/model ollama/deepseek-r1:32b
 ```
 
 You can list available models with `/model`, `/model list`, or `/model status`.
@@ -767,8 +758,7 @@ You can list available models with `/model`, `/model list`, or `/model status`.
 You can also force a specific auth profile for the provider (per session):
 
 ```
-/model opus@anthropic:default
-/model opus@anthropic:work
+/model ollama/qwen3-coder:32b
 ```
 
 Tip: `/model status` shows which agent is active, which `auth-profiles.json` file is being used, and which auth profile
@@ -841,20 +831,17 @@ Fallbacks are for **errors**, not "hard tasks," so use `/model` or a separate ag
 
 ```json5
 {
-  env: {
-    MINIMAX_API_KEY: 'sk-...'
-  },
   agents: {
     defaults: {
       model: {
-        primary: 'minimax/MiniMax-M2.1'
+        primary: 'ollama/qwen3-coder:14b'
       },
       models: {
-        'minimax/MiniMax-M2.1': {
-          alias: 'minimax'
+        'ollama/qwen3-coder:14b': {
+          alias: 'coder'
         },
         'ollama/deepseek-r1:32b': {
-          alias: 'gpt'
+          alias: 'deepseek'
         }
       }
     }
@@ -916,28 +903,22 @@ Then `/model sonnet` (or `/<alias>` when supported) resolves to that model ID.
 
 ### How do I add models from other providers like OpenRouter or ZAI
 
-Z.AI (GLM models):
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
 
 ```json5
 {
   agents: {
     defaults: {
       model: {
-        primary: 'zai/glm-4.7'
+        primary: 'ollama/qwen3-coder:14b'
       },
       models: {
-        'zai/glm-4.7': {}
+        'ollama/qwen3-coder:14b': {}
       }
     }
-  },
-  env: {
-    ZAI_API_KEY: '...'
   }
 }
 ```
-
-If you reference a provider/model but the required provider key is missing, you'll get a runtime auth error (e.g.
-`No API key found for provider "zai"`).
 
 **No API key found for provider after adding a new agent**
 
@@ -976,13 +957,12 @@ No credentials found for profile "anthropic:default"
 It means the system attempted to use the auth profile ID `anthropic:default`, but could not find credentials for it in
 the expected auth store.
 
-### Why did it also try Google Gemini and fail
+### Why did it also try another provider and fail
 
-If your model config includes Google Gemini as a fallback (or you switched to a Gemini shorthand), Datzi will try it
-during model fallback. If you haven't configured Google credentials, you'll see`No API key found for provider "google"`.
+If your model config includes another provider as a fallback, Datzi will try it
+during model fallback. If you haven't configured credentials for that provider, you'll see a "No API key found" error.
 
-Fix: either provide Google auth, or remove/avoid Google models in `agents.defaults.model.fallbacks` / aliases so
-fallback doesn't route there.
+Fix: remove external provider models from `agents.defaults.model.fallbacks` / aliases and use local Ollama models instead (e.g. `ollama/qwen3-coder:14b`).
 
 **LLM request rejected message thinking signature required google antigravity**
 

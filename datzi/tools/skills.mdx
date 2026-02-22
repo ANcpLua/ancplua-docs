@@ -18,8 +18,6 @@ tags:
   ]
 ---
 
-Source: https://docs.datzi.ai/tools/skills
-
 # Skills (Datzi)
 
 Datzi uses **[AgentSkills](https://agentskills.io)-compatible** skill folders to teach the agent how to use tools. Each
@@ -127,21 +125,10 @@ Datzi **filters skills at load time** using `metadata` (single-line JSON):
 
 ```markdown
 ---
-name: nano-banana-pro
-description: Generate or edit images via Gemini 3 Pro Image
+name: example-skill
+description: Example skill with gating
 metadata:
-  {
-    'datzi':
-      {
-        'requires':
-          {
-            'bins': ['uv'],
-            'env': ['GEMINI_API_KEY'],
-            'config': ['browser.enabled']
-          },
-        'primaryEnv': 'GEMINI_API_KEY'
-      }
-  }
+  { 'datzi': { 'requires': { 'bins': ['uv'], 'config': ['browser.enabled'] } } }
 ---
 ```
 

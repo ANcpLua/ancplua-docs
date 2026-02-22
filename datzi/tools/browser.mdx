@@ -8,8 +8,6 @@ tags:
   [browser, chrome, playwright, cdp, automation, profiles, snapshot, extension]
 ---
 
-Source: https://docs.datzi.ai/tools/browser
-
 # Browser (datzi-managed)
 
 Datzi can run a **dedicated Chrome/Brave/Edge/Chromium profile** that the agent controls.
@@ -176,33 +174,7 @@ Notes:
 
 ## Browserless (hosted remote CDP)
 
-[Browserless](https://browserless.io) is a hosted Chromium service that exposes
-CDP endpoints over HTTPS. You can point a Datzi browser profile at a
-Browserless region endpoint and authenticate with your API key.
-
-Example:
-
-```json5
-{
-  browser: {
-    enabled: true,
-    defaultProfile: 'browserless',
-    remoteCdpTimeoutMs: 2000,
-    remoteCdpHandshakeTimeoutMs: 4000,
-    profiles: {
-      browserless: {
-        cdpUrl: 'https://production-sfo.browserless.io?token=<BROWSERLESS_API_KEY>',
-        color: '#00AA00'
-      }
-    }
-  }
-}
-```
-
-Notes:
-
-- Replace `<BROWSERLESS_API_KEY>` with your real Browserless token.
-- Choose the region endpoint that matches your Browserless account (see their docs).
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required. Browserless is a paid hosted service. For local-only setups, use the local managed browser instead.
 
 ## Security
 

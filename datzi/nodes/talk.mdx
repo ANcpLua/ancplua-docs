@@ -19,8 +19,6 @@ tags:
   ]
 ---
 
-Source: https://docs.datzi.ai/nodes/talk
-
 # Talk Mode
 
 Talk mode is a continuous voice conversation loop:
@@ -68,13 +66,11 @@ Supported keys:
 
 ## Config (`~/.datzi/datzi.json`)
 
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required. Talk mode TTS requires a local TTS alternative or is not available in local-only mode.
+
 ```json5
 {
   talk: {
-    voiceId: 'elevenlabs_voice_id',
-    modelId: 'eleven_v3',
-    outputFormat: 'mp3_44100_128',
-    apiKey: 'elevenlabs_api_key',
     interruptOnSpeech: true
   }
 }
@@ -83,10 +79,6 @@ Supported keys:
 Defaults:
 
 - `interruptOnSpeech`: true
-- `voiceId`: falls back to `ELEVENLABS_VOICE_ID` / `SAG_VOICE_ID` (or first ElevenLabs voice when API key is available)
-- `modelId`: defaults to `eleven_v3` when unset
-- `apiKey`: falls back to `ELEVENLABS_API_KEY` (or gateway shell profile if available)
-- `outputFormat`: defaults to `pcm_44100` on macOS/iOS and `pcm_24000` on Android (set `mp3_*` to force MP3 streaming)
 
 ## macOS UI
 
@@ -103,8 +95,7 @@ Defaults:
 
 - Requires Speech + Microphone permissions.
 - Uses `chat.send` against session key `main`.
-- TTS uses ElevenLabs streaming API with `ELEVENLABS_API_KEY` and incremental playback on macOS/iOS/Android for lower
-  latency.
+- TTS playback is available on macOS/iOS/Android when a TTS provider is configured.
 - `stability` for `eleven_v3` is validated to `0.0`, `0.5`, or `1.0`; other models accept `0..1`.
 - `latency_tier` is validated to `0..4` when set.
 - Android supports `pcm_16000`, `pcm_22050`, `pcm_24000`, and `pcm_44100` output formats for low-latency AudioTrack

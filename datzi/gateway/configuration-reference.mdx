@@ -7,7 +7,6 @@ summary: Complete reference for all Gateway configuration fields, types, and def
 tags: ['configuration', 'reference', 'yaml', 'gateway']
 ---
 
-Source: https://docs.datzi.ai/gateway/configuration-reference
 
 Complete field-by-field reference for ~/.datzi/datzi.json
 
@@ -293,12 +292,6 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
             channelId: '234567890123456789'
           }
         ],
-        tts: {
-          provider: 'openai',
-          openai: {
-            voice: 'alloy'
-          }
-        }
       },
       retry: {
         attempts: 3,
@@ -1495,7 +1488,7 @@ See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for preceden
 ```json5
 {
   messages: {
-    responsePrefix: '🦞',
+    responsePrefix: '🐟',
     // or "auto"
     ackReaction: '👀',
     ackReactionScope: 'group-mentions',
@@ -1559,78 +1552,13 @@ Control commands bypass debouncing.
 
 ### TTS (text-to-speech)
 
-```json5
-{
-  messages: {
-    tts: {
-      auto: 'always',
-      // off | always | inbound | tagged
-      mode: 'final',
-      // final | all
-      provider: 'elevenlabs',
-      summaryModel: 'ollama/qwen3-coder:14b',
-      modelOverrides: {
-        enabled: true
-      },
-      maxTextLength: 4000,
-      timeoutMs: 30000,
-      prefsPath: '~/.datzi/settings/tts.json',
-      elevenlabs: {
-        apiKey: 'elevenlabs_api_key',
-        baseUrl: 'https://api.elevenlabs.io',
-        voiceId: 'voice_id',
-        modelId: 'eleven_multilingual_v2',
-        seed: 42,
-        applyTextNormalization: 'auto',
-        languageCode: 'en',
-        voiceSettings: {
-          stability: 0.5,
-          similarityBoost: 0.75,
-          style: 0.0,
-          useSpeakerBoost: true,
-          speed: 1.0
-        }
-      },
-      openai: {
-        apiKey: 'openai_api_key',
-        model: 'gpt-4o-mini-tts',
-        voice: 'alloy'
-      }
-    }
-  }
-}
-```
-
-- `auto` controls auto-TTS. `/tts off|always|inbound|tagged` overrides per session.
-- `summaryModel` overrides `agents.defaults.model.primary` for auto-summary.
-- `modelOverrides` is enabled by default; `modelOverrides.allowProvider` defaults to `false` (opt-in).
-- API keys fall back to `ELEVENLABS_API_KEY`/`XI_API_KEY` and `OPENAI_API_KEY`.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required. TTS requires local alternatives or is disabled in local-only mode.
 
 ---
 
 ## Talk
 
-Defaults for Talk mode (macOS/iOS/Android).
-
-```json5
-{
-  talk: {
-    voiceId: 'elevenlabs_voice_id',
-    voiceAliases: {
-      Clawd: 'EXAVITQu4vr4xnSDxMaL',
-      Roger: 'CwhRBWXzGAHq8TQ4Fs17'
-    },
-    modelId: 'eleven_v3',
-    outputFormat: 'mp3_44100_128',
-    apiKey: 'elevenlabs_api_key',
-    interruptOnSpeech: true
-  }
-}
-```
-
-- Voice IDs fall back to `ELEVENLABS_VOICE_ID` or `SAG_VOICE_ID`.
-- `apiKey` falls back to `ELEVENLABS_API_KEY`.
-- `voiceAliases` lets Talk directives use friendly names.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required. Talk mode TTS is not available in local-only mode.
 
 ---
 
@@ -1780,7 +1708,6 @@ Settings can be defined globally in `tools.loopDetection` and overridden per-age
       search: {
         enabled: true,
         apiKey: 'brave_api_key',
-        // or BRAVE_API_KEY env
         maxResults: 5,
         timeoutSeconds: 30,
         cacheTtlMinutes: 15
@@ -1823,10 +1750,6 @@ Configures inbound media understanding (image/audio/video):
         },
         models: [
           {
-            provider: 'openai',
-            model: 'gpt-4o-mini-transcribe'
-          },
-          {
             type: 'cli',
             command: 'whisper',
             args: ['--model', 'base', '{{MediaPath}}']
@@ -1836,12 +1759,7 @@ Configures inbound media understanding (image/audio/video):
       video: {
         enabled: true,
         maxBytes: 52428800,
-        models: [
-          {
-            provider: 'google',
-            model: 'gemini-3-flash-preview'
-          }
-        ]
+        models: []
       }
     }
   }
@@ -1851,7 +1769,7 @@ Configures inbound media understanding (image/audio/video):
 <Accordion title="Media model entry fields">
   **Provider entry** (`type: "provider"` or omitted):
 
-- `provider`: API provider id (`openai`, `anthropic`, `google`/`gemini`, `groq`, etc.)
+- `provider`: API provider id (e.g. `ollama`)
 - `model`: model id override
 - `profile` / `preferredProfile`: auth profile selection
 
@@ -1862,8 +1780,7 @@ Configures inbound media understanding (image/audio/video):
 
 **Common fields:**
 
-- `capabilities`: optional list (`image`, `audio`, `video`). Defaults: `openai`/`anthropic`/`minimax` → image,`google` →
-  image+audio+video, `groq` → audio.
+- `capabilities`: optional list (`image`, `audio`, `video`).
 - `prompt`, `maxChars`, `maxBytes`, `timeoutSeconds`, `language`: per-entry overrides.
 - Failures fall back to the next entry.
 
@@ -1975,40 +1892,23 @@ Datzi uses the pi-coding-agent model catalog. Add custom providers via `models.p
 
 ### Provider examples
 
-<Accordion title="Cerebras (GLM 4.6 / 4.7)">
+<Accordion title="Ollama (recommended)">
   ```json5
   {
-    env: { CEREBRAS_API_KEY: "sk-..." },
     agents: {
       defaults: {
         model: {
-          primary: "cerebras/zai-glm-4.7",
-          fallbacks: ["cerebras/zai-glm-4.6"],
+          primary: "ollama/qwen3-coder:14b",
         },
         models: {
-          "cerebras/zai-glm-4.7": { alias: "GLM 4.7 (Cerebras)" },
-          "cerebras/zai-glm-4.6": { alias: "GLM 4.6 (Cerebras)" },
-        },
-      },
-    },
-    models: {
-      mode: "merge",
-      providers: {
-        cerebras: {
-          baseUrl: "https://api.cerebras.ai/v1",
-          apiKey: "${CEREBRAS_API_KEY}",
-          api: "openai-completions",
-          models: [
-            { id: "zai-glm-4.7", name: "GLM 4.7 (Cerebras)" },
-            { id: "zai-glm-4.6", name: "GLM 4.6 (Cerebras)" },
-          ],
+          "ollama/qwen3-coder:14b": { alias: "Qwen3 Coder" },
         },
       },
     },
   }
   ```
 
-Use `cerebras/zai-glm-4.7` for Cerebras; `zai/glm-4.7` for Z.AI direct.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
 
 </Accordion>
 
@@ -2024,7 +1924,7 @@ Use `cerebras/zai-glm-4.7` for Cerebras; `zai/glm-4.7` for Z.AI direct.
   }
   ```
 
-Set `OPENCODE_API_KEY` (or `OPENCODE_ZEN_API_KEY`). Shortcut: `datzi onboard --auth-choice opencode-zen`.
+Shortcut: `datzi onboard --auth-choice opencode-zen`.
 
 </Accordion>
 
@@ -2040,7 +1940,7 @@ Set `OPENCODE_API_KEY` (or `OPENCODE_ZEN_API_KEY`). Shortcut: `datzi onboard --a
   }
   ```
 
-Set `ZAI_API_KEY`. `z.ai/*` and `z-ai/*` are accepted aliases. Shortcut: `datzi onboard --auth-choice zai-api-key`.
+`z.ai/*` and `z-ai/*` are accepted aliases. Shortcut: `datzi onboard --auth-choice zai-api-key`.
 
 - General endpoint: `https://api.z.ai/api/paas/v4`
 - Coding endpoint (default): `https://api.z.ai/api/coding/paas/v4`
@@ -2050,132 +1950,70 @@ Set `ZAI_API_KEY`. `z.ai/*` and `z-ai/*` are accepted aliases. Shortcut: `datzi 
 <Accordion title="Moonshot AI (Kimi)">
   ```json5
   {
-    env: { MOONSHOT_API_KEY: "sk-..." },
     agents: {
       defaults: {
-        model: { primary: "moonshot/kimi-k2.5" },
-        models: { "moonshot/kimi-k2.5": { alias: "Kimi K2.5" } },
-      },
-    },
-    models: {
-      mode: "merge",
-      providers: {
-        moonshot: {
-          baseUrl: "https://api.moonshot.ai/v1",
-          apiKey: "${MOONSHOT_API_KEY}",
-          api: "openai-completions",
-          models: [
-            {
-              id: "kimi-k2.5",
-              name: "Kimi K2.5",
-              reasoning: false,
-              input: ["text"],
-              cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-              contextWindow: 256000,
-              maxTokens: 8192,
-            },
-          ],
-        },
+        model: { primary: "ollama/qwen3-coder:14b" },
+        models: { "ollama/qwen3-coder:14b": { alias: "Qwen3 Coder" } },
       },
     },
   }
   ```
 
-For the China endpoint: `baseUrl: "https://api.moonshot.cn/v1"` or `datzi onboard --auth-choice moonshot-api-key-cn`.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
+
+Shortcut: `datzi onboard --auth-choice moonshot-api-key-cn`.
 
 </Accordion>
 
 <Accordion title="Kimi Coding">
   ```json5
   {
-    env: { KIMI_API_KEY: "sk-..." },
     agents: {
       defaults: {
-        model: { primary: "kimi-coding/k2p5" },
-        models: { "kimi-coding/k2p5": { alias: "Kimi K2.5" } },
+        model: { primary: "ollama/qwen3-coder:14b" },
+        models: { "ollama/qwen3-coder:14b": { alias: "Qwen3 Coder" } },
       },
     },
   }
   ```
 
-Anthropic-compatible, built-in provider. Shortcut: `datzi onboard --auth-choice kimi-code-api-key`.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
+
+Shortcut: `datzi onboard --auth-choice kimi-code-api-key`.
 
 </Accordion>
 
-<Accordion title="Synthetic (Anthropic-compatible)">
+<Accordion title="Local models (Ollama)">
   ```json5
   {
-    env: { SYNTHETIC_API_KEY: "sk-..." },
     agents: {
       defaults: {
-        model: { primary: "synthetic/hf:MiniMaxAI/MiniMax-M2.1" },
-        models: { "synthetic/hf:MiniMaxAI/MiniMax-M2.1": { alias: "MiniMax M2.1" } },
-      },
-    },
-    models: {
-      mode: "merge",
-      providers: {
-        synthetic: {
-          baseUrl: "https://api.synthetic.new/anthropic",
-          apiKey: "${SYNTHETIC_API_KEY}",
-          api: "anthropic-messages",
-          models: [
-            {
-              id: "hf:MiniMaxAI/MiniMax-M2.1",
-              name: "MiniMax M2.1",
-              reasoning: false,
-              input: ["text"],
-              cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-              contextWindow: 192000,
-              maxTokens: 65536,
-            },
-          ],
-        },
+        model: { primary: "ollama/qwen3-coder:14b" },
+        models: { "ollama/qwen3-coder:14b": { alias: "Qwen3 Coder" } },
       },
     },
   }
   ```
 
-Base URL should omit `/v1` (Anthropic client appends it). Shortcut: `datzi onboard --auth-choice synthetic-api-key`.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
 
 </Accordion>
 
-<Accordion title="MiniMax M2.1 (direct)">
+<Accordion title="MiniMax M2.1 (local via LM Studio)">
   ```json5
   {
     agents: {
       defaults: {
-        model: { primary: "minimax/MiniMax-M2.1" },
+        model: { primary: "ollama/qwen3-coder:14b" },
         models: {
-          "minimax/MiniMax-M2.1": { alias: "Minimax" },
-        },
-      },
-    },
-    models: {
-      mode: "merge",
-      providers: {
-        minimax: {
-          baseUrl: "https://api.minimax.io/anthropic",
-          apiKey: "${MINIMAX_API_KEY}",
-          api: "anthropic-messages",
-          models: [
-            {
-              id: "MiniMax-M2.1",
-              name: "MiniMax M2.1",
-              reasoning: false,
-              input: ["text"],
-              cost: { input: 15, output: 60, cacheRead: 2, cacheWrite: 10 },
-              contextWindow: 200000,
-              maxTokens: 8192,
-            },
-          ],
+          "ollama/qwen3-coder:14b": { alias: "Qwen3 Coder" },
         },
       },
     },
   }
   ```
 
-Set `MINIMAX_API_KEY`. Shortcut: `datzi onboard --auth-choice minimax-api`.
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required.
 
 </Accordion>
 
@@ -2202,15 +2040,8 @@ Set `MINIMAX_API_KEY`. Shortcut: `datzi onboard --auth-choice minimax-api`.
       // npm | pnpm | yarn
     },
     entries: {
-      'nano-banana-pro': {
-        apiKey: 'GEMINI_KEY_HERE',
-        env: {}
-      },
       peekaboo: {
         enabled: true
-      },
-      sag: {
-        enabled: false
       }
     }
   }
@@ -2494,7 +2325,7 @@ Auth: `Authorization: Bearer <token>` or `x-datzi-token: <token>`.
         mode: 'funnel',
         path: '/gmail-pubsub'
       },
-      model: 'openrouter/meta-llama/llama-3.3-70b-instruct:free',
+      model: 'ollama/qwen3-coder:14b',
       thinking: 'off'
     }
   }
@@ -2580,9 +2411,7 @@ Setup: `datzi dns setup --apply`.
 ```json5
 {
   env: {
-    vars: {
-      GROQ_API_KEY: 'gsk-...'
-    },
+    vars: {},
     shellEnv: {
       enabled: true,
       timeoutMs: 15000
@@ -2619,30 +2448,7 @@ Reference env vars in any config string with `${VAR_NAME}`:
 
 ## Auth storage
 
-```json5
-{
-  auth: {
-    profiles: {
-      'anthropic:me@example.com': {
-        provider: 'anthropic',
-        mode: 'oauth',
-        email: 'me@example.com'
-      },
-      'anthropic:work': {
-        provider: 'anthropic',
-        mode: 'api_key'
-      }
-    },
-    order: {
-      anthropic: ['anthropic:me@example.com', 'anthropic:work']
-    }
-  }
-}
-```
-
-- Per-agent auth profiles stored at `<agentDir>/auth-profiles.json`.
-- Legacy OAuth imports from `~/.datzi/credentials/oauth.json`.
-- See [OAuth](/concepts/oauth).
+> Datzi runs on Ollama (qwen3-coder:14b). No external API keys required. Auth profiles are not needed for local Ollama.
 
 ---
 

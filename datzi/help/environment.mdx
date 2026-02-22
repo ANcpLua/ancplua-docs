@@ -7,8 +7,6 @@ summary: Lists and explains environment variables that control Datzi agent and G
 tags: ['environment-variables', 'configuration', 'help']
 ---
 
-Source: https://docs.datzi.ai/help/environment
-
 # Environment variables
 
 Datzi pulls environment variables from multiple sources. The rule is **never override existing values**.
@@ -31,9 +29,7 @@ Two equivalent ways to set inline env vars (both are non-overriding):
 ```json5
 {
   env: {
-    vars: {
-      GROQ_API_KEY: 'gsk-...'
-    }
+    vars: {}
   }
 }
 ```
@@ -64,11 +60,9 @@ You can reference env vars directly in config string values using `${VAR_NAME}` 
 
 ```json5
 {
-  models: {
-    providers: {
-      'vercel-gateway': {
-        apiKey: '${VERCEL_GATEWAY_API_KEY}'
-      }
+  gateway: {
+    auth: {
+      token: '${DATZI_GATEWAY_TOKEN}'
     }
   }
 }
