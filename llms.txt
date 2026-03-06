@@ -5,8 +5,10 @@
 ## Sections
 
 - **SDK** (`/sdk/*`): MSBuild SDK configuration, variants, properties
-- **Analyzers** (`/analyzers/*`): 24 diagnostic rules + 2 refactorings
+- **Analyzers** (`/analyzers/*`): 102 diagnostic rules (AL0001–AL0106) + 2 refactorings (AR0001–AR0002)
 - **Utilities** (`/utilities/*`): Roslyn utilities for source generators
+- **ErrorOrX** (`/erroror/*`): Error handling library with source generator
+- **qyl** (`/qyl/*`): Observability platform
 - **API** (`/api-reference/*`): qyl observability REST API
 
 ## SDK Variants
@@ -31,31 +33,61 @@
 - `/sdk/polyfills` - netstandard2.0 compatibility
 - `/sdk/banned-apis` - Deprecated API enforcement
 - `/sdk/testing` - Test base classes
+- `/sdk/extensions` - SDK extensions
+- `/sdk/shared-utilities` - Shared utilities
+- `/sdk/configuration-files` - Configuration files
 
 ### Analyzers
 - `/analyzers/overview` - Rule table with severity
 - `/analyzers/configuration` - EditorConfig settings
-- `/analyzers/rules/AL0001` through `/analyzers/rules/AL0025` - Individual rules
+- `/analyzers/rules/AL0001` through `/analyzers/rules/AL0096` - Core diagnostic rules
+- `/analyzers/rules/AL0101` through `/analyzers/rules/AL0106` - Extended diagnostic rules
+- `/analyzers/rules/AR0001` - Refactoring 1
+- `/analyzers/rules/AR0002` - Refactoring 2
 
 ### Utilities
 - `/utilities/overview` - Package overview
 - `/utilities/diagnostic-flow` - Railway-oriented diagnostics
+- `/utilities/pipeline` - Pipeline patterns
+- `/utilities/contexts` - Context utilities
 - `/utilities/patterns` - Symbol pattern matching
+- `/utilities/operations` - Operation utilities
+- `/utilities/symbols` - Symbol utilities
 - `/utilities/semantic-guard` - Declarative validation
+- `/utilities/codegen` - Code generation utilities
+- `/utilities/guard` - Guard utilities
+- `/utilities/testing` - Testing utilities
+
+### ErrorOrX
+- `/erroror/overview` - Error handling overview
+- `/erroror/http-mapping` - HTTP result mapping
+- `/erroror/generator` - Source generator
+- `/erroror/api-versioning` - API versioning
+- `/erroror/diagnostics` - Diagnostics
+
+### qyl
+- `/qyl/overview` - Observability platform overview
+- `/qyl/configuration` - Configuration
+- `/qyl/dashboard` - Dashboard features
+- `/qyl/mcp` - MCP integration
 
 ## Navigation Hints
 
 | Query | Page |
 |-------|------|
-| "getting started", "setup" | `/quickstart` |
+| "getting started", "setup", "install" | `/quickstart` |
 | "MSBuild properties" | `/sdk/msbuild-properties` |
 | "polyfills", "netstandard" | `/sdk/polyfills` |
-| "banned APIs", "DateTime" | `/sdk/banned-apis` |
+| "banned APIs", "DateTime", "lock" | `/sdk/banned-apis` |
 | "analyzer rules", "AL0XXX" | `/analyzers/rules/AL0XXX` |
-| "source generators" | `/utilities/overview` |
-| "DiagnosticFlow" | `/utilities/diagnostic-flow` |
-| "testing", "xUnit" | `/sdk/testing` |
-| "OpenTelemetry", "web" | `/sdk/service-defaults` |
+| "refactoring", "AR0XXX" | `/analyzers/rules/AR0XXX` |
+| "source generators", "Roslyn" | `/utilities/overview` |
+| "DiagnosticFlow", "railway" | `/utilities/diagnostic-flow` |
+| "testing", "xUnit", "MTP" | `/sdk/testing` |
+| "OpenTelemetry", "web", "health" | `/sdk/service-defaults` |
+| "error handling", "ErrorOr" | `/erroror/overview` |
+| "observability", "traces", "spans" | `/qyl/overview` |
+| "MCP", "Model Context Protocol" | `/qyl/mcp` |
 
 ## Requirements
 

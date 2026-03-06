@@ -13,12 +13,12 @@ jobs:
     name: Lint documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - uses: errata-ai/vale-action@v2
         with:
           reporter: github-pr-review
           filter_mode: added
-          fail_on_error: false
+          fail_on_error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

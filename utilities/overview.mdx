@@ -7,6 +7,20 @@ icon: 'code'
 
 ANcpLua.Roslyn.Utilities provides utilities for building Roslyn analyzers and source generators.
 
+## What's New in v1.42
+
+**Performance namespace** -- seven zero-allocation primitives for `netstandard2.0`:
+
+- `BitHelpers` -- `PopCount`, `LeadingZeroCount`, `Log2`, `RoundUpToPowerOf2`, rotations
+- `AsciiSet` -- 128-bit bitmap for O(1) character membership
+- `AsciiHelpers` -- branchless `EqualsIgnoreCase`, `TrimWhiteSpace`, `IsAscii`
+- `SpanHelpers` -- `Count`, `ContainsAny`, `IndexOfAny`, `IsWhiteSpace` for spans
+- `IntegerParser` -- `TryParseInt32`/`TryParseInt64` from `ReadOnlySpan<char>` and `ReadOnlySpan<byte>`
+- `SpanTokenizer` -- `ref struct` allocation-free tokenizer with `foreach` support
+- `MemoryHelpers` -- `AsBytes`, `Cast`, `GetReference` wrappers for `MemoryMarshal`
+
+**Directory restructure** -- projects moved from `ANcpLua.Roslyn.Utilities/` to `src/` subfolder.
+
 ## What's New in v1.19
 
 **Expanded Guard API** - Comprehensive argument validation:
@@ -74,6 +88,7 @@ dotnet add package ANcpLua.Roslyn.Utilities.Testing
 | Pipeline            | `GroupBy()`, `Batch()`, `Distinct()`          | [Pipeline](/utilities/pipeline)              |
 | Symbol Extensions   | `IsEqualTo()`, `HasAttribute()`               | [Symbols](/utilities/symbols)                |
 | Testing             | `Test<TGenerator>.Run()`, caching validation  | [Testing](/utilities/testing)                |
+| Performance         | `BitHelpers`, `AsciiSet`, `SpanTokenizer`     | [Performance](/utilities/performance)        |
 
 ## Quick Example
 

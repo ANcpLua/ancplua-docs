@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "jetbrains": {
+      "type": "sse",
+      "url": "http://localhost:64342/sse"
+    },
+    "nuget": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": ["dnx", "NuGet.Mcp.Server", "--yes", "--prerelease"],
+      "env": {}
+    }
+  }
+}

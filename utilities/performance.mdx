@@ -1,0 +1,133 @@
+---
+title: 'Performance Utilities'
+sidebarTitle: 'Performance'
+description: 'Zero-allocation, netstandard2.0-compatible performance primitives for span operations, ASCII handling, bit manipulation, and tokenization.'
+icon: 'gauge-high'
+---
+
+Low-level performance primitives in the `ANcpLua.Roslyn.Utilities.Performance` namespace. All types target `netstandard2.0` and use the same algorithms found in the .NET runtime, Kestrel, and System.Text.Json internals.
+
+## BitHelpers
+
+Software polyfills for `System.Numerics.BitOperations` (unavailable on `netstandard2.0`). Hamming weight, De Bruijn sequences, and standard bit-twiddling -- the JIT can replace these with hardware intrinsics on modern runtimes.
+
+```csharp
+BitHelpers.PopCount(0b1010_1010u)           // 4
+BitHelpers.LeadingZeroCount(0x00FF_0000u)   // 8
+BitHelpers.TrailingZeroCount(0x0000_0080u)  // 7
+BitHelpers.Log2(255u)                       // 7
+BitHelpers.IsPowerOfTwo(64u)                // true
+
+// Hash table bucket sizing
+uint capacity = BitHelpers.RoundUpToPowerOf2((uint)count);
+int bucket = hashCode & (int)(capacity - 1);
+
+// Also: RotateLeft/RotateRight for uint and ulong
+```
+
+## AsciiSet
+
+128-bit bitmap `readonly struct` for O(1) ASCII character membership. Replaces branchy `if (c == 'a' || c == 'b' || ...)` chains with a single bit-test. Two `ulong` fields, 16 bytes on the stack.
+
+```csharp
+var delimiters = new AsciiSet(",;|".AsSpan());
+
+delimiters.Contains(';')  // true
+delimiters.Contains('x')  // false
+
+ReadOnlySpan<char> input = "key=value;next".AsSpan();
+int idx = delimiters.IndexOfAny(input); // 9
+
+// Also works with ReadOnlySpan<byte> for UTF-8 buffers
+```
+
+## AsciiHelpers
+
+Branchless ASCII operations. The `|= 0x20` trick folds uppercase to lowercase in a single OR -- no branch, no table.
+
+```csharp
+// Case-insensitive comparison for protocol tokens (HTTP headers, etc.)
+AsciiHelpers.EqualsIgnoreCase(left, right) // ReadOnlySpan<byte>
+
+// Trim ASCII whitespace (space + tab)
+var trimmed = AsciiHelpers.TrimWhiteSpace(utf8Span);
+
+// Gate the UTF-8 fast path
+if (AsciiHelpers.IsAscii(payload))
+    ProcessAscii(payload);  // no multi-byte decoding needed
+```
+
+<Warning>
+  `EqualsIgnoreCase` handles ASCII letters only (A-Z / a-z). It does not perform
+  Unicode case folding. Use it for protocol tokens, not user-facing text.
+</Warning>
+
+## SpanHelpers
+
+Span utilities missing from `netstandard2.0`: counting, multi-value search, and whitespace checks.
+
+```csharp
+SpanHelpers.Count(source, '\n')           // occurrences of char/byte
+SpanHelpers.ContainsAny(span, ",;".AsSpan())  // any match?
+SpanHelpers.IndexOfAny(span, ",;".AsSpan())   // first match index (-1 if none)
+SpanHelpers.IsWhiteSpace(span)                // all whitespace?
+```
+
+## IntegerParser
+
+Zero-allocation integer parsing from `ReadOnlySpan<char>` and `ReadOnlySpan<byte>` with overflow detection. Handles optional leading sign.
+
+```csharp
+// From char spans
+IntegerParser.TryParseInt32("42".AsSpan(), out var i)     // true, i = 42
+IntegerParser.TryParseInt64("-100".AsSpan(), out var l)    // true, l = -100
+
+// Same API for UTF-8 byte spans
+IntegerParser.TryParseInt32(utf8Bytes, out var result)
+```
+
+<Info>
+  Uses `ulong` accumulation with per-digit overflow checks. Correctly handles
+  `int.MinValue` and `long.MinValue` (the asymmetric negative bound).
+</Info>
+
+## SpanTokenizer
+
+`ref struct` allocation-free tokenizer that splits `ReadOnlySpan<char>` on a separator. Supports `foreach` via duck-typed enumerator -- no `IEnumerable`, no boxing, no heap.
+
+```csharp
+var tokenizer = new SpanTokenizer("100,200,-42".AsSpan(), ',');
+
+foreach (ReadOnlySpan<char> token in tokenizer)
+{
+    if (IntegerParser.TryParseInt32(token, out var value))
+        sum += value;
+}
+```
+
+<Warning>
+  `ref struct` -- cannot be stored in fields, captured by lambdas, or used
+  across `await` boundaries.
+</Warning>
+
+## MemoryHelpers
+
+Typed wrappers around `MemoryMarshal` for span reinterpretation.
+
+```csharp
+// Reinterpret value-type spans as bytes
+ReadOnlySpan<byte> bytes = MemoryHelpers.AsBytes("hello".AsSpan());
+// bytes.Length == 10 (2 bytes per UTF-16 char)
+
+// Cast between value types
+Span<int> ints = MemoryHelpers.Cast<byte, int>(byteSpan);
+
+// Get reference to first element
+ref var first = ref MemoryHelpers.GetReference(span);
+```
+
+## See Also
+
+- [Polyfills](/utilities/polyfills) -- language feature polyfills for `netstandard2.0`
+- [Code Generation](/utilities/codegen) -- `EquatableArray`, `HashCombiner`, `IndentedStringBuilder`
+- [Guard](/utilities/guard) -- argument validation with aggressive inlining

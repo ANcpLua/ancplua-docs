@@ -1,12 +1,7 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
   title: QYL Observability API
-  version: '2025-01-01'
-servers:
-  - url: https://qyl-api-production.up.railway.app
-    description: Production (Railway)
-  - url: http://localhost:5100
-    description: Local development
+  version: '2026-01-26'
 tags:
   - name: Streaming
   - name: Traces
@@ -14,16 +9,423 @@ tags:
   - name: Metrics
   - name: Sessions
   - name: Errors
-  - name: Exceptions
   - name: Deployments
-  - name: CI/CD
   - name: Services
   - name: Health
+  - name: Workspaces
+  - name: Onboarding
+  - name: Configurator
+  - name: Issues
+  - name: Workflows
+  - name: Search
+  - name: Alerts
 paths:
-  /health:
+  /api/v1/alerts/firings:
     get:
-      operationId: health_check
-      description: Health check endpoint
+      operationId: AlertsApi_listFirings
+      description: List alert firings
+      parameters:
+        - name: ruleId
+          in: query
+          required: false
+          description: Rule ID filter
+          schema:
+            type: string
+          explode: false
+        - name: status
+          in: query
+          required: false
+          description: Status filter
+          schema:
+            $ref: '#/components/schemas/Qyl.Domains.Alerting.AlertFiringStatus'
+          explode: false
+        - name: startTime
+          in: query
+          required: false
+          description: Start time
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: endTime
+          in: query
+          required: false
+          description: End time
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          explode: false
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - has_more
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Qyl.Domains.Alerting.AlertFiringEntity'
+                    description: List of items in this page
+                  next_cursor:
+                    type: string
+                    description: Cursor for the next page (null if no more pages)
+                  prev_cursor:
+                    type: string
+                    description: Cursor for the previous page (null if first page)
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items available
+                description: Cursor-based paginated response wrapper
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Alerts
+  /api/v1/alerts/fixes:
+    get:
+      operationId: AlertsApi_listFixRuns
+      description: List fix runs
+      parameters:
+        - name: issueId
+          in: query
+          required: false
+          description: Issue ID filter
+          schema:
+            type: string
+          explode: false
+        - name: status
+          in: query
+          required: false
+          description: Status filter
+          schema:
+            $ref: '#/components/schemas/Qyl.Domains.Alerting.FixRunStatus'
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          explode: false
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - has_more
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Qyl.Domains.Alerting.FixRunEntity'
+                    description: List of items in this page
+                  next_cursor:
+                    type: string
+                    description: Cursor for the next page (null if no more pages)
+                  prev_cursor:
+                    type: string
+                    description: Cursor for the previous page (null if first page)
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items available
+                description: Cursor-based paginated response wrapper
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Alerts
+  /api/v1/alerts/fixes/{fixId}:
+    get:
+      operationId: AlertsApi_getFixRun
+      description: Get fix run by ID
+      parameters:
+        - name: fixId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Alerting.FixRunEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Alerts
+  /api/v1/alerts/rules:
+    get:
+      operationId: AlertsApi_listRules
+      description: List alert rules
+      parameters:
+        - name: projectId
+          in: query
+          required: false
+          description: Project ID filter
+          schema:
+            type: string
+          explode: false
+        - name: enabled
+          in: query
+          required: false
+          description: Enabled filter
+          schema:
+            type: boolean
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          explode: false
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - has_more
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Qyl.Domains.Alerting.AlertRuleEntity'
+                    description: List of items in this page
+                  next_cursor:
+                    type: string
+                    description: Cursor for the next page (null if no more pages)
+                  prev_cursor:
+                    type: string
+                    description: Cursor for the previous page (null if first page)
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items available
+                description: Cursor-based paginated response wrapper
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Alerts
+  /api/v1/alerts/rules/{ruleId}:
+    get:
+      operationId: AlertsApi_getRule
+      description: Get alert rule by ID
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Alerting.AlertRuleEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Alerts
+  /api/v1/configurator/jobs:
+    post:
+      operationId: ConfiguratorApi_createJob
+      description: Create a generation job
       parameters: []
       responses:
         '200':
@@ -31,34 +433,370 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponse'
+                $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationJobEntity'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
-        - Health
-  /health/live:
+        - Configurator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerationJobCreateRequest'
+  /api/v1/configurator/jobs/{jobId}:
     get:
-      operationId: health_liveness
-      description: Liveness probe
+      operationId: ConfiguratorApi_getJob
+      description: Get generation job status
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationJobEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Configurator
+  /api/v1/configurator/profiles:
+    get:
+      operationId: ConfiguratorApi_listProfiles
+      description: List generation profiles
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          explode: false
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - has_more
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationProfileEntity'
+                    description: List of items in this page
+                  next_cursor:
+                    type: string
+                    description: Cursor for the next page (null if no more pages)
+                  prev_cursor:
+                    type: string
+                    description: Cursor for the previous page (null if first page)
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items available
+                description: Cursor-based paginated response wrapper
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Configurator
+    post:
+      operationId: ConfiguratorApi_createProfile
+      description: Create generation profile
       parameters: []
       responses:
         '200':
           description: The request has succeeded.
-        '503':
-          description: Service unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationProfileEntity'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
-        - Health
-  /health/ready:
+        - Configurator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerationProfileCreateRequest'
+  /api/v1/configurator/profiles/{profileId}:
     get:
-      operationId: health_readiness
-      description: Readiness probe
+      operationId: ConfiguratorApi_getProfile
+      description: Get generation profile by ID
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationProfileEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Configurator
+  /api/v1/configurator/selections:
+    get:
+      operationId: ConfiguratorApi_getSelections
+      description: Get generation selections for a workspace
+      parameters:
+        - name: workspaceId
+          in: query
+          required: true
+          description: Workspace ID
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationSelectionEntity'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Configurator
+    post:
+      operationId: ConfiguratorApi_saveSelections
+      description: Save generation selections
       parameters: []
       responses:
         '200':
           description: The request has succeeded.
-        '503':
-          description: Service unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationSelectionEntity'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
-        - Health
-  /v1/deployments:
+        - Configurator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerationSelectionSaveRequest'
+  /api/v1/deployments:
     get:
       operationId: DeploymentsApi_list
       description: List deployments
@@ -233,7 +971,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DeploymentCreate'
-  /v1/deployments/metrics/dora:
+  /api/v1/deployments/metrics/dora:
     get:
       operationId: DeploymentsApi_getDoraMetrics
       description: Get DORA metrics
@@ -294,7 +1032,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Deployments
-  /v1/deployments/{deploymentId}:
+  /api/v1/deployments/{deploymentId}:
     get:
       operationId: DeploymentsApi_get
       description: Get deployment by ID
@@ -422,7 +1160,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DeploymentUpdate'
-  /v1/errors:
+  /api/v1/errors:
     get:
       operationId: ErrorsApi_list
       description: List error groups
@@ -544,7 +1282,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Errors
-  /v1/errors/stats:
+  /api/v1/errors/stats:
     get:
       operationId: ErrorsApi_getStats
       description: Get error statistics
@@ -598,7 +1336,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Errors
-  /v1/errors/{errorId}:
+  /api/v1/errors/{errorId}:
     get:
       operationId: ErrorsApi_get
       description: Get error by ID
@@ -726,7 +1464,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ErrorUpdate'
-  /v1/errors/{errorId}/correlations:
+  /api/v1/errors/{errorId}/correlations:
     get:
       operationId: ErrorsApi_getCorrelations
       description: Get error correlations
@@ -779,22 +1517,15 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Errors
-  /v1/exceptions:
+  /api/v1/issues:
     get:
-      operationId: ExceptionsApi_list
-      description: List exceptions
+      operationId: IssuesApi_list
+      description: List error issues
       parameters:
-        - name: serviceName
+        - name: projectId
           in: query
           required: false
-          description: Service name filter
-          schema:
-            type: string
-          explode: false
-        - name: exceptionType
-          in: query
-          required: false
-          description: Exception type filter
+          description: Project ID filter
           schema:
             type: string
           explode: false
@@ -803,7 +1534,21 @@ paths:
           required: false
           description: Status filter
           schema:
-            $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.ExceptionStatus'
+            $ref: '#/components/schemas/Qyl.Domains.Issues.IssueStatus'
+          explode: false
+        - name: priority
+          in: query
+          required: false
+          description: Priority filter
+          schema:
+            $ref: '#/components/schemas/Qyl.Domains.Issues.IssuePriority'
+          explode: false
+        - name: level
+          in: query
+          required: false
+          description: Level filter
+          schema:
+            $ref: '#/components/schemas/Qyl.Domains.Issues.IssueLevel'
           explode: false
         - name: startTime
           in: query
@@ -829,8 +1574,8 @@ paths:
             type: integer
             format: int32
             minimum: 1
-            maximum: 1000
-            default: 100
+            maximum: 100
+            default: 20
           explode: false
         - name: cursor
           in: query
@@ -853,7 +1598,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.EnrichedException'
+                      $ref: '#/components/schemas/Qyl.Domains.Issues.ErrorIssueEntity'
                     description: List of items in this page
                   next_cursor:
                     type: string
@@ -900,42 +1645,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
-        - Exceptions
-  /v1/exceptions/stats:
+        - Issues
+  /api/v1/issues/{issueId}:
     get:
-      operationId: ExceptionsApi_getStats
-      description: Get exception statistics
+      operationId: IssuesApi_get
+      description: Get issue by ID
       parameters:
-        - name: serviceName
-          in: query
-          required: false
-          description: Service name filter
+        - name: issueId
+          in: path
+          required: true
           schema:
             type: string
-          explode: false
-        - name: startTime
-          in: query
-          required: false
-          description: Start time
-          schema:
-            type: string
-            format: date-time
-          explode: false
-        - name: endTime
-          in: query
-          required: false
-          description: End time
-          schema:
-            type: string
-            format: date-time
-          explode: false
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.ExceptionStats'
+                $ref: '#/components/schemas/Qyl.Domains.Issues.ErrorIssueEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
         '500':
           description: Internal server error (500)
           headers:
@@ -954,8 +1698,239 @@ paths:
               schema:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
-        - Exceptions
-  /v1/logs:
+        - Issues
+    patch:
+      operationId: IssuesApi_update
+      description: Update issue status
+      parameters:
+        - name: issueId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Issues.ErrorIssueEntity'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Issues
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueUpdateRequest'
+  /api/v1/issues/{issueId}/breadcrumbs:
+    get:
+      operationId: IssuesApi_getBreadcrumbs
+      description: Get issue breadcrumbs
+      parameters:
+        - name: issueId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 50
+            default: 20
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Qyl.Domains.Issues.ErrorBreadcrumbEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Issues
+  /api/v1/issues/{issueId}/events:
+    get:
+      operationId: IssuesApi_getEvents
+      description: Get issue events
+      parameters:
+        - name: issueId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          explode: false
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - has_more
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Qyl.Domains.Issues.ErrorIssueEventEntity'
+                    description: List of items in this page
+                  next_cursor:
+                    type: string
+                    description: Cursor for the next page (null if no more pages)
+                  prev_cursor:
+                    type: string
+                    description: Cursor for the previous page (null if first page)
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items available
+                description: Cursor-based paginated response wrapper
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Issues
+  /api/v1/logs:
     get:
       operationId: LogsApi_list
       description: Query logs with filtering and pagination
@@ -1098,7 +2073,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Logs
-  /v1/logs/aggregate:
+  /api/v1/logs/aggregate:
     post:
       operationId: LogsApi_aggregate
       description: Aggregate logs
@@ -1152,7 +2127,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LogAggregationRequest'
-  /v1/logs/patterns:
+  /api/v1/logs/patterns:
     get:
       operationId: LogsApi_getPatterns
       description: Get log patterns
@@ -1216,7 +2191,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Logs
-  /v1/logs/search:
+  /api/v1/logs/search:
     post:
       operationId: LogsApi_search
       description: Search logs with complex query
@@ -1289,7 +2264,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Qyl.Domains.Observe.Log.LogQuery'
-  /v1/logs/stats:
+  /api/v1/logs/stats:
     get:
       operationId: LogsApi_getStats
       description: Get log statistics
@@ -1343,7 +2318,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Logs
-  /v1/metrics:
+  /api/v1/metrics:
     get:
       operationId: MetricsApi_list
       description: List available metrics
@@ -1425,7 +2400,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Metrics
-  /v1/metrics/query:
+  /api/v1/metrics/query:
     post:
       operationId: MetricsApi_query
       description: Query metric data points
@@ -1479,7 +2454,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MetricQueryRequest'
-  /v1/metrics/{metricName}:
+  /api/v1/metrics/{metricName}:
     get:
       operationId: MetricsApi_getMetadata
       description: Get metric metadata
@@ -1532,92 +2507,18 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Metrics
-  /v1/pipelines:
-    get:
-      operationId: PipelinesApi_list
-      description: List pipeline runs
-      parameters:
-        - name: pipelineName
-          in: query
-          required: false
-          description: Pipeline name filter
-          schema:
-            type: string
-          explode: false
-        - name: status
-          in: query
-          required: false
-          description: Status filter
-          schema:
-            $ref: '#/components/schemas/Qyl.Domains.Ops.Cicd.CicdPipelineStatus'
-          explode: false
-        - name: system
-          in: query
-          required: false
-          description: CI/CD system filter
-          schema:
-            $ref: '#/components/schemas/Qyl.Domains.Ops.Cicd.CicdSystem'
-          explode: false
-        - name: startTime
-          in: query
-          required: false
-          description: Start time
-          schema:
-            type: string
-            format: date-time
-          explode: false
-        - name: endTime
-          in: query
-          required: false
-          description: End time
-          schema:
-            type: string
-            format: date-time
-          explode: false
-        - name: limit
-          in: query
-          required: false
-          description: Page size
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 1000
-            default: 100
-          explode: false
-        - name: cursor
-          in: query
-          required: false
-          description: Cursor
-          schema:
-            type: string
-          explode: false
+  /api/v1/onboarding/handshake:
+    post:
+      operationId: OnboardingApi_startHandshake
+      description: Start a new handshake session
+      parameters: []
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - items
-                  - has_more
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Qyl.Domains.Ops.Cicd.PipelineRunEvent'
-                    description: List of items in this page
-                  next_cursor:
-                    type: string
-                    description: Cursor for the next page (null if no more pages)
-                  prev_cursor:
-                    type: string
-                    description: Cursor for the previous page (null if first page)
-                  has_more:
-                    type: boolean
-                    description: Whether there are more items available
-                description: Cursor-based paginated response wrapper
+                $ref: '#/components/schemas/Qyl.Domains.Workspace.HandshakeSessionEntity'
         '400':
           description: Bad request - validation failed (400)
           headers:
@@ -1653,42 +2554,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
-        - CI/CD
-  /v1/pipelines/stats:
+        - Onboarding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HandshakeStartRequest'
+  /api/v1/onboarding/handshake/{sessionId}:
     get:
-      operationId: PipelinesApi_getStats
-      description: Get pipeline statistics
+      operationId: OnboardingApi_getHandshake
+      description: Get handshake session status
       parameters:
-        - name: pipelineName
-          in: query
-          required: false
-          description: Pipeline name filter
+        - name: sessionId
+          in: path
+          required: true
           schema:
             type: string
-          explode: false
-        - name: startTime
-          in: query
-          required: false
-          description: Start time
-          schema:
-            type: string
-            format: date-time
-          explode: false
-        - name: endTime
-          in: query
-          required: false
-          description: End time
-          schema:
-            type: string
-            format: date-time
-          explode: false
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PipelineStats'
+                $ref: '#/components/schemas/Qyl.Domains.Workspace.HandshakeSessionEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
         '500':
           description: Internal server error (500)
           headers:
@@ -1707,8 +2613,189 @@ paths:
               schema:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
-        - CI/CD
-  /v1/services:
+        - Onboarding
+  /api/v1/onboarding/handshake/{sessionId}/verify:
+    post:
+      operationId: OnboardingApi_verifyHandshake
+      description: Complete handshake verification
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HandshakeVerifyResponse'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Onboarding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HandshakeVerifyRequest'
+  /api/v1/search:
+    post:
+      operationId: SearchApi_search
+      description: Unified search across all entity types
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Search.SearchResponse'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Qyl.Domains.Search.SearchRequest'
+  /api/v1/search/suggestions:
+    get:
+      operationId: SearchApi_getSuggestions
+      description: Get search suggestions
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Query prefix
+          schema:
+            type: string
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          description: Maximum suggestions
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 20
+            default: 5
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Search
+  /api/v1/services:
     get:
       operationId: ServicesApi_list
       description: List discovered services
@@ -1783,7 +2870,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Services
-  /v1/services/{serviceName}:
+  /api/v1/services/{serviceName}:
     get:
       operationId: ServicesApi_get
       description: Get service details
@@ -1836,7 +2923,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Services
-  /v1/services/{serviceName}/dependencies:
+  /api/v1/services/{serviceName}/dependencies:
     get:
       operationId: ServicesApi_getDependencies
       description: Get service dependencies
@@ -1891,7 +2978,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Services
-  /v1/services/{serviceName}/operations:
+  /api/v1/services/{serviceName}/operations:
     get:
       operationId: ServicesApi_getOperations
       description: Get service operations
@@ -1979,7 +3066,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Services
-  /v1/sessions:
+  /api/v1/sessions:
     get:
       operationId: SessionsApi_list
       description: List sessions
@@ -2094,7 +3181,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Sessions
-  /v1/sessions/stats:
+  /api/v1/sessions/stats:
     get:
       operationId: SessionsApi_getStats
       description: Get session statistics
@@ -2141,7 +3228,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Sessions
-  /v1/sessions/{sessionId}:
+  /api/v1/sessions/{sessionId}:
     get:
       operationId: SessionsApi_get
       description: Get session by ID
@@ -2194,7 +3281,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Sessions
-  /v1/sessions/{sessionId}/traces:
+  /api/v1/sessions/{sessionId}/traces:
     get:
       operationId: SessionsApi_getTraces
       description: Get session traces
@@ -2282,7 +3369,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Sessions
-  /v1/stream/deployments:
+  /api/v1/stream/deployments:
     get:
       operationId: StreamingApi_streamDeployments
       description: Stream deployment events
@@ -2310,7 +3397,7 @@ paths:
                 type: string
       tags:
         - Streaming
-  /v1/stream/events:
+  /api/v1/stream/events:
     get:
       operationId: StreamingApi_streamEvents
       description: Stream all telemetry events (SSE)
@@ -2348,35 +3435,7 @@ paths:
                 type: string
       tags:
         - Streaming
-  /v1/stream/exceptions:
-    get:
-      operationId: StreamingApi_streamExceptions
-      description: Stream exceptions in real-time
-      parameters:
-        - name: serviceName
-          in: query
-          required: false
-          description: Service name filter
-          schema:
-            type: string
-          explode: false
-        - name: exceptionType
-          in: query
-          required: false
-          description: Exception type filter
-          schema:
-            type: string
-          explode: false
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            text/event-stream:
-              schema:
-                type: string
-      tags:
-        - Streaming
-  /v1/stream/logs:
+  /api/v1/stream/logs:
     get:
       operationId: StreamingApi_streamLogs
       description: Stream logs in real-time
@@ -2412,7 +3471,7 @@ paths:
                 type: string
       tags:
         - Streaming
-  /v1/stream/metrics:
+  /api/v1/stream/metrics:
     get:
       operationId: StreamingApi_streamMetrics
       description: Stream metrics in real-time
@@ -2440,7 +3499,7 @@ paths:
                 type: string
       tags:
         - Streaming
-  /v1/stream/traces:
+  /api/v1/stream/traces:
     get:
       operationId: StreamingApi_streamTraces
       description: Stream traces in real-time
@@ -2469,7 +3528,7 @@ paths:
                 type: string
       tags:
         - Streaming
-  /v1/stream/traces/{traceId}/spans:
+  /api/v1/stream/traces/{traceId}/spans:
     get:
       operationId: StreamingApi_streamTraceSpans
       description: Stream spans for a specific trace
@@ -2488,7 +3547,7 @@ paths:
                 type: string
       tags:
         - Streaming
-  /v1/traces:
+  /api/v1/traces:
     get:
       operationId: TracesApi_list
       description: List traces with pagination
@@ -2636,7 +3695,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Traces
-  /v1/traces/search:
+  /api/v1/traces/search:
     post:
       operationId: TracesApi_search
       description: Search traces
@@ -2709,7 +3768,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TraceQuery'
-  /v1/traces/{traceId}:
+  /api/v1/traces/{traceId}:
     get:
       operationId: TracesApi_get
       description: Get a specific trace by ID
@@ -2762,7 +3821,7 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Traces
-  /v1/traces/{traceId}/spans:
+  /api/v1/traces/{traceId}/spans:
     get:
       operationId: TracesApi_getSpans
       description: Get spans for a trace
@@ -2852,14 +3911,861 @@ paths:
                 $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
       tags:
         - Traces
+  /api/v1/workflows/runs:
+    get:
+      operationId: WorkflowsApi_listRuns
+      description: List workflow runs
+      parameters:
+        - name: projectId
+          in: query
+          required: false
+          description: Project ID filter
+          schema:
+            type: string
+          explode: false
+        - name: workflowId
+          in: query
+          required: false
+          description: Workflow ID filter
+          schema:
+            type: string
+          explode: false
+        - name: status
+          in: query
+          required: false
+          description: Status filter
+          schema:
+            $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowRunStatus'
+          explode: false
+        - name: startTime
+          in: query
+          required: false
+          description: Start time
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: endTime
+          in: query
+          required: false
+          description: End time
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          explode: false
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - has_more
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowRunEntity'
+                    description: List of items in this page
+                  next_cursor:
+                    type: string
+                    description: Cursor for the next page (null if no more pages)
+                  prev_cursor:
+                    type: string
+                    description: Cursor for the previous page (null if first page)
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items available
+                description: Cursor-based paginated response wrapper
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workflows
+  /api/v1/workflows/runs/{runId}:
+    get:
+      operationId: WorkflowsApi_getRun
+      description: Get workflow run by ID
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowRunEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workflows
+  /api/v1/workflows/runs/{runId}/events:
+    get:
+      operationId: WorkflowsApi_getRunEvents
+      description: Get workflow events
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: afterSequence
+          in: query
+          required: false
+          description: After sequence number
+          schema:
+            type: integer
+            format: int64
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowEventEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workflows
+  /api/v1/workflows/runs/{runId}/nodes:
+    get:
+      operationId: WorkflowsApi_getRunNodes
+      description: Get workflow run nodes
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+          explode: false
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - has_more
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowNodeEntity'
+                    description: List of items in this page
+                  next_cursor:
+                    type: string
+                    description: Cursor for the next page (null if no more pages)
+                  prev_cursor:
+                    type: string
+                    description: Cursor for the previous page (null if first page)
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items available
+                description: Cursor-based paginated response wrapper
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workflows
+  /api/v1/workflows/runs/{runId}/nodes/{nodeId}/approve:
+    post:
+      operationId: WorkflowsApi_approveStep
+      description: Approve a pending workflow step
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: nodeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowNodeEntity'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workflows
+  /api/v1/workflows/runs/{runId}/resume:
+    post:
+      operationId: WorkflowsApi_resumeRun
+      description: Resume a paused workflow
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowRunEntity'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workflows
+  /api/v1/workspaces/current:
+    get:
+      operationId: WorkspacesApi_getCurrent
+      description: Get current workspace envelope
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Workspace.WorkspaceEnvelopeEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workspaces
+  /api/v1/workspaces/current/heartbeat:
+    post:
+      operationId: WorkspacesApi_heartbeat
+      description: Register workspace heartbeat
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Workspace.WorkspaceEnvelopeEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workspaces
+  /api/v1/workspaces/projects:
+    get:
+      operationId: WorkspacesApi_listProjects
+      description: List projects
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          explode: false
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - has_more
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Qyl.Domains.Workspace.ProjectEntity'
+                    description: List of items in this page
+                  next_cursor:
+                    type: string
+                    description: Cursor for the next page (null if no more pages)
+                  prev_cursor:
+                    type: string
+                    description: Cursor for the previous page (null if first page)
+                  has_more:
+                    type: boolean
+                    description: Whether there are more items available
+                description: Cursor-based paginated response wrapper
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workspaces
+    post:
+      operationId: WorkspacesApi_createProject
+      description: Create a new project
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Workspace.ProjectEntity'
+        '400':
+          description: Bad request - validation failed (400)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.ValidationError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workspaces
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreateRequest'
+  /api/v1/workspaces/projects/{projectId}:
+    get:
+      operationId: WorkspacesApi_getProject
+      description: Get project by ID
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Domains.Workspace.ProjectEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workspaces
+  /api/v1/workspaces/projects/{projectId}/environments:
+    get:
+      operationId: WorkspacesApi_listEnvironments
+      description: List environments for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Qyl.Domains.Workspace.ProjectEnvironmentEntity'
+        '404':
+          description: Resource not found (404)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.NotFoundError'
+        '500':
+          description: Internal server error (500)
+          headers:
+            X-Trace-Id:
+              required: false
+              description: Trace ID for correlation
+              schema:
+                type: string
+            X-Request-Id:
+              required: false
+              description: Request ID for support
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qyl.Common.Errors.InternalServerError'
+      tags:
+        - Workspaces
+  /health:
+    get:
+      operationId: health_check
+      description: Health check endpoint
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+      tags:
+        - Health
+  /health/live:
+    get:
+      operationId: health_liveness
+      description: Liveness probe
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+        '503':
+          description: Service unavailable.
+      tags:
+        - Health
+  /health/ready:
+    get:
+      operationId: health_readiness
+      description: Readiness probe
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+        '503':
+          description: Service unavailable.
+      tags:
+        - Health
 components:
   schemas:
     ApiVersions:
       type: string
       enum:
-        - '2024-01-01'
-        - '2024-06-01'
-        - '2025-01-01'
+        - '2025-12-01'
+        - '2026-01-15'
+        - '2026-01-26'
     DeploymentCreate:
       type: object
       required:
@@ -2961,6 +4867,104 @@ components:
             - $ref: '#/components/schemas/Qyl.Common.UrlString'
           description: Issue URL
       description: Error update request
+    GenerationJobCreateRequest:
+      type: object
+      required:
+        - workspace_id
+        - profile_id
+        - job_type
+      properties:
+        workspace_id:
+          type: string
+          description: Workspace ID
+        profile_id:
+          type: string
+          description: Profile ID
+        job_type:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationJobType'
+          description: Job type
+      description: Generation job creation request
+    GenerationProfileCreateRequest:
+      type: object
+      required:
+        - name
+        - target_framework
+      properties:
+        name:
+          type: string
+          description: Profile name
+        target_framework:
+          type: string
+          description: Target framework
+        description:
+          type: string
+          description: Profile description
+        features_json:
+          type: string
+          description: Feature flags
+      description: Generation profile creation request
+    GenerationSelectionSaveRequest:
+      type: object
+      required:
+        - workspace_id
+        - profile_id
+        - selected_keys_json
+      properties:
+        workspace_id:
+          type: string
+          description: Workspace ID
+        profile_id:
+          type: string
+          description: Profile ID
+        selected_keys_json:
+          type: string
+          description: Selected semconv keys
+      description: Save generation selections request
+    HandshakeStartRequest:
+      type: object
+      required:
+        - code_challenge
+        - client_id
+      properties:
+        code_challenge:
+          type: string
+          description: PKCE code challenge
+        client_id:
+          type: string
+          description: Client identifier
+      description: Handshake start request
+    HandshakeVerifyRequest:
+      type: object
+      required:
+        - code_verifier
+        - code
+      properties:
+        code_verifier:
+          type: string
+          description: PKCE code verifier
+        code:
+          type: string
+          description: Authorization code
+      description: Handshake verification request
+    HandshakeVerifyResponse:
+      type: object
+      required:
+        - access_token
+        - expires_at
+        - workspace_id
+      properties:
+        access_token:
+          type: string
+          description: Access token
+        expires_at:
+          type: string
+          format: date-time
+          description: Token expiration
+        workspace_id:
+          type: string
+          description: Workspace ID
+      description: Handshake verification response
     HealthResponse:
       type: object
       required:
@@ -2982,7 +4986,7 @@ components:
           description: Uptime in seconds
         components:
           type: object
-          unevaluatedProperties:
+          additionalProperties:
             $ref: '#/components/schemas/HealthStatus'
           description: Component health
       description: Health check response
@@ -2992,6 +4996,21 @@ components:
         - healthy
         - degraded
         - unhealthy
+    IssueUpdateRequest:
+      type: object
+      properties:
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Issues.IssueStatus'
+          description: New status
+        priority:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Issues.IssuePriority'
+          description: New priority
+        assigned_to:
+          type: string
+          description: Assignee
+      description: Issue update request
     LogAggregationBucket:
       type: object
       required:
@@ -3104,7 +5123,7 @@ components:
           description: Metric name
         filters:
           type: object
-          unevaluatedProperties:
+          additionalProperties:
             type: string
           description: Label filters
         start_time:
@@ -3152,7 +5171,7 @@ components:
       properties:
         labels:
           type: object
-          unevaluatedProperties:
+          additionalProperties:
             type: string
           description: Labels
         points:
@@ -3195,57 +5214,22 @@ components:
           format: double
           description: P99 duration in milliseconds
       description: Operation information
-    PipelineStats:
+    ProjectCreateRequest:
       type: object
       required:
-        - total_runs
-        - success_rate
-        - avg_duration_seconds
-        - p95_duration_seconds
-        - by_status
+        - name
+        - slug
       properties:
-        total_runs:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Count'
-          description: Total runs
-        success_rate:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Ratio'
-          description: Success rate
-        avg_duration_seconds:
-          type: number
-          format: double
-          description: Average duration in seconds
-        p95_duration_seconds:
-          type: number
-          format: double
-          description: P95 duration in seconds
-        by_status:
-          type: array
-          items:
-            $ref: '#/components/schemas/PipelineStatusStats'
-          description: Runs by status
-      description: Pipeline statistics
-    PipelineStatusStats:
-      type: object
-      required:
-        - status
-        - count
-        - percentage
-      properties:
-        status:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Ops.Cicd.CicdPipelineStatus'
-          description: Status
-        count:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Count'
-          description: Count
-        percentage:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Percentage'
-          description: Percentage
-      description: Pipeline status statistics
+        name:
+          type: string
+          description: Project name
+        slug:
+          type: string
+          description: Project slug (URL-safe)
+        description:
+          type: string
+          description: Project description
+      description: Project creation request
     Qyl.Common.Attribute:
       type: object
       required:
@@ -3285,7 +5269,7 @@ components:
             type: number
             format: double
         - type: string
-          contentEncoding: base64
+          format: byte
       description: Primitive attribute value types supported by OpenTelemetry
     Qyl.Common.CostUsd:
       type: number
@@ -3551,8 +5535,7 @@ components:
       type: string
       pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
       description: Semantic version string (e.g., 1.2.3)
-      examples:
-        - 2.1.0
+      example: 2.1.0
     Qyl.Common.SessionId:
       type: string
       minLength: 1
@@ -3567,8 +5550,7 @@ components:
       maxLength: 16
       pattern: ^[a-f0-9]{16}$
       description: Unique span identifier (16 lowercase hex characters)
-      examples:
-        - b7ad6b7169203331
+      example: b7ad6b7169203331
       x-csharp-type: SpanId
       x-csharp-struct: true
       x-duckdb-type: VARCHAR(16)
@@ -3593,16 +5575,14 @@ components:
       maxLength: 32
       pattern: ^[a-f0-9]{32}$
       description: Unique trace identifier (32 lowercase hex characters)
-      examples:
-        - 0af7651916cd43dd8448eb211c80319c
+      example: 0af7651916cd43dd8448eb211c80319c
       x-csharp-type: TraceId
       x-csharp-struct: true
       x-duckdb-type: VARCHAR(32)
     Qyl.Common.TraceState:
       type: string
       description: W3C Trace Context tracestate header (vendor-specific key-value pairs)
-      examples:
-        - rojo=00f067aa0ba902b7,congo=t61rcWkgMzE
+      example: rojo=00f067aa0ba902b7,congo=t61rcWkgMzE
     Qyl.Common.UrlString:
       type: string
       format: uri
@@ -3610,88 +5590,447 @@ components:
     Qyl.Common.UserAgent:
       type: string
       description: User agent string
-      examples:
-        - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+      example: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
     Qyl.Common.UserId:
       type: string
       minLength: 1
       maxLength: 256
       description: User identifier (pseudonymized for privacy)
-    Qyl.Domains.AI.Code.CodeLocation:
+    Qyl.Domains.Alerting.AlertFiringEntity:
       type: object
       required:
-        - filepath
-        - line_number
+        - id
+        - rule_id
+        - fingerprint
+        - severity
+        - title
+        - status
+        - fired_at
       properties:
-        filepath:
+        id:
           type: string
-          description: Source file path
-        line_number:
-          type: integer
-          format: int32
-          minimum: 1
-          description: Line number (1-indexed)
-        column_number:
-          type: integer
-          format: int32
-          minimum: 1
-          description: Column number (1-indexed)
-        function_name:
+          description: Firing ID
+        rule_id:
           type: string
-          description: Function/method name
-        class_name:
+          description: Source rule
+        fingerprint:
           type: string
-          description: Class/type name
-        namespace:
-          type: string
-          description: Namespace/module
-      description: Precise source code location for debugging and tracing
-    Qyl.Domains.AI.Code.StackFrame:
-      type: object
-      required:
-        - index
-        - location
-      properties:
-        index:
-          type: integer
-          format: int32
-          description: Frame index (0 = top of stack)
-        location:
+          description: Dedup fingerprint
+        severity:
           allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.AI.Code.CodeLocation'
-          description: Source location
-        is_user_code:
-          type: boolean
-          description: Whether this is user code (not library/framework)
-        module_name:
+            - $ref: '#/components/schemas/Qyl.Domains.Alerting.AlertSeverity'
+          description: Alert severity
+        title:
           type: string
-          description: Assembly/module name
-        module_version:
+          description: Alert title
+        message:
+          type: string
+          description: Alert message
+        trigger_value:
+          type: number
+          format: double
+          description: Measured value that triggered the alert
+        threshold_value:
+          type: number
+          format: double
+          description: Threshold value
+        context_json:
+          type: string
+          description: Additional context
+          x-duckdb-type: JSON
+        status:
           allOf:
-            - $ref: '#/components/schemas/Qyl.Common.SemVer'
-          description: Assembly/module version
-        is_native:
-          type: boolean
-          description: Native/managed indicator
-      description: Single frame in a call stack
-    Qyl.Domains.AI.Code.StackTrace:
+            - $ref: '#/components/schemas/Qyl.Domains.Alerting.AlertFiringStatus'
+          description: Firing status
+        acknowledged_at:
+          type: string
+          format: date-time
+          description: Acknowledgment timestamp
+        acknowledged_by:
+          type: string
+          description: Acknowledged by
+        resolved_at:
+          type: string
+          format: date-time
+          description: Resolution timestamp
+        fired_at:
+          type: string
+          format: date-time
+          description: Firing timestamp
+        dedup_key:
+          type: string
+          description: Dedup key for suppressing duplicates
+      description: Triggered alert instance
+      x-csharp-type: AlertFiringEntity
+      x-duckdb-table: alert_firings
+    Qyl.Domains.Alerting.AlertFiringStatus:
+      type: string
+      enum:
+        - firing
+        - acknowledged
+        - resolved
+        - suppressed
+      description: Alert firing status
+    Qyl.Domains.Alerting.AlertRuleEntity:
       type: object
       required:
-        - frames
+        - id
+        - project_id
+        - name
+        - rule_type
+        - condition_json
+        - target_type
+        - severity
+        - cooldown_seconds
+        - enabled
+        - trigger_count
+        - created_at
+        - updated_at
       properties:
-        frames:
-          type: array
-          items:
-            $ref: '#/components/schemas/Qyl.Domains.AI.Code.StackFrame'
-          description: Stack frames (top to bottom)
-        truncated:
-          type: boolean
-          description: Whether the stack was truncated
-        total_frames:
+        id:
+          type: string
+          description: Rule ID
+        project_id:
+          type: string
+          description: Owning project
+        name:
+          type: string
+          description: Rule name
+        description:
+          type: string
+          description: Rule description
+        rule_type:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Alerting.AlertRuleType'
+          description: Rule type
+        condition_json:
+          type: string
+          description: Condition definition
+          x-duckdb-type: JSON
+        threshold_json:
+          type: string
+          description: Threshold definition
+          x-duckdb-type: JSON
+        target_type:
+          type: string
+          description: Target type for evaluation
+        target_filter_json:
+          type: string
+          description: Target filter
+          x-duckdb-type: JSON
+        severity:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Alerting.AlertSeverity'
+          description: Alert severity
+        cooldown_seconds:
           type: integer
           format: int32
-          description: Total frame count before truncation
-      description: Full stack trace
+          description: Cooldown between firings in seconds
+        notification_channels_json:
+          type: string
+          description: Notification channels
+          x-duckdb-type: JSON
+        enabled:
+          type: boolean
+          description: Whether rule is enabled
+        last_triggered_at:
+          type: string
+          format: date-time
+          description: Last trigger timestamp
+        trigger_count:
+          type: integer
+          format: int64
+          description: Total trigger count
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      description: Alert rule definition
+      x-csharp-type: AlertRuleEntity
+      x-duckdb-table: alert_rules
+    Qyl.Domains.Alerting.AlertRuleType:
+      type: string
+      enum:
+        - threshold
+        - error_rate
+        - new_issue
+        - regression
+        - burn_rate
+        - anomaly
+        - custom
+      description: Alert rule types
+    Qyl.Domains.Alerting.AlertSeverity:
+      type: string
+      enum:
+        - critical
+        - warning
+        - info
+      description: Alert severity levels
+    Qyl.Domains.Alerting.FixRunEntity:
+      type: object
+      required:
+        - id
+        - issue_id
+        - trigger_type
+        - strategy
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Fix run ID
+        issue_id:
+          type: string
+          description: Target issue
+        alert_firing_id:
+          type: string
+          description: Triggering alert firing
+        trigger_type:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Alerting.FixTriggerType'
+          description: What triggered the fix
+        strategy:
+          type: string
+          description: Fix strategy
+        model_name:
+          type: string
+          description: AI model used
+        model_provider:
+          type: string
+          description: AI provider
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Alerting.FixRunStatus'
+          description: Fix run status
+        error_message:
+          type: string
+          description: Error message if failed
+        tokens_used:
+          type: integer
+          format: int32
+          description: Tokens consumed
+        duration_ms:
+          type: integer
+          format: int32
+          description: Duration in milliseconds
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        started_at:
+          type: string
+          format: date-time
+          description: Start timestamp
+        completed_at:
+          type: string
+          format: date-time
+          description: Completion timestamp
+      description: AI-assisted fix attempt
+      x-csharp-type: FixRunEntity
+      x-duckdb-table: fix_runs
+    Qyl.Domains.Alerting.FixRunStatus:
+      type: string
+      enum:
+        - pending
+        - running
+        - awaiting_approval
+        - applied
+        - rejected
+        - failed
+      description: Fix run status
+    Qyl.Domains.Alerting.FixTriggerType:
+      type: string
+      enum:
+        - alert
+        - manual
+        - mcp
+        - scheduled
+      description: Fix trigger types
+    Qyl.Domains.Configurator.GenerationJobEntity:
+      type: object
+      required:
+        - id
+        - workspace_id
+        - profile_id
+        - job_type
+        - status
+        - priority
+        - queued_at
+      properties:
+        id:
+          type: string
+          description: Job ID
+        workspace_id:
+          type: string
+          description: Workspace
+        profile_id:
+          type: string
+          description: Profile
+        job_type:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Configurator.GenerationJobType'
+          description: Job type
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Configurator.JobStatus'
+          description: Job status
+        priority:
+          type: integer
+          format: int32
+          description: Priority (higher = more urgent)
+        input_hash:
+          type: string
+          description: Hash of inputs for dedup
+        output_path:
+          type: string
+          description: Local path where output was written
+        output_hash:
+          type: string
+          description: Hash of generated output
+        error_message:
+          type: string
+          description: Error message if failed
+        queued_at:
+          type: string
+          format: date-time
+          description: Queue timestamp
+        started_at:
+          type: string
+          format: date-time
+          description: Start timestamp
+        completed_at:
+          type: string
+          format: date-time
+          description: Completion timestamp
+        duration_ms:
+          type: integer
+          format: int32
+          description: Duration in milliseconds
+      description: Code generation job entry
+      x-csharp-type: GenerationJobEntity
+      x-duckdb-table: generation_jobs
+    Qyl.Domains.Configurator.GenerationJobType:
+      type: string
+      enum:
+        - full
+        - incremental
+        - preview
+      description: Generation job types
+    Qyl.Domains.Configurator.GenerationProfileEntity:
+      type: object
+      required:
+        - id
+        - project_id
+        - name
+        - target_framework
+        - target_language
+        - semconv_version
+        - features_json
+        - is_default
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Profile ID
+        project_id:
+          type: string
+          description: Owning project
+        name:
+          type: string
+          description: Profile name
+        description:
+          type: string
+          description: Profile description
+        target_framework:
+          type: string
+          description: Target framework (e.g. net10.0)
+        target_language:
+          type: string
+          description: Target language
+        semconv_version:
+          type: string
+          description: Semantic conventions version
+        features_json:
+          type: string
+          description: Enabled features/modules
+          x-duckdb-type: JSON
+        template_overrides_json:
+          type: string
+          description: Template customizations
+          x-duckdb-type: JSON
+        is_default:
+          type: boolean
+          description: Whether this is the default profile
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      description: Named instrumentation profile for code generation
+      x-csharp-type: GenerationProfileEntity
+      x-duckdb-table: generation_profiles
+    Qyl.Domains.Configurator.GenerationSelectionEntity:
+      type: object
+      required:
+        - id
+        - workspace_id
+        - profile_id
+        - selection_type
+        - selection_key
+        - enabled
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Selection ID
+        workspace_id:
+          type: string
+          description: Workspace
+        profile_id:
+          type: string
+          description: Profile
+        selection_type:
+          type: string
+          description: Selection type (semconv_group, feature, custom_attribute)
+        selection_key:
+          type: string
+          description: Selection key (e.g. http, db, genai)
+        enabled:
+          type: boolean
+          description: Whether enabled
+        config_json:
+          type: string
+          description: Selection-specific configuration
+          x-duckdb-type: JSON
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      description: Selected semconv/feature per workspace for code generation
+      x-csharp-type: GenerationSelectionEntity
+      x-duckdb-table: generation_selections
+    Qyl.Domains.Configurator.JobStatus:
+      type: string
+      enum:
+        - queued
+        - running
+        - completed
+        - failed
+        - cancelled
+      description: Job lifecycle status
     Qyl.Domains.Identity.ServiceDependency:
       type: object
       required:
@@ -3720,6 +6059,273 @@ components:
           format: double
           description: Average latency in milliseconds
       description: Service dependency map
+    Qyl.Domains.Issues.BreadcrumbType:
+      type: string
+      enum:
+        - navigation
+        - http
+        - query
+        - user
+        - log
+        - error
+        - debug
+        - default
+      description: Breadcrumb types
+    Qyl.Domains.Issues.ErrorBreadcrumbEntity:
+      type: object
+      required:
+        - id
+        - event_id
+        - breadcrumb_type
+        - level
+        - timestamp
+      properties:
+        id:
+          type: string
+          description: Breadcrumb ID
+        event_id:
+          type: string
+          description: Parent event
+        breadcrumb_type:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Issues.BreadcrumbType'
+          description: Breadcrumb type
+        category:
+          type: string
+          description: Category (e.g. http, db, ui)
+        message:
+          type: string
+          description: Breadcrumb message
+        level:
+          type: string
+          description: Severity level
+        data_json:
+          type: string
+          description: Breadcrumb data
+          x-duckdb-type: JSON
+        timestamp:
+          type: string
+          format: date-time
+          description: Breadcrumb timestamp
+      description: Pre-error context breadcrumb
+      x-csharp-type: ErrorBreadcrumbEntity
+      x-duckdb-table: error_breadcrumbs
+    Qyl.Domains.Issues.ErrorIssueEntity:
+      type: object
+      required:
+        - id
+        - project_id
+        - fingerprint
+        - title
+        - error_type
+        - category
+        - level
+        - first_seen_at
+        - last_seen_at
+        - occurrence_count
+        - affected_users_count
+        - status
+        - priority
+        - regression_count
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Issue ID
+        project_id:
+          type: string
+          description: Owning project
+        fingerprint:
+          type: string
+          description: Error fingerprint for grouping
+        title:
+          type: string
+          description: Issue title
+        culprit:
+          type: string
+          description: Culprit (function/module causing the error)
+        error_type:
+          type: string
+          description: Error type (exception class name or code)
+        category:
+          type: string
+          description: Error category
+        level:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Issues.IssueLevel'
+          description: Severity level
+        platform:
+          type: string
+          description: Platform (csharp, javascript, python, etc.)
+        first_seen_at:
+          type: string
+          format: date-time
+          description: First occurrence
+        last_seen_at:
+          type: string
+          format: date-time
+          description: Last occurrence
+        occurrence_count:
+          type: integer
+          format: int64
+          description: Total occurrence count
+        affected_users_count:
+          type: integer
+          format: int32
+          description: Affected unique users count
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Issues.IssueStatus'
+          description: Issue status
+        substatus:
+          type: string
+          description: Issue substatus
+        priority:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Issues.IssuePriority'
+          description: Priority level
+        assigned_to:
+          type: string
+          description: Assigned team member
+        resolved_at:
+          type: string
+          format: date-time
+          description: Resolution timestamp
+        resolved_by:
+          type: string
+          description: Resolved by
+        regression_count:
+          type: integer
+          format: int32
+          description: Number of regressions
+        last_release:
+          type: string
+          description: Last associated release
+        tags_json:
+          type: string
+          description: Issue tags
+          x-duckdb-type: JSON
+        metadata_json:
+          type: string
+          description: Issue metadata
+          x-duckdb-type: JSON
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      description: Error issue aggregate with lifecycle tracking
+      x-csharp-type: ErrorIssueEntity
+      x-duckdb-table: error_issues
+    Qyl.Domains.Issues.ErrorIssueEventEntity:
+      type: object
+      required:
+        - id
+        - issue_id
+        - timestamp
+      properties:
+        id:
+          type: string
+          description: Event ID
+        issue_id:
+          type: string
+          description: Parent issue
+        trace_id:
+          type: string
+          description: Associated trace ID
+        span_id:
+          type: string
+          description: Associated span ID
+        message:
+          type: string
+          description: Error message
+        stack_trace:
+          type: string
+          description: Stack trace
+        stack_frames_json:
+          type: string
+          description: Parsed stack frames
+          x-duckdb-type: JSON
+        environment:
+          type: string
+          description: Environment (dev, staging, prod)
+        release_version:
+          type: string
+          description: Release version
+        user_id:
+          type: string
+          description: Affected user ID
+        user_ip:
+          type: string
+          description: Client IP address
+        request_url:
+          type: string
+          description: Request URL
+        request_method:
+          type: string
+          description: HTTP request method
+        browser:
+          type: string
+          description: Browser info
+        os:
+          type: string
+          description: Operating system
+        device:
+          type: string
+          description: Device info
+        runtime:
+          type: string
+          description: Runtime name
+        runtime_version:
+          type: string
+          description: Runtime version
+        context_json:
+          type: string
+          description: Additional context data
+          x-duckdb-type: JSON
+        tags_json:
+          type: string
+          description: Event tags
+          x-duckdb-type: JSON
+        timestamp:
+          type: string
+          format: date-time
+          description: Event timestamp
+      description: Individual error occurrence linked to an issue
+      x-csharp-type: ErrorIssueEventEntity
+      x-duckdb-table: error_issue_events
+    Qyl.Domains.Issues.IssueLevel:
+      type: string
+      enum:
+        - debug
+        - info
+        - warning
+        - error
+        - fatal
+      description: Issue severity level
+    Qyl.Domains.Issues.IssuePriority:
+      type: string
+      enum:
+        - critical
+        - high
+        - medium
+        - low
+      description: Issue priority
+    Qyl.Domains.Issues.IssueStatus:
+      type: string
+      enum:
+        - unresolved
+        - acknowledged
+        - investigating
+        - in_progress
+        - resolved
+        - ignored
+        - regressed
+      description: Issue lifecycle status
     Qyl.Domains.Observe.Error.CorrelatedError:
       type: object
       required:
@@ -3994,184 +6600,6 @@ components:
         - follows
         - unrelated
       description: Temporal relationship between errors
-    Qyl.Domains.Observe.Exceptions.EnrichedException:
-      type: object
-      required:
-        - exception_type
-        - message
-      properties:
-        exception_type:
-          type: string
-          description: Exception type/class name
-        message:
-          type: string
-          description: Exception message
-        stack_trace:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.AI.Code.StackTrace'
-          description: Parsed stack trace
-        cause:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.EnrichedException'
-          description: Exception cause/inner exception
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Qyl.Common.Attribute'
-          description: Additional exception data
-        fingerprint:
-          type: string
-          description: Exception fingerprint (for grouping)
-        first_seen:
-          type: string
-          format: date-time
-          description: First occurrence timestamp
-        last_seen:
-          type: string
-          format: date-time
-          description: Last occurrence timestamp
-        occurrence_count:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Count'
-          description: Occurrence count
-        affected_users:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Count'
-          description: Affected users count
-        status:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.ExceptionStatus'
-          description: Status
-      description: Enriched exception with parsed stack trace
-    Qyl.Domains.Observe.Exceptions.ExceptionEvent:
-      type: object
-      required:
-        - event.name
-        - exception.type
-        - exception.message
-        - exception.escaped
-        - timestamp
-      properties:
-        event.name:
-          type: string
-          enum:
-            - exception
-          description: Event name (always 'exception')
-        exception.type:
-          type: string
-          description: Exception type/class name
-        exception.message:
-          type: string
-          description: Exception message
-        exception.stacktrace:
-          type: string
-          description: Exception stacktrace
-        exception.escaped:
-          type: boolean
-          description: Whether the exception escaped
-        timestamp:
-          type: string
-          format: date-time
-          description: Event timestamp
-        trace_id:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.TraceId'
-          description: Associated trace ID
-        span_id:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.SpanId'
-          description: Associated span ID
-      description: Exception event following OTel spec
-    Qyl.Domains.Observe.Exceptions.ExceptionServiceStats:
-      type: object
-      required:
-        - service_name
-        - count
-        - rate_per_minute
-      properties:
-        service_name:
-          type: string
-          description: Service name
-        count:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Count'
-          description: Exception count
-        rate_per_minute:
-          type: number
-          format: double
-          description: Exception rate (per minute)
-      description: Exception stats by service
-    Qyl.Domains.Observe.Exceptions.ExceptionStats:
-      type: object
-      required:
-        - total_count
-        - unique_types
-        - by_type
-      properties:
-        total_count:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Count'
-          description: Total exception count
-        unique_types:
-          type: integer
-          format: int32
-          description: Unique exception types
-        by_type:
-          type: array
-          items:
-            $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.ExceptionTypeStats'
-          description: Exceptions by type
-        by_service:
-          type: array
-          items:
-            $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.ExceptionServiceStats'
-          description: Most affected services
-        trend:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.ExceptionTrend'
-          description: Exception trend (up/down/stable)
-      description: Exception statistics
-    Qyl.Domains.Observe.Exceptions.ExceptionStatus:
-      type: string
-      enum:
-        - new
-        - investigating
-        - in_progress
-        - resolved
-        - ignored
-        - regressed
-      description: Exception status
-    Qyl.Domains.Observe.Exceptions.ExceptionTrend:
-      type: string
-      enum:
-        - up
-        - down
-        - stable
-      description: Exception trend
-    Qyl.Domains.Observe.Exceptions.ExceptionTypeStats:
-      type: object
-      required:
-        - exception_type
-        - count
-        - percentage
-        - status
-      properties:
-        exception_type:
-          type: string
-          description: Exception type
-        count:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Count'
-          description: Count
-        percentage:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.Percentage'
-          description: Percentage of total
-        status:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.ExceptionStatus'
-          description: Status
-      description: Exception stats by type
     Qyl.Domains.Observe.Log.AggregationFunction:
       type: string
       enum:
@@ -4482,6 +6910,7 @@ components:
         - trace_count
         - span_count
         - error_count
+        - services
         - state
       properties:
         session.id:
@@ -4519,6 +6948,11 @@ components:
           format: int32
           minimum: 0
           description: Total error count in session
+        services:
+          type: array
+          items:
+            type: string
+          description: Service names observed in this session
         state:
           allOf:
             - $ref: '#/components/schemas/Qyl.Domains.Observe.Session.SessionState'
@@ -4656,106 +7090,6 @@ components:
             $ref: '#/components/schemas/Qyl.Domains.Observe.Session.SessionCountryStats'
           description: Sessions by country
       description: Aggregated session statistics
-    Qyl.Domains.Ops.Cicd.CicdEventName:
-      type: string
-      enum:
-        - cicd.pipeline.start
-        - cicd.pipeline.end
-        - cicd.task.start
-        - cicd.task.end
-        - cicd.deployment.start
-        - cicd.deployment.end
-      description: CI/CD event names
-    Qyl.Domains.Ops.Cicd.CicdPipelineStatus:
-      type: string
-      enum:
-        - pending
-        - running
-        - success
-        - failed
-        - cancelled
-        - skipped
-      description: CI/CD pipeline status
-    Qyl.Domains.Ops.Cicd.CicdSystem:
-      type: string
-      enum:
-        - github_actions
-        - gitlab_ci
-        - jenkins
-        - azure_devops
-        - circleci
-        - travis_ci
-        - bitbucket_pipelines
-        - teamcity
-        - bamboo
-        - drone_ci
-        - buildkite
-        - tekton
-        - argocd
-        - flux
-        - spinnaker
-        - other
-      description: CI/CD systems/providers
-    Qyl.Domains.Ops.Cicd.CicdTriggerType:
-      type: string
-      enum:
-        - push
-        - pull_request
-        - manual
-        - schedule
-        - api
-        - webhook
-        - dependency
-        - tag
-        - release
-      description: CI/CD trigger types
-    Qyl.Domains.Ops.Cicd.PipelineRunEvent:
-      type: object
-      required:
-        - event.name
-        - cicd.pipeline.name
-        - cicd.pipeline.run.id
-        - status
-        - system
-        - timestamp
-      properties:
-        event.name:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Ops.Cicd.CicdEventName'
-          description: Event name
-        cicd.pipeline.name:
-          type: string
-          description: Pipeline name
-        cicd.pipeline.run.id:
-          type: string
-          description: Pipeline run ID
-        status:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Ops.Cicd.CicdPipelineStatus'
-          description: Pipeline status
-        system:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Ops.Cicd.CicdSystem'
-          description: CI/CD system
-        trigger_type:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Ops.Cicd.CicdTriggerType'
-          description: Trigger type
-        vcs.repository.ref.name:
-          type: string
-          description: Git branch
-        vcs.repository.ref.revision:
-          type: string
-          description: Git commit SHA
-        duration_s:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Common.DurationS'
-          description: Duration in seconds
-        timestamp:
-          type: string
-          format: date-time
-          description: Event timestamp
-      description: Pipeline run event
     Qyl.Domains.Ops.Deployment.DeploymentEntity:
       type: object
       required:
@@ -4905,6 +7239,532 @@ components:
         - shadow
         - feature_flag
       description: Deployment strategies
+    Qyl.Domains.Search.SearchEntityType:
+      type: string
+      enum:
+        - span
+        - log
+        - issue
+        - workflow
+        - deployment
+        - session
+        - alert
+        - fix
+      description: Searchable entity types
+    Qyl.Domains.Search.SearchRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: Search query text
+        entity_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/Qyl.Domains.Search.SearchEntityType'
+          description: Entity type filters
+        project_id:
+          type: string
+          description: Project scope
+        limit:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          description: Maximum results
+          default: 20
+        cursor:
+          type: string
+          description: Cursor for pagination
+      description: Unified search request
+    Qyl.Domains.Search.SearchResponse:
+      type: object
+      required:
+        - results
+        - total_count
+        - duration_ms
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Qyl.Domains.Search.SearchResult'
+          description: Search results
+        total_count:
+          type: integer
+          format: int64
+          description: Total matching documents
+        duration_ms:
+          type: integer
+          format: int32
+          description: Query execution time in ms
+        next_cursor:
+          type: string
+          description: Next page cursor
+        suggestions:
+          type: array
+          items:
+            type: string
+          description: Search suggestions
+      description: Unified search response
+    Qyl.Domains.Search.SearchResult:
+      type: object
+      required:
+        - document_id
+        - entity_type
+        - entity_id
+        - title
+        - score
+      properties:
+        document_id:
+          type: string
+          description: Document ID
+        entity_type:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Search.SearchEntityType'
+          description: Entity type
+        entity_id:
+          type: string
+          description: Entity ID
+        title:
+          type: string
+          description: Result title
+        snippet:
+          type: string
+          description: Result snippet with highlights
+        score:
+          type: number
+          format: double
+          description: Relevance score
+        url:
+          type: string
+          description: Link to entity
+      description: Individual search result
+    Qyl.Domains.Workflow.WorkflowEventEntity:
+      type: object
+      required:
+        - id
+        - run_id
+        - event_type
+        - event_name
+        - sequence_number
+        - timestamp
+      properties:
+        id:
+          type: string
+          description: Event ID
+        run_id:
+          type: string
+          description: Parent run
+        node_id:
+          type: string
+          description: Source node (null for run-level events)
+        event_type:
+          type: string
+          description: Event type
+        event_name:
+          type: string
+          description: Event name
+        payload_json:
+          type: string
+          description: Event payload
+          x-duckdb-type: JSON
+        sequence_number:
+          type: integer
+          format: int64
+          description: Monotonic sequence number
+        source:
+          type: string
+          description: Event source identifier
+        correlation_id:
+          type: string
+          description: Correlation ID
+        timestamp:
+          type: string
+          format: date-time
+          description: Event timestamp
+      description: Append-only workflow event
+      x-csharp-type: WorkflowEventEntity
+      x-duckdb-table: workflow_events
+    Qyl.Domains.Workflow.WorkflowNodeEntity:
+      type: object
+      required:
+        - id
+        - run_id
+        - node_id
+        - node_type
+        - node_name
+        - attempt
+        - status
+        - retry_count
+        - max_retries
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Execution ID
+        run_id:
+          type: string
+          description: Parent run
+        node_id:
+          type: string
+          description: Node definition ID
+        node_type:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowNodeType'
+          description: Node type
+        node_name:
+          type: string
+          description: Node name
+        attempt:
+          type: integer
+          format: int32
+          description: Attempt number (1-based)
+        input_json:
+          type: string
+          description: Node input data
+          x-duckdb-type: JSON
+        output_json:
+          type: string
+          description: Node output data
+          x-duckdb-type: JSON
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowRunStatus'
+          description: Node status
+        error_message:
+          type: string
+          description: Error message if failed
+        retry_count:
+          type: integer
+          format: int32
+          description: Retry count
+        max_retries:
+          type: integer
+          format: int32
+          description: Maximum retries allowed
+        timeout_ms:
+          type: integer
+          format: int32
+          description: Timeout in milliseconds
+        started_at:
+          type: string
+          format: date-time
+          description: Start timestamp
+        completed_at:
+          type: string
+          format: date-time
+          description: Completion timestamp
+        duration_ms:
+          type: integer
+          format: int32
+          description: Duration in milliseconds
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+      description: Individual DAG node execution
+      x-csharp-type: WorkflowNodeEntity
+      x-duckdb-table: workflow_nodes
+    Qyl.Domains.Workflow.WorkflowNodeType:
+      type: string
+      enum:
+        - agent
+        - tool
+        - condition
+        - fork
+        - join
+        - approval
+        - sub_workflow
+        - transform
+        - wait
+      description: Workflow node types
+    Qyl.Domains.Workflow.WorkflowRunEntity:
+      type: object
+      required:
+        - id
+        - workflow_id
+        - workflow_version
+        - project_id
+        - trigger_type
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Run ID
+        workflow_id:
+          type: string
+          description: Workflow definition ID
+        workflow_version:
+          type: integer
+          format: int32
+          description: Workflow definition version
+        project_id:
+          type: string
+          description: Owning project
+        trigger_type:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowTriggerType'
+          description: Trigger type
+        trigger_source:
+          type: string
+          description: Trigger source identifier
+        input_json:
+          type: string
+          description: Run input data
+          x-duckdb-type: JSON
+        output_json:
+          type: string
+          description: Run output data
+          x-duckdb-type: JSON
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Workflow.WorkflowRunStatus'
+          description: Run status
+        error_message:
+          type: string
+          description: Error message if failed
+        parent_run_id:
+          type: string
+          description: Parent run ID for sub-workflows
+        correlation_id:
+          type: string
+          description: Correlation ID for tracing
+        started_at:
+          type: string
+          format: date-time
+          description: Start timestamp
+        completed_at:
+          type: string
+          format: date-time
+          description: Completion timestamp
+        duration_ms:
+          type: integer
+          format: int32
+          description: Duration in milliseconds
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+      description: Top-level workflow execution
+      x-csharp-type: WorkflowRunEntity
+      x-duckdb-table: workflow_runs
+    Qyl.Domains.Workflow.WorkflowRunStatus:
+      type: string
+      enum:
+        - pending
+        - running
+        - paused
+        - completed
+        - failed
+        - cancelled
+        - timed_out
+      description: Workflow run status
+    Qyl.Domains.Workflow.WorkflowTriggerType:
+      type: string
+      enum:
+        - manual
+        - alert
+        - schedule
+        - event
+        - api
+        - mcp
+      description: Workflow trigger types
+    Qyl.Domains.Workspace.HandshakeSessionEntity:
+      type: object
+      required:
+        - id
+        - workspace_id
+        - challenge
+        - challenge_method
+        - state
+        - expires_at
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Session ID
+        workspace_id:
+          type: string
+          description: Target workspace
+        challenge:
+          type: string
+          description: PKCE-style challenge
+        challenge_method:
+          type: string
+          description: Challenge method
+        browser_fingerprint:
+          type: string
+          description: Browser fingerprint
+        origin_url:
+          type: string
+          description: Origin URL
+        state:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Workspace.HandshakeState'
+          description: Handshake state
+        verified_at:
+          type: string
+          format: date-time
+          description: Verification timestamp
+        expires_at:
+          type: string
+          format: date-time
+          description: Expiration timestamp
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+      description: Browser-local handshake session for workspace verification
+      x-csharp-type: HandshakeSessionEntity
+      x-duckdb-table: handshake_sessions
+    Qyl.Domains.Workspace.HandshakeState:
+      type: string
+      enum:
+        - pending
+        - verified
+        - expired
+        - rejected
+      description: Handshake session state
+    Qyl.Domains.Workspace.ProjectEntity:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Project ID
+        name:
+          type: string
+          description: Project name
+        slug:
+          type: string
+          description: URL-safe slug (unique)
+        description:
+          type: string
+          description: Project description
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        archived_at:
+          type: string
+          format: date-time
+          description: Archive timestamp (null if active)
+      description: 'Project registry: top-level organizational unit'
+      x-csharp-type: ProjectEntity
+      x-duckdb-table: projects
+    Qyl.Domains.Workspace.ProjectEnvironmentEntity:
+      type: object
+      required:
+        - id
+        - project_id
+        - name
+        - display_name
+        - sort_order
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Environment ID
+        project_id:
+          type: string
+          description: Owning project
+        name:
+          type: string
+          description: Environment name (dev, staging, prod)
+        display_name:
+          type: string
+          description: Display name for UI
+        color:
+          type: string
+          description: Hex color for UI
+        sort_order:
+          type: integer
+          format: int32
+          description: Sort order for display
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+      description: Environment row per project (dev, staging, prod)
+      x-csharp-type: ProjectEnvironmentEntity
+      x-duckdb-table: project_environments
+    Qyl.Domains.Workspace.WorkspaceEnvelopeEntity:
+      type: object
+      required:
+        - id
+        - project_id
+        - environment_id
+        - node_id
+        - name
+        - root_path
+        - heartbeat_interval_seconds
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Workspace ID
+        project_id:
+          type: string
+          description: Owning project
+        environment_id:
+          type: string
+          description: Environment
+        node_id:
+          type: string
+          description: Host node
+        name:
+          type: string
+          description: Workspace name
+        root_path:
+          type: string
+          description: Local filesystem root path
+        heartbeat_at:
+          type: string
+          format: date-time
+          description: Last heartbeat timestamp
+        heartbeat_interval_seconds:
+          type: integer
+          format: int32
+          description: Heartbeat interval in seconds
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Qyl.Domains.Workspace.WorkspaceStatus'
+          description: Workspace status
+        config_json:
+          type: string
+          description: Workspace-level configuration overrides
+          x-duckdb-type: JSON
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      description: 'Workspace envelope: the local-first workspace unit'
+      x-csharp-type: WorkspaceEnvelopeEntity
+      x-duckdb-table: workspace_envelopes
+    Qyl.Domains.Workspace.WorkspaceStatus:
+      type: string
+      enum:
+        - active
+        - suspended
+        - archived
+      description: Workspace lifecycle status
     Qyl.OTel.Enums.AggregationTemporality:
       type: number
       enum:
@@ -5032,7 +7892,7 @@ components:
       properties:
         bytes_value:
           type: string
-          contentEncoding: base64
+          format: byte
           description: Binary value (base64 encoded)
       description: Binary log body
     Qyl.OTel.Logs.LogBodyKvList:
@@ -6045,7 +8905,7 @@ components:
           x-duckdb-column: service_name
         genAiProviderName:
           type: string
-          description: 'GenAI provider name (e.g., openai, anthropic) - OTel 1.39: gen_ai.provider.name'
+          description: 'GenAI provider name (e.g., openai, anthropic) - OTel 1.40: gen_ai.provider.name'
           x-promoted: true
           x-duckdb-index: idx_spans_gen_ai_provider_name
           x-duckdb-column: gen_ai_provider_name
@@ -6109,6 +8969,16 @@ components:
           description: Resource attributes as JSON
           x-duckdb-type: VARCHAR
           x-duckdb-column: resource_json
+        baggageJson:
+          type: string
+          description: W3C Baggage key-value pairs as JSON for cross-cutting concern propagation
+          x-duckdb-type: VARCHAR
+          x-duckdb-column: baggage_json
+        schemaUrl:
+          type: string
+          description: OTel semantic convention schema URL (e.g., https://opentelemetry.io/schemas/1.40.0)
+          x-duckdb-type: VARCHAR(256)
+          x-duckdb-column: schema_url
         createdAt:
           type: string
           format: date-time
@@ -6229,32 +9099,6 @@ components:
           format: date-time
           description: Event timestamp
       description: Deployment stream event
-    Streaming.ExceptionEvents:
-      anyOf:
-        - $ref: '#/components/schemas/Streaming.ExceptionStreamEvent'
-        - $ref: '#/components/schemas/Streaming.HeartbeatEvent'
-      description: Exception stream events
-    Streaming.ExceptionStreamEvent:
-      type: object
-      required:
-        - type
-        - data
-        - timestamp
-      properties:
-        type:
-          type: string
-          enum:
-            - exception
-          description: Event type
-        data:
-          allOf:
-            - $ref: '#/components/schemas/Qyl.Domains.Observe.Exceptions.ExceptionEvent'
-          description: Exception data
-        timestamp:
-          type: string
-          format: date-time
-          description: Event timestamp
-      description: Exception stream event
     Streaming.HeartbeatEvent:
       type: object
       required:
@@ -6356,7 +9200,6 @@ components:
         - spans
         - logs
         - metrics
-        - exceptions
         - deployments
         - all
       description: Stream event types
@@ -6385,7 +9228,7 @@ components:
           description: Minimum severity for logs (1-24)
         filters:
           type: object
-          unevaluatedProperties:
+          additionalProperties:
             type: string
           description: Attribute filters
         sample_rate:
@@ -6429,7 +9272,6 @@ components:
         - $ref: '#/components/schemas/Streaming.SpanStreamEvent'
         - $ref: '#/components/schemas/Streaming.LogStreamEvent'
         - $ref: '#/components/schemas/Streaming.MetricStreamEvent'
-        - $ref: '#/components/schemas/Streaming.ExceptionStreamEvent'
         - $ref: '#/components/schemas/Streaming.DeploymentStreamEvent'
         - $ref: '#/components/schemas/Streaming.HeartbeatEvent'
       description: All possible stream event types
@@ -6504,7 +9346,7 @@ components:
           description: Time range end
         tags:
           type: object
-          unevaluatedProperties:
+          additionalProperties:
             type: string
           description: Tag filters
         limit:
@@ -6518,3 +9360,10 @@ components:
           type: string
           description: Cursor
       description: Trace search query
+servers:
+  - url: https://api.staging.qyl.dev
+    description: QYL Staging API
+    variables: {}
+  - url: https://api.qyl.dev
+    description: QYL Production API
+    variables: {}

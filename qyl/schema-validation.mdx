@@ -1,0 +1,157 @@
+---
+title: 'Schema Validation'
+sidebarTitle: 'Schema Validation'
+description: 'Automated OpenAPI schema diff and drift detection in the NUKE build system.'
+icon: 'shield-check'
+---
+
+# Schema Validation
+
+qyl uses two NUKE build targets to guard against unintentional API contract changes: **`ApiDiff`** detects and classifies changes between the current OpenAPI spec and a git baseline, while **`VerifyApiUnchanged`** prevents uncommitted schema drift in CI.
+
+Both targets live in `eng/build/BuildApiDiff.cs`.
+
+## Why schema validation matters
+
+Every endpoint, request body, and response shape in qyl flows from a single source of truth: TypeSpec definitions in `core/specs/*.tsp`. These compile into `core/openapi/openapi.yaml`, which in turn generates C# types, DuckDB DDL, and TypeScript client types. A silent change to any endpoint can break consumers across the entire stack.
+
+## How it works
+
+The `ApiDiff` target performs a semantic comparison of the current `openapi.yaml` against a git baseline (default: `HEAD`). It parses both YAML documents with YamlDotNet and diffs them at three levels:
+
+1. **Paths** -- added or removed API endpoints
+2. **Operations** -- added or removed HTTP methods on existing endpoints
+3. **Schemas** -- added or removed component models, properties, and required-set changes
+
+Each detected change is classified as either **BREAKING** or **NON-BREAKING**.
+
+## Change classification
+
+| Change Kind        | Example                                        | Classification |
+| ------------------ | ---------------------------------------------- | -------------- |
+| `PathAdded`        | New `/api/v1/widgets` endpoint                 | NON-BREAKING   |
+| `PathRemoved`      | Deleted `/api/v1/legacy` endpoint              | BREAKING       |
+| `OperationAdded`   | Added `POST` to existing path                  | NON-BREAKING   |
+| `OperationRemoved` | Removed `DELETE` from existing path            | BREAKING       |
+| `SchemaAdded`      | New `WidgetEntity` component                   | NON-BREAKING   |
+| `SchemaRemoved`    | Deleted `LegacyEntity` component               | BREAKING       |
+| `PropertyAdded`    | New field on a response model                  | NON-BREAKING   |
+| `PropertyRemoved`  | Removed field from a response model            | BREAKING       |
+| `RequiredAdded`    | Property became required (new mandatory input) | BREAKING       |
+| `RequiredRemoved`  | Property relaxed to optional                   | NON-BREAKING   |
+
+<Warning>
+  Removing a path, operation, property, or adding a new required field to a
+  request body are all classified as breaking changes. The build will fail in CI
+  when breaking changes are detected.
+</Warning>
+
+## Usage
+
+### Diff against HEAD (default)
+
+```bash
+nuke ApiDiff
+```
+
+### Diff against a specific branch
+
+```bash
+nuke ApiDiff --iapidiff-base-ref main
+```
+
+### Force failure on breaking changes (local)
+
+```bash
+nuke ApiDiff --iapidiff-fail-on-breaking
+```
+
+By default, `ApiDiff` only fails on breaking changes when running on CI (`IsServerBuild == true`). Locally, it prints a warning-level report but does not fail the build. Use the `--iapidiff-fail-on-breaking` flag to enforce the same behavior locally.
+
+### Verify schema is committed
+
+```bash
+nuke VerifyApiUnchanged
+```
+
+## CI behavior
+
+### ApiDiff
+
+On CI servers (`IsServerBuild == true`), the `ApiDiff` target throws an `InvalidOperationException` when any breaking changes are detected. The error message includes the count of breaking changes and instructs the developer to update the schema version and document the change.
+
+Locally, the target prints a summary report with `BREAKING` and `NON-BREAKING` sections but does not fail the build unless `--iapidiff-fail-on-breaking` is passed.
+
+### VerifyApiUnchanged
+
+The `VerifyApiUnchanged` target is a CI gate that:
+
+<Steps>
+  <Step title="Regenerates the schema">
+    Runs `TypeSpecCompile` to produce a fresh `openapi.yaml` from the current
+    TypeSpec sources.
+  </Step>
+  <Step title="Compares against HEAD">
+    Uses `git diff --name-only HEAD` to check whether the regenerated file
+    differs from what is committed.
+  </Step>
+  <Step title="Fails on drift">
+    If the file changed, the build fails with an error instructing the developer
+    to run `nuke TypeSpecCompile` and commit the result.
+  </Step>
+</Steps>
+
+This prevents a common mistake: modifying TypeSpec definitions but forgetting to regenerate and commit the OpenAPI spec before pushing.
+
+## Comparison with Sentry's approach
+
+Sentry implements an equivalent workflow in TypeScript (`openapi-diff.ts`) that runs during their CI pipeline. qyl mirrors the same concept but implements it in pure C# within the NUKE build system, using YamlDotNet for YAML parsing instead of a JavaScript-based OpenAPI diff library.
+
+| Aspect           | Sentry                     | qyl                                       |
+| ---------------- | -------------------------- | ----------------------------------------- |
+| Language         | TypeScript                 | C#                                        |
+| Build system     | Custom CI scripts          | NUKE                                      |
+| YAML parser      | JS yaml package            | YamlDotNet                                |
+| Diff granularity | Paths, operations, schemas | Paths, operations, schemas, required sets |
+| CI enforcement   | Fails on breaking          | Fails on breaking (+ drift detection)     |
+
+## Report output
+
+When changes are detected, the diff report is printed to the build log:
+
+```
+===============================================================
+  OpenAPI Schema Diff vs. HEAD
+===============================================================
+
+  !!  BREAKING (2):
+    [-] PathRemoved             /api/v1/legacy
+    [-] PropertyRemoved         WidgetEntity.deprecated_field
+
+  +  NON-BREAKING (3):
+    [+] PathAdded               /api/v1/widgets
+    [+] OperationAdded          /api/v1/traces  [POST]
+    [+] PropertyAdded           WidgetEntity.new_field
+
+===============================================================
+  Total: 5 change(s) -- 2 breaking, 3 non-breaking
+===============================================================
+```
+
+<Note>
+  The report uses Serilog structured logging. On CI, the output integrates with
+  GitHub Actions log grouping for easy scanning.
+</Note>
+
+## Configuration
+
+The `IApiDiff` interface exposes two parameters:
+
+| Parameter                     | Default                       | Description                                   |
+| ----------------------------- | ----------------------------- | --------------------------------------------- |
+| `--iapidiff-base-ref`         | `HEAD`                        | Git ref to compare the current schema against |
+| `--iapidiff-fail-on-breaking` | `true` on CI, `false` locally | Whether to fail the build on breaking changes |
+
+```bash title="Compare against the main branch and fail on breaking"
+nuke ApiDiff --iapidiff-base-ref main --iapidiff-fail-on-breaking
+```
