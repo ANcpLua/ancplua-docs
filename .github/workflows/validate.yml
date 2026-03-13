@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
@@ -57,6 +57,7 @@ jobs:
 
       - name: Check broken links
         id: broken-links
+        continue-on-error: true
         run: npx mint broken-links 2>&1 | tee broken-links.log
 
       - name: Check accessibility

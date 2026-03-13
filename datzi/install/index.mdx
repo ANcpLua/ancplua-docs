@@ -14,7 +14,7 @@ methods, platform-specific instructions, and maintenance.
 
 ## System requirements
 
-- **[Node 22+](/datzi/install/index)** (the [installer script](#install-methods) will install it if missing)
+- **Node 22+** (the installer script for this page will install it if missing)
 - macOS, Linux, or Windows
 - `pnpm` only if you build from source
 
@@ -152,27 +152,13 @@ methods, platform-specific instructions, and maintenance.
 
 ## Other install methods
 
-<CardGroup>
-  <Card title="Docker"  icon="container">
-    Containerized or headless deployments.
-  </Card>
+For operators who prefer non-native deployment models:
 
-<Card title="Podman" icon="container">
-  Rootless container: run `setup-podman.sh` once, then the launch script.
-</Card>
-
-<Card title="Nix" icon="snowflake">
-  Declarative install via Nix.
-</Card>
-
-<Card title="Ansible" icon="server">
-  Automated fleet provisioning.
-</Card>
-
-  <Card title="Bun" icon="zap">
-    CLI-only usage via the Bun runtime.
-  </Card>
-</CardGroup>
+- **Docker**: containerized or headless deployments.
+- **Podman**: rootless container workflows (e.g., `setup-podman.sh`).
+- **Nix**: declarative installs.
+- **Ansible**: automated fleet provisioning.
+- **Bun**: CLI-only runtime usage.
 
 ## After install
 

@@ -31,7 +31,7 @@ Hooks are small scripts that run when something happens. There are two kinds:
 - **Webhooks**: external HTTP webhooks that let other systems trigger work in Datzi.
   See [Webhook Hooks](/datzi/automation/webhook) or use `datzi webhooks` for Gmail helper commands.
 
-Hooks can also be bundled inside plugins; see [Plugins](/datzi/tools/skills).
+Hooks can also be bundled inside plugins. See plugin loading details in [Gateway configuration](/datzi/gateway/configuration-reference#plugins).
 
 Common uses:
 
@@ -1057,6 +1057,6 @@ node -e "import('./path/to/handler.ts').then(console.log)"
 ## See Also
 
 - CLI Reference: hooks
-- [Bundled Hooks README](https://github.com/datzi/tree/main/src/hooks/bundled)
+- [Bundled Hooks README](https://github.com/datzi/datzi/tree/main/src/hooks/bundled)
 - [Webhook Hooks](/datzi/automation/webhook)
 - [Configuration](/datzi/gateway/configuration#hooks)
