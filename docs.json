@@ -216,7 +216,7 @@
         ]
       },
       {
-        "tab": "Datzi 🐟",
+        "tab": "Datzi",
         "groups": [
           {
             "group": "Getting Started",
@@ -347,7 +347,6 @@
               "datzi/reference/templates/AGENTS",
               "datzi/reference/templates/USER",
               "datzi/reference/templates/HEARTBEAT",
-              "datzi/reference/templates/MEMORY",
               "datzi/reference/templates/TOOLS",
               "datzi/reference/session-management-compaction",
               "datzi/reference/token-use"
@@ -373,167 +372,165 @@
           },
           {
             "group": "Features",
-            "pages": ["qyl/dashboard", "qyl/mcp"]
-          },
-          {
-            "group": "Development",
-            "pages": ["qyl/schema-validation"]
+            "pages": ["qyl/dashboard", "qyl/mcp", "qyl/schema-validation"]
           },
           {
             "group": "API Reference",
-            "pages": ["api-reference/introduction"]
-          },
-          {
-            "group": "Health",
             "pages": [
-              "api-reference/health/health-check",
-              "api-reference/health/liveness",
-              "api-reference/health/readiness"
-            ]
-          },
-          {
-            "group": "Traces",
-            "pages": [
-              "api-reference/traces/list-traces",
-              "api-reference/traces/search-traces",
-              "api-reference/traces/get-trace",
-              "api-reference/traces/get-spans"
-            ]
-          },
-          {
-            "group": "Logs",
-            "pages": [
-              "api-reference/logs/list-logs",
-              "api-reference/logs/search-logs",
-              "api-reference/logs/aggregate",
-              "api-reference/logs/patterns",
-              "api-reference/logs/stats"
-            ]
-          },
-          {
-            "group": "Metrics",
-            "pages": [
-              "api-reference/metrics/list-metrics",
-              "api-reference/metrics/query",
-              "api-reference/metrics/metadata"
-            ]
-          },
-          {
-            "group": "Sessions",
-            "pages": [
-              "api-reference/sessions/list-sessions",
-              "api-reference/sessions/stats",
-              "api-reference/sessions/get-session",
-              "api-reference/sessions/session-traces"
-            ]
-          },
-          {
-            "group": "Errors",
-            "pages": [
-              "api-reference/errors/list-errors",
-              "api-reference/errors/stats",
-              "api-reference/errors/get-error",
-              "api-reference/errors/update-error",
-              "api-reference/errors/correlations"
-            ]
-          },
-          {
-            "group": "Issues",
-            "pages": [
-              "api-reference/issues/list-issues",
-              "api-reference/issues/get-issue",
-              "api-reference/issues/update-issue",
-              "api-reference/issues/breadcrumbs",
-              "api-reference/issues/events"
-            ]
-          },
-          {
-            "group": "Deployments",
-            "pages": [
-              "api-reference/deployments/list-deployments",
-              "api-reference/deployments/create-deployment",
-              "api-reference/deployments/dora-metrics",
-              "api-reference/deployments/get-deployment",
-              "api-reference/deployments/update-deployment"
-            ]
-          },
-          {
-            "group": "Streaming",
-            "pages": [
-              "api-reference/streaming/stream-events",
-              "api-reference/streaming/stream-traces",
-              "api-reference/streaming/stream-logs",
-              "api-reference/streaming/stream-metrics",
-              "api-reference/streaming/stream-deployments",
-              "api-reference/streaming/stream-trace-spans"
-            ]
-          },
-          {
-            "group": "Services",
-            "pages": [
-              "api-reference/services/list-services",
-              "api-reference/services/get-service",
-              "api-reference/services/dependencies",
-              "api-reference/services/operations"
-            ]
-          },
-          {
-            "group": "Alerts",
-            "pages": [
-              "api-reference/alerts/list-firings",
-              "api-reference/alerts/list-fix-runs",
-              "api-reference/alerts/get-fix-run",
-              "api-reference/alerts/list-rules",
-              "api-reference/alerts/get-rule"
-            ]
-          },
-          {
-            "group": "Configurator",
-            "pages": [
-              "api-reference/configurator/create-job",
-              "api-reference/configurator/get-job",
-              "api-reference/configurator/list-profiles",
-              "api-reference/configurator/create-profile",
-              "api-reference/configurator/get-profile",
-              "api-reference/configurator/get-selections",
-              "api-reference/configurator/save-selections"
-            ]
-          },
-          {
-            "group": "Onboarding",
-            "pages": [
-              "api-reference/onboarding/start-handshake",
-              "api-reference/onboarding/get-handshake",
-              "api-reference/onboarding/verify-handshake"
-            ]
-          },
-          {
-            "group": "Search",
-            "pages": [
-              "api-reference/search/search",
-              "api-reference/search/suggestions"
-            ]
-          },
-          {
-            "group": "Workflows",
-            "pages": [
-              "api-reference/workflows/list-runs",
-              "api-reference/workflows/get-run",
-              "api-reference/workflows/run-events",
-              "api-reference/workflows/run-nodes",
-              "api-reference/workflows/approve-step",
-              "api-reference/workflows/resume-run"
-            ]
-          },
-          {
-            "group": "Workspaces",
-            "pages": [
-              "api-reference/workspaces/get-current",
-              "api-reference/workspaces/heartbeat",
-              "api-reference/workspaces/list-projects",
-              "api-reference/workspaces/create-project",
-              "api-reference/workspaces/get-project",
-              "api-reference/workspaces/list-environments"
+              "api-reference/introduction",
+              {
+                "group": "Health",
+                "pages": [
+                  "api-reference/health/health-check",
+                  "api-reference/health/liveness",
+                  "api-reference/health/readiness"
+                ]
+              },
+              {
+                "group": "Traces",
+                "pages": [
+                  "api-reference/traces/list-traces",
+                  "api-reference/traces/search-traces",
+                  "api-reference/traces/get-trace",
+                  "api-reference/traces/get-spans"
+                ]
+              },
+              {
+                "group": "Logs",
+                "pages": [
+                  "api-reference/logs/list-logs",
+                  "api-reference/logs/search-logs",
+                  "api-reference/logs/aggregate",
+                  "api-reference/logs/patterns",
+                  "api-reference/logs/stats"
+                ]
+              },
+              {
+                "group": "Metrics",
+                "pages": [
+                  "api-reference/metrics/list-metrics",
+                  "api-reference/metrics/query",
+                  "api-reference/metrics/metadata"
+                ]
+              },
+              {
+                "group": "Sessions",
+                "pages": [
+                  "api-reference/sessions/list-sessions",
+                  "api-reference/sessions/stats",
+                  "api-reference/sessions/get-session",
+                  "api-reference/sessions/session-traces"
+                ]
+              },
+              {
+                "group": "Errors",
+                "pages": [
+                  "api-reference/errors/list-errors",
+                  "api-reference/errors/stats",
+                  "api-reference/errors/get-error",
+                  "api-reference/errors/update-error",
+                  "api-reference/errors/correlations"
+                ]
+              },
+              {
+                "group": "Issues",
+                "pages": [
+                  "api-reference/issues/list-issues",
+                  "api-reference/issues/get-issue",
+                  "api-reference/issues/update-issue",
+                  "api-reference/issues/breadcrumbs",
+                  "api-reference/issues/events"
+                ]
+              },
+              {
+                "group": "Deployments",
+                "pages": [
+                  "api-reference/deployments/list-deployments",
+                  "api-reference/deployments/create-deployment",
+                  "api-reference/deployments/dora-metrics",
+                  "api-reference/deployments/get-deployment",
+                  "api-reference/deployments/update-deployment"
+                ]
+              },
+              {
+                "group": "Streaming",
+                "pages": [
+                  "api-reference/streaming/stream-events",
+                  "api-reference/streaming/stream-traces",
+                  "api-reference/streaming/stream-logs",
+                  "api-reference/streaming/stream-metrics",
+                  "api-reference/streaming/stream-deployments",
+                  "api-reference/streaming/stream-trace-spans"
+                ]
+              },
+              {
+                "group": "Services",
+                "pages": [
+                  "api-reference/services/list-services",
+                  "api-reference/services/get-service",
+                  "api-reference/services/dependencies",
+                  "api-reference/services/operations"
+                ]
+              },
+              {
+                "group": "Alerts",
+                "pages": [
+                  "api-reference/alerts/list-firings",
+                  "api-reference/alerts/list-fix-runs",
+                  "api-reference/alerts/get-fix-run",
+                  "api-reference/alerts/list-rules",
+                  "api-reference/alerts/get-rule"
+                ]
+              },
+              {
+                "group": "Configurator",
+                "pages": [
+                  "api-reference/configurator/create-job",
+                  "api-reference/configurator/get-job",
+                  "api-reference/configurator/list-profiles",
+                  "api-reference/configurator/create-profile",
+                  "api-reference/configurator/get-profile",
+                  "api-reference/configurator/get-selections",
+                  "api-reference/configurator/save-selections"
+                ]
+              },
+              {
+                "group": "Onboarding",
+                "pages": [
+                  "api-reference/onboarding/start-handshake",
+                  "api-reference/onboarding/get-handshake",
+                  "api-reference/onboarding/verify-handshake"
+                ]
+              },
+              {
+                "group": "Search",
+                "pages": [
+                  "api-reference/search/search",
+                  "api-reference/search/suggestions"
+                ]
+              },
+              {
+                "group": "Workflows",
+                "pages": [
+                  "api-reference/workflows/list-runs",
+                  "api-reference/workflows/get-run",
+                  "api-reference/workflows/run-events",
+                  "api-reference/workflows/run-nodes",
+                  "api-reference/workflows/approve-step",
+                  "api-reference/workflows/resume-run"
+                ]
+              },
+              {
+                "group": "Workspaces",
+                "pages": [
+                  "api-reference/workspaces/get-current",
+                  "api-reference/workspaces/heartbeat",
+                  "api-reference/workspaces/list-projects",
+                  "api-reference/workspaces/create-project",
+                  "api-reference/workspaces/get-project",
+                  "api-reference/workspaces/list-environments"
+                ]
+              }
             ]
           }
         ],

@@ -13,7 +13,7 @@ Complete field-by-field reference for ~/.datzi/datzi.json
 # Configuration Reference
 
 Every field available in `~/.datzi/datzi.json`. For a task-oriented overview,
-see [Configuration](/gateway/configuration).
+see [Configuration](/datzi/gateway/configuration).
 
 Config format is **JSON5** (comments + trailing commas allowed). All fields are optional — Datzi uses safe defaults when
 omitted.
@@ -208,7 +208,7 @@ WhatsApp runs through the gateway's web channel (Baileys Web). It starts automat
   the default account.
 - `configWrites: false` blocks Telegram-initiated config writes (supergroup ID migrations, `/config set|unset`).
 - Telegram stream previews use `sendMessage` + `editMessageText` (works in direct and group chats).
-- Retry policy: see [Retry policy](/concepts/retry).
+- Retry policy: see Retry policy.
 
 ### Discord
 
@@ -949,7 +949,7 @@ Periodic heartbeat runs.
 }
 ```
 
-- `mode`: `default` or `safeguard` (chunked summarization for long histories). See [Compaction](/concepts/compaction).
+- `mode`: `default` or `safeguard` (chunked summarization for long histories). See [Compaction](/datzi/concepts/compaction).
 - `memoryFlush`: silent agentic turn before auto-compaction to store durable memories. Skipped when workspace is
   read-only.
 
@@ -1005,7 +1005,7 @@ Notes:
 - If fewer than `keepLastAssistants` assistant messages exist, pruning is skipped.
 </Accordion>
 
-See [Session Pruning](/concepts/session-pruning) for behavior details.
+See [Session Pruning](/datzi/concepts/session) for behavior details.
 
 ### Block streaming
 
@@ -1039,7 +1039,7 @@ See [Session Pruning](/concepts/session-pruning) for behavior details.
 - `humanDelay`: randomized pause between block replies. `natural` = 800–2500ms. Per-agent override:
   `agents.list[].humanDelay`.
 
-See [Streaming](/concepts/streaming) for behavior + chunking details.
+See [Streaming](/datzi/concepts/agent-loop) for behavior + chunking details.
 
 ### Typing indicators
 
@@ -1058,11 +1058,11 @@ See [Streaming](/concepts/streaming) for behavior + chunking details.
 - Defaults: `instant` for direct chats/mentions, `message` for unmentioned group chats.
 - Per-session overrides: `session.typingMode`, `session.typingIntervalSeconds`.
 
-See [Typing Indicators](/concepts/typing-indicators).
+See Typing Indicators.
 
 ### `agents.defaults.sandbox`
 
-Optional **Docker sandboxing** for the embedded agent. See [Sandboxing](/gateway/sandboxing) for the full guide.
+Optional **Docker sandboxing** for the embedded agent. See [Sandboxing](/datzi/gateway/sandboxing) for the full guide.
 
 ```json5
 {
@@ -1247,7 +1247,7 @@ scripts/sandbox-browser-setup.sh   # optional browser image
 
 ## Multi-agent routing
 
-Run multiple isolated agents inside one Gateway. See [Multi-Agent](/concepts/multi-agent).
+Run multiple isolated agents inside one Gateway. See [Multi-Agent](/datzi/concepts/multi-agent).
 
 ```json5
 {
@@ -1390,7 +1390,7 @@ Within each tier, the first matching `bindings` entry wins.
   ```
 </Accordion>
 
-See [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) for precedence details.
+See [Multi-Agent Sandbox & Tools](/datzi/tools/subagents) for precedence details.
 
 ---
 
@@ -2018,7 +2018,7 @@ Shortcut: `datzi onboard --auth-choice kimi-code-api-key`.
 </Accordion>
 
 <Accordion title="Local models (LM Studio)">
-  See [Local Models](/gateway/local-models). TL;DR: run MiniMax M2.1 via LM
+  See [Local Models](/datzi/gateway/local-models). TL;DR: run MiniMax M2.1 via LM
   Studio Responses API on serious hardware; keep hosted models merged for
   fallback.
 </Accordion>
@@ -2081,7 +2081,7 @@ Shortcut: `datzi onboard --auth-choice kimi-code-api-key`.
 - **Config changes require a gateway restart.**
 - `allow`: optional allowlist (only listed plugins load). `deny` wins.
 
-See [Plugins](/tools/plugin).
+See [Plugins](/datzi/tools/skills).
 
 ---
 
@@ -2204,7 +2204,7 @@ See [Plugins](/tools/plugin).
   * `bind`: `auto`, `loopback` (default), `lan` (`0.0.0.0`), `tailnet` (Tailscale IP only), or `custom`.
   * **Auth**: required by default. Non-loopback binds require a shared token/password. Onboarding wizard generates a token by default.
   * `auth.mode: "none"`: explicit no-auth mode. Use only for trusted local loopback setups; this is intentionally not offered by onboarding prompts.
-  * `auth.mode: "trusted-proxy"`: delegate auth to an identity-aware reverse proxy and trust identity headers from `gateway.trustedProxies` (see [Trusted Proxy Auth](/gateway/trusted-proxy-auth)).
+  * `auth.mode: "trusted-proxy"`: delegate auth to an identity-aware reverse proxy and trust identity headers from `gateway.trustedProxies` (see Trusted Proxy Auth).
   * `auth.allowTailscale`: when `true`, Tailscale Serve identity headers can satisfy Control UI/WebSocket auth (verified via `tailscale whois`); HTTP API endpoints still require token/password auth. This tokenless flow assumes the gateway host is trusted. Defaults to `true` when `tailscale.mode = "serve"`.
   * `auth.rateLimit`: optional failed-auth limiter. Applies per client IP and per auth scope (shared-secret and device-token are tracked independently). Blocked attempts return `429` + `Retry-After`.
     * `auth.rateLimit.exemptLoopback` defaults to `true`; set `false` when you intentionally want localhost traffic rate-limited too (for test setups or strict proxy deployments).
@@ -2238,7 +2238,7 @@ datzi gateway --port 19001
 
 Convenience flags: `--dev` (uses `~/.datzi-dev` + port `19001`), `--profile <name>` (uses `~/.datzi-<name>`).
 
-See [Multiple Gateways](/gateway/multiple-gateways).
+See Multiple Gateways.
 
 ---
 
@@ -2423,7 +2423,7 @@ Setup: `datzi dns setup --apply`.
 - Inline env vars are only applied if the process env is missing the key.
 - `.env` files: CWD `.env` + `~/.datzi/.env` (neither overrides existing vars).
 - `shellEnv`: imports missing expected keys from your login shell profile.
-- See [Environment](/help/environment) for full precedence.
+- See [Environment](/datzi/help/environment) for full precedence.
 
 ### Env var substitution
 
@@ -2567,7 +2567,7 @@ part of the config schema (validation fails until removed; `datzi doctor --fix` 
 - `webhook`: deprecated legacy fallback webhook URL (http/https) used only for stored jobs that still have
   `notify: true`.
 
-See [Cron Jobs](/automation/cron-jobs).
+See [Cron Jobs](/datzi/automation/cron-jobs).
 
 ---
 
@@ -2631,6 +2631,4 @@ Split config into multiple files:
 
 ---
 
-_Related: [Configuration](/gateway/configuration) · [Configuration Examples](/gateway/configuration-examples) · [Doctor](/gateway/doctor)_
-
-# Discovery and Transports
+_Related: [Configuration](/datzi/gateway/configuration) · [Configuration Examples](/datzi/gateway/configuration-examples) · [Doctor](/datzi/gateway/troubleshooting)_

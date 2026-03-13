@@ -58,7 +58,7 @@ The Gateway advertises `_datzi-gw._tcp` on `local.`. The iOS app lists these aut
 ### Tailnet (cross-network)
 
 If mDNS is blocked, use a unicast DNS-SD zone (choose a domain; example: `datzi.internal.`) and Tailscale split DNS.
-See [Bonjour](/gateway/bonjour) for the CoreDNS example.
+See Bonjour for the CoreDNS example.
 
 ### Manual host/port
 
@@ -98,12 +98,12 @@ datzi nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"maxWi
 
 - `NODE_BACKGROUND_UNAVAILABLE`: bring the iOS app to the foreground (canvas/camera/screen commands require it).
 - `A2UI_HOST_NOT_CONFIGURED`: the Gateway did not advertise a canvas host URL; check `canvasHost`
-  in [Gateway configuration](/gateway/configuration).
+  in [Gateway configuration](/datzi/gateway/configuration).
 - Pairing prompt never appears: run `datzi nodes pending` and approve manually.
 - Reconnect fails after reinstall: the Keychain pairing token was cleared; re-pair the node.
 
 ## Related docs
 
-- [Pairing](/gateway/pairing)
-- [Discovery](/gateway/discovery)
-- [Bonjour](/gateway/bonjour)
+- [Pairing](/datzi/channels/pairing)
+- Discovery
+- Bonjour

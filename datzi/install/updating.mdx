@@ -72,7 +72,7 @@ datzi update --channel stable
 
 Use `--tag <dist-tag|version>` for a one-off install tag/version.
 
-See [Development channels](/install/development-channels) for channel semantics and release notes.
+See Development channels for channel semantics and release notes.
 
 Note: on npm installs, the gateway logs an update hint on startup (checks the current channel tag). Disable via
 `update.checkOnStart: false`.
@@ -143,7 +143,7 @@ datzi health
 Notes:
 
 - `pnpm build` matters when you run the packaged `datzi` binary ([
-  `datzi.mjs`](https://github.com/datzi/datzi/blob/main/datzi.mjs)) or use Node to run `dist/`.
+  `datzi.mjs`](https://github.com/datzi/blob/main/datzi.mjs)) or use Node to run `dist/`.
 - If you run from a repo checkout without a global install, use `pnpm datzi ...` for CLI commands.
 - If you run directly from TypeScript (`pnpm datzi ...`), a rebuild is usually unnecessary, but **config migrations
   still apply** → run doctor.
@@ -164,7 +164,7 @@ Typical things it does:
 - Detect and migrate older gateway services (launchd/systemd; legacy schtasks) to current Datzi services.
 - On Linux, ensure systemd user lingering (so the Gateway survives logout).
 
-Details: [Doctor](/gateway/doctor)
+Details: [Doctor](/datzi/gateway/troubleshooting)
 
 ## Start / stop / restart the Gateway
 
@@ -186,7 +186,7 @@ If you're supervised:
 - Windows (WSL2): `systemctl --user restart datzi-gateway[-<profile>].service`
   - `launchctl`/`systemctl` only work if the service is installed; otherwise run `datzi gateway install`.
 
-Runbook + exact service labels: [Gateway runbook](/gateway)
+Runbook + exact service labels: [Gateway runbook](/datzi/gateway/index)
 
 ## Rollback / pinning (when something breaks)
 
@@ -238,5 +238,5 @@ git pull
 ## If you're stuck
 
 - Run `datzi doctor` again and read the output carefully (it often tells you the fix).
-- Check: [Troubleshooting](/gateway/troubleshooting)
+- Check: [Troubleshooting](/datzi/gateway/troubleshooting)
 - Ask in Discord: [https://discord.gg/clawd](https://discord.gg/clawd)

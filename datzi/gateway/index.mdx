@@ -12,11 +12,11 @@ tags: ['runbook', 'operations', 'overview', 'gateway']
 Use this page for day-1 startup and day-2 operations of the Gateway service.
 
 <CardGroup>
-  <Card title="Deep troubleshooting" icon="siren" href="/gateway/troubleshooting">
+  <Card title="Deep troubleshooting" icon="siren" href="/datzi/gateway/troubleshooting">
     Symptom-first diagnostics with exact command ladders and log signatures.
   </Card>
 
-  <Card title="Configuration" icon="sliders" href="/gateway/configuration">
+  <Card title="Configuration" icon="sliders" href="/datzi/gateway/configuration">
     Task-oriented setup guide + full configuration reference.
   </Card>
 </CardGroup>
@@ -114,7 +114,7 @@ Then connect clients to `ws://127.0.0.1:18789` locally.
   (`token`/`password`) even over SSH tunnels.
 </Warning>
 
-See: [Remote Gateway](/gateway/remote), [Authentication](/gateway/authentication), [Tailscale](/gateway/tailscale).
+See: [Remote Gateway](/datzi/gateway/remote), [Authentication](/datzi/gateway/authentication), Tailscale.
 
 ## Supervision and service lifecycle
 
@@ -178,7 +178,7 @@ DATZI_CONFIG_PATH=~/.datzi/a.json DATZI_STATE_DIR=~/.datzi-a datzi gateway --por
 DATZI_CONFIG_PATH=~/.datzi/b.json DATZI_STATE_DIR=~/.datzi-b datzi gateway --port 19002
 ```
 
-See: [Multiple gateways](/gateway/multiple-gateways).
+See: Multiple gateways.
 
 ### Dev profile quick path
 
@@ -202,7 +202,7 @@ Agent runs are two-stage:
 1. Immediate accepted ack (`status:"accepted"`)
 2. Final completion response (`status:"ok"|"error"`), with streamed `agent` events in between.
 
-See full protocol docs: [Gateway Protocol](/gateway/protocol).
+See full protocol docs: Gateway Protocol.
 
 ## Operational checks
 
@@ -232,7 +232,7 @@ Events are not replayed. On sequence gaps, refresh state (`health`, `system-pres
 | `Gateway start blocked: set gateway.mode=local`                | Config set to remote mode                |
 | `unauthorized` during connect                                  | Auth mismatch between client and gateway |
 
-For full diagnosis ladders, use [Gateway Troubleshooting](/gateway/troubleshooting).
+For full diagnosis ladders, use [Gateway Troubleshooting](/datzi/gateway/troubleshooting).
 
 ## Safety guarantees
 
@@ -244,11 +244,9 @@ For full diagnosis ladders, use [Gateway Troubleshooting](/gateway/troubleshooti
 
 Related:
 
-- [Troubleshooting](/gateway/troubleshooting)
-- [Background Process](/gateway/background-process)
-- [Configuration](/gateway/configuration)
-- [Health](/gateway/health)
-- [Doctor](/gateway/doctor)
-- [Authentication](/gateway/authentication)
-
-# Local Models
+- [Troubleshooting](/datzi/gateway/troubleshooting)
+- Background Process
+- [Configuration](/datzi/gateway/configuration)
+- [Health](/datzi/gateway/health)
+- [Doctor](/datzi/gateway/troubleshooting)
+- [Authentication](/datzi/gateway/authentication)

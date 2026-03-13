@@ -48,9 +48,15 @@ jobs:
           git commit -m "style: auto-fix formatting [skip ci]"
           git push
 
+      - name: Validate docs.json
+        run: node -e "JSON.parse(require('fs').readFileSync('docs.json','utf8'))"
+
+      - name: Check navigation sync
+        id: nav-sync
+        run: npm run lint:nav
+
       - name: Check broken links
         id: broken-links
-        continue-on-error: true
         run: npx mint broken-links 2>&1 | tee broken-links.log
 
       - name: Check accessibility
@@ -64,7 +70,7 @@ jobs:
         run: npx mint openapi-check api-reference/openapi.yaml 2>&1 | tee openapi.log
 
       - name: Report issues on PR
-        if: github.event_name == 'pull_request' && (steps.broken-links.outcome == 'failure' || steps.a11y.outcome == 'failure' || steps.openapi.outcome == 'failure')
+        if: always() && github.event_name == 'pull_request' && (steps.nav-sync.outcome == 'failure' || steps.broken-links.outcome == 'failure' || steps.a11y.outcome == 'failure' || steps.openapi.outcome == 'failure')
         uses: actions/github-script@v8
         with:
           script: |
@@ -75,6 +81,9 @@ jobs:
             const a11y = fs.existsSync('a11y.log') ? fs.readFileSync('a11y.log', 'utf8') : '';
             const openapi = fs.existsSync('openapi.log') ? fs.readFileSync('openapi.log', 'utf8') : '';
 
+            if ('${{ steps.nav-sync.outcome }}' === 'failure') {
+              body += '### Navigation Sync\nPages referenced in `docs.json` do not match files on disk. Run `npm run lint:nav` locally for details.\n\n';
+            }
             if ('${{ steps.broken-links.outcome }}' === 'failure') {
               body += '### Broken Links\n```\n' + brokenLinks.slice(0, 2000) + '\n```\n\n';
             }
@@ -93,7 +102,7 @@ jobs:
             });
 
       - name: Fail if validation errors
-        if: steps.broken-links.outcome == 'failure' || steps.a11y.outcome == 'failure' || steps.openapi.outcome == 'failure'
+        if: always() && (steps.nav-sync.outcome == 'failure' || steps.broken-links.outcome == 'failure' || steps.a11y.outcome == 'failure' || steps.openapi.outcome == 'failure')
         run: |
           echo "Validation failed. Check the logs above."
           exit 1

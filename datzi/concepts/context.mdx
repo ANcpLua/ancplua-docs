@@ -30,7 +30,7 @@ the model’s current window.
 - `/compact` → summarize older history into a compact entry to free window space.
 
 See
-also: [Slash commands](/tools/slash-commands), [Token use & costs](/reference/token-use), [Compaction](/concepts/compaction).
+also: [Slash commands](/datzi/tools/slash-commands), [Token use & costs](/datzi/reference/token-use), [Compaction](/datzi/concepts/compaction).
 
 ## Example output
 
@@ -101,7 +101,7 @@ The system prompt is **Datzi-owned** and rebuilt each run. It includes:
 - Runtime metadata (host/OS/model/thinking).
 - Injected workspace bootstrap files under **Project Context**.
 
-Full breakdown: [System Prompt](/concepts/system-prompt).
+Full breakdown: [System Prompt](/datzi/concepts/agent).
 
 ## Injected workspace files (Project Context)
 
@@ -148,7 +148,7 @@ Slash commands are handled by the Gateway. There are a few different behaviors:
 - **Inline shortcuts** (allowlisted senders only): certain `/...` tokens inside a normal message can run immediately (
   example: “hey /status”), and are stripped before the model sees the remaining text.
 
-Details: [Slash commands](/tools/slash-commands).
+Details: [Slash commands](/datzi/tools/slash-commands).
 
 ## Sessions, compaction, and pruning (what persists)
 
@@ -158,7 +158,7 @@ What persists across messages depends on the mechanism:
 - **Compaction** persists a summary into the transcript and keeps recent messages intact.
 - **Pruning** removes old tool results from the _in-memory_ prompt for a run, but does not rewrite the transcript.
 
-Docs: [Session](/concepts/session), [Compaction](/concepts/compaction), [Session pruning](/concepts/session-pruning).
+Docs: [Session](/datzi/concepts/session), [Compaction](/datzi/concepts/compaction), [Session pruning](/datzi/concepts/session).
 
 ## What `/context` actually reports
 
@@ -169,5 +169,3 @@ Docs: [Session](/concepts/session), [Compaction](/concepts/compaction), [Session
   doesn’t generate the report).
 
 Either way, it reports sizes and top contributors; it does **not** dump the full system prompt or tool schemas.
-
-# Features

@@ -16,7 +16,7 @@ Datzi ships two lightweight web tools:
 - `web_fetch` — HTTP fetch + readable extraction (HTML → markdown/text).
 
 These are **not** browser automation. For JS-heavy sites or logins, use the
-[Browser tool](/tools/browser).
+[Browser tool](/datzi/tools/browser).
 
 ## How it works
 
@@ -64,7 +64,7 @@ current limits and pricing.
 
 **Environment alternative:** set `BRAVE_API_KEY` in the Gateway process
 environment. For a gateway install, put it in `~/.datzi/.env` (or your
-service environment). See [Env vars](/help/faq#how-does-datzi-load-environment-variables).
+service environment). See [Env vars](/datzi/help/faq#how-does-datzi-load-environment-variables).
 
 ## web_search
 
@@ -187,7 +187,7 @@ Notes:
 - `web_fetch` caps the downloaded response body size to `tools.web.fetch.maxResponseBytes` before parsing; oversized
   responses are truncated and include a warning.
 - `web_fetch` is best-effort extraction; some sites will need the browser tool.
-- See [Firecrawl](/tools/firecrawl) for key setup and service details.
+- Firecrawl can be configured as an optional anti-bot fallback for web fetching.
 - Responses are cached (default 15 minutes) to reduce repeated fetches.
 - If you use tool profiles/allowlists, add `web_search`/`web_fetch` or `group:web`.
 - If the Brave key is missing, `web_search` returns a short setup hint with a docs link.

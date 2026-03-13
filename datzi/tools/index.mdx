@@ -181,15 +181,15 @@ Example (allow only file tools + browser):
 ## Plugins + tools
 
 Plugins can register **additional tools** (and CLI commands) beyond the core set.
-See [Plugins](/tools/plugin) for install + config, and [Skills](/tools/skills) for how
+See [Plugins](/datzi/tools/skills) for install + config, and [Skills](/datzi/tools/skills) for how
 tool usage guidance is injected into prompts. Some plugins ship their own skills
 alongside tools (for example, the voice-call plugin).
 
 Optional plugin tools:
 
-- [Lobster](/tools/lobster): typed workflow runtime with resumable approvals (requires the Lobster CLI on the gateway
+- Lobster: typed workflow runtime with resumable approvals (requires the Lobster CLI on the gateway
   host).
-- [LLM Task](/tools/llm-task): JSON-only LLM step for structured workflow output (optional schema validation).
+- LLM Task: JSON-only LLM step for structured workflow output (optional schema validation).
 
 ## Tool inventory
 
@@ -226,7 +226,7 @@ Notes:
   alias for `host=gateway` + `security=full`.
 - `elevated` only changes behavior when the agent is sandboxed (otherwise it's a no-op).
 - `host=node` can target a macOS companion app or a headless node host (`datzi node run`).
-- gateway/node approvals and allowlists: [Exec approvals](/tools/exec-approvals).
+- gateway/node approvals and allowlists: [Exec](/datzi/tools/exec).
 
 ### `process`
 
@@ -282,10 +282,10 @@ Core parameters:
 
 Notes:
 
-- Requires a Brave API key (recommended: `datzi configure --section web`). <!-- Brave Search has a free tier -->
+- Requires a Brave API key (recommended: `datzi configure --section web`). {/* Brave Search has a free tier */}
 - Enable via `tools.web.search.enabled`.
 - Responses are cached (default 15 min).
-- See [Web tools](/tools/web) for setup.
+- See [Web tools](/datzi/tools/web) for setup.
 
 ### `web_fetch`
 
@@ -303,8 +303,8 @@ Notes:
 - `maxChars` is clamped by `tools.web.fetch.maxCharsCap` (default 50000).
 - Responses are cached (default 15 min).
 - For JS-heavy sites, prefer the browser tool.
-- See [Web tools](/tools/web) for setup.
-- See [Firecrawl](/tools/firecrawl) for the optional anti-bot fallback.
+- See [Web tools](/datzi/tools/web) for setup.
+- Firecrawl can be configured as an optional anti-bot fallback.
 
 ### `browser`
 

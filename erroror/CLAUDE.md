@@ -22,14 +22,14 @@ This section documents **ErrorOrX** - a discriminated union library for .NET wit
 
 ### Key Concepts
 
-| Concept         | Description                                 |
-| --------------- | ------------------------------------------- |
-| `ErrorOr<T>`    | Discriminated union: value or errors        |
-| `ErrorType`     | Enum: Validation, NotFound, Conflict, etc.  |
-| `Error`         | Error instance with Code, Description, Type |
-| HTTP Mapping    | ErrorType → HTTP status code → TypedResults |
-| Results<> Union | Generated OpenAPI-compatible response types |
-| Fluent API      | Then, Else, Match, Switch, FailIf           |
+| Concept       | Description                                 |
+| ------------- | ------------------------------------------- |
+| `ErrorOr<T>`  | Discriminated union: value or errors        |
+| `ErrorType`   | Enum: Validation, NotFound, Conflict, etc.  |
+| `Error`       | Error instance with Code, Description, Type |
+| HTTP Mapping  | ErrorType → HTTP status code → TypedResults |
+| Results Union | Generated OpenAPI-compatible response types |
+| Fluent API    | Then, Else, Match, Switch, FailIf           |
 
 ### Key Features
 

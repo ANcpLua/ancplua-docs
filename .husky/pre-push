@@ -1,0 +1,67 @@
+#!/bin/sh
+
+echo "Running pre-push validation..."
+echo ""
+
+failed=0
+
+# Navigation sync (fast, pure Node — run first)
+echo "==> Checking navigation/file sync..."
+if npm run lint:nav; then
+  echo "  Navigation sync passed."
+else
+  echo "  Navigation sync FAILED."
+  failed=1
+fi
+
+echo ""
+
+# Run mint checks in parallel using background jobs
+echo "==> Running link and accessibility checks in parallel..."
+
+tmpdir=$(mktemp -d)
+
+(npx mint broken-links > "$tmpdir/links.log" 2>&1; echo $? > "$tmpdir/links.exit") &
+pid_links=$!
+
+(npx mint a11y > "$tmpdir/a11y.log" 2>&1; echo $? > "$tmpdir/a11y.exit") &
+pid_a11y=$!
+
+# Wait for both to finish
+wait $pid_links
+wait $pid_a11y
+
+# Report results
+links_exit=$(cat "$tmpdir/links.exit")
+a11y_exit=$(cat "$tmpdir/a11y.exit")
+
+echo ""
+echo "--- Broken Links ---"
+if [ "$links_exit" -eq 0 ]; then
+  echo "  Passed."
+else
+  cat "$tmpdir/links.log"
+  echo "  Broken links check FAILED."
+  failed=1
+fi
+
+echo ""
+echo "--- Accessibility ---"
+if [ "$a11y_exit" -eq 0 ]; then
+  echo "  Passed."
+else
+  cat "$tmpdir/a11y.log"
+  echo "  Accessibility check FAILED."
+  failed=1
+fi
+
+# Cleanup
+rm -rf "$tmpdir"
+
+echo ""
+if [ "$failed" -ne 0 ]; then
+  echo "Pre-push validation FAILED. Push aborted."
+  exit 1
+fi
+
+echo "All pre-push checks passed."

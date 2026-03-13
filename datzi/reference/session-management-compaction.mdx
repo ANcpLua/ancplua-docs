@@ -21,10 +21,10 @@ This document explains how Datzi manages sessions end-to-end:
 
 If you want a higher-level overview first, start with:
 
-- [/concepts/session](/concepts/session)
-- [/concepts/compaction](/concepts/compaction)
-- [/concepts/session-pruning](/concepts/session-pruning)
-- [/reference/transcript-hygiene](/reference/transcript-hygiene)
+- [/concepts/session](/datzi/concepts/session)
+- [/concepts/compaction](/datzi/concepts/compaction)
+- [/concepts/session-pruning](/datzi/concepts/session)
+- [/reference/session-management-compaction](/datzi/reference/session-management-compaction)
 
 ---
 
@@ -78,7 +78,7 @@ Common patterns:
 - Cron: `cron:<job.id>`
 - Webhook: `hook:<uuid>` (unless overridden)
 
-The canonical rules are documented at [/concepts/session](/concepts/session).
+The canonical rules are documented at [/concepts/session](/datzi/concepts/session).
 
 ---
 
@@ -157,7 +157,7 @@ If you’re tuning limits:
 - The context window comes from the model catalog (and can be overridden via config).
 - `contextTokens` in the store is a runtime estimate/reporting value; don’t treat it as a strict guarantee.
 
-For more, see [/token-use](/reference/token-use).
+For more, see [/token-use](/datzi/reference/token-use).
 
 ---
 
@@ -171,7 +171,7 @@ After compaction, future turns see:
 - The compaction summary
 - Messages after `firstKeptEntryId`
 
-Compaction is **persistent** (unlike session pruning). See [/concepts/session-pruning](/concepts/session-pruning).
+Compaction is **persistent** (unlike session pruning). See [/concepts/session-pruning](/datzi/concepts/session).
 
 ---
 
@@ -272,7 +272,7 @@ Notes:
 - The flush runs once per compaction cycle (tracked in `sessions.json`).
 - The flush runs only for embedded Pi sessions (CLI backends skip it).
 - The flush is skipped when the session workspace is read-only (`workspaceAccess: "ro"` or `"none"`).
-- See [Memory](/concepts/memory) for the workspace file layout and write patterns.
+- See [Memory](/datzi/concepts/memory) for the workspace file layout and write patterns.
 
 Pi also exposes a `session_before_compact` hook in the extension API, but Datzi’s
 flush logic lives on the Gateway side today.
@@ -281,7 +281,7 @@ flush logic lives on the Gateway side today.
 
 ## Troubleshooting checklist
 
-- Session key wrong? Start with [/concepts/session](/concepts/session) and confirm the `sessionKey` in `/status`.
+- Session key wrong? Start with [/concepts/session](/datzi/concepts/session) and confirm the `sessionKey` in `/status`.
 - Store vs transcript mismatch? Confirm the Gateway host and the store path from `datzi status`.
 - Compaction spam? Check:
   - model context window (too small)
@@ -289,5 +289,3 @@ flush logic lives on the Gateway side today.
   - tool-result bloat: enable/tune session pruning
 - Silent turns leaking? Confirm the reply starts with `NO_REPLY` (exact token) and you’re on a build that includes the
   streaming suppression fix.
-
-# AGENTS.md Template

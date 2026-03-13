@@ -9,9 +9,9 @@ tags: ['concepts', 'models']
 
 # Models CLI
 
-See [/concepts/model-failover](/concepts/model-failover) for auth profile
+See [/concepts/model-failover](/datzi/concepts/model-failover) for auth profile
 rotation, cooldowns, and how that interacts with fallbacks.
-Quick provider overview + examples: [/concepts/model-providers](/concepts/model-providers).
+Quick provider overview + examples: [/concepts/model-providers](/datzi/concepts/model-providers).
 
 ## How model selection works
 
@@ -27,7 +27,7 @@ Related:
 - `agents.defaults.models` is the allowlist/catalog of models Datzi can use (plus aliases).
 - `agents.defaults.imageModel` is used **only when** the primary model can’t accept images.
 - Per-agent defaults can override `agents.defaults.model` via `agents.list[].model` plus bindings (
-  see [/concepts/multi-agent](/concepts/multi-agent)).
+  see [/concepts/multi-agent](/datzi/concepts/multi-agent)).
 
 ## Quick model picks (anecdotal)
 
@@ -57,7 +57,7 @@ Model refs are normalized to lowercase. Provider aliases like `z.ai/*` normalize
 to `zai/*`.
 
 Provider configuration examples (including OpenCode Zen) live in
-[/gateway/configuration](/gateway/configuration#opencode-zen-multi-model-proxy).
+[/gateway/configuration](/datzi/gateway/configuration#opencode-zen-multi-model-proxy).
 
 ## “Model is not allowed” (and why replies stop)
 
@@ -120,7 +120,7 @@ Notes:
 - If you omit the provider, Datzi treats the input as an alias or a model for the **default provider** (only works when
   there is no `/` in the model ID).
 
-Full command behavior/config: [Slash commands](/tools/slash-commands).
+Full command behavior/config: [Slash commands](/datzi/tools/slash-commands).
 
 ## CLI commands
 
@@ -181,5 +181,3 @@ datzi models status
 Custom providers in `models.providers` are written into `models.json` under the
 agent directory (default `~/.datzi/agents/<agentId>/models.json`). This file
 is merged by default unless `models.mode` is set to `replace`.
-
-# Authentication
