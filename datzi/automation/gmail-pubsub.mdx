@@ -7,8 +7,6 @@ summary: Step-by-step guide to wiring Gmail watch notifications through Google P
 tags: [gmail, pubsub, webhook, google-cloud, tailscale, gog, hooks]
 ---
 
-# Gmail PubSub
-
 # Gmail Pub/Sub -> Datzi
 
 Goal: Gmail watch -> Pub/Sub push -> `gog gmail watch serve` -> Datzi webhook.
@@ -17,7 +15,7 @@ Goal: Gmail watch -> Pub/Sub push -> `gog gmail watch serve` -> Datzi webhook.
 
 - `gcloud` installed and logged in ([install guide](https://docs.cloud.google.com/sdk/docs/install-sdk)).
 - `gog` (gogcli) installed and authorized for the Gmail account ([gogcli.sh](https://gogcli.sh/)).
-- Datzi hooks enabled (see [Webhooks](/automation/webhook)).
+- Datzi hooks enabled (see [Webhooks](/datzi/automation/webhook)).
 - `tailscale` logged in ([tailscale.com](https://tailscale.com/)). Supported setup uses Tailscale Funnel for the public
   HTTPS endpoint.
   Other tunnel services can work, but are DIY/unsupported and require manual wiring.
@@ -94,7 +92,7 @@ Notes:
   To disable (dangerous), set `hooks.gmail.allowUnsafeExternalContent: true`.
 
 To customize payload handling further, add `hooks.mappings` or a JS/TS transform module
-under `~/.datzi/hooks/transforms` (see [Webhooks](/automation/webhook)).
+under `~/.datzi/hooks/transforms` (see [Webhooks](/datzi/automation/webhook)).
 
 ## Wizard (recommended)
 

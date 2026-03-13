@@ -28,7 +28,7 @@ Datzi assembles its own system prompt on every run. It includes:
 - Reply tags + heartbeat behavior
 - Runtime metadata (host/OS/model/thinking)
 
-See the full breakdown in [System Prompt](/concepts/system-prompt).
+See the full breakdown in [System Prompt](/datzi/concepts/agent).
 
 ## What counts in the context window
 
@@ -48,7 +48,7 @@ Use `agents.defaults.imageMaxDimensionPx` (default: `1200`) to tune this:
 - Higher values preserve more visual detail for OCR/UI-heavy screenshots.
 
 For a practical breakdown (per injected file, tools, skills, and system prompt size), use `/context list` or
-`/context detail`. See [Context](/concepts/context).
+`/context detail`. See [Context](/datzi/concepts/context).
 
 ## How to see current token usage
 
@@ -87,8 +87,8 @@ has expired, then resets the cache window so subsequent requests can re-use the
 freshly cached context instead of re-caching the full history. This keeps cache
 write costs lower when a session goes idle past the TTL.
 
-Configure it in [Gateway configuration](/gateway/configuration) and see the
-behavior details in [Session pruning](/concepts/session-pruning).
+Configure it in [Gateway configuration](/datzi/gateway/configuration) and see the
+behavior details in [Session pruning](/datzi/concepts/session).
 
 Heartbeat can keep the cache **warm** across idle gaps. If your model cache TTL
 is `1h`, setting the heartbeat interval just under that (e.g., `55m`) can avoid
@@ -122,6 +122,4 @@ agents:
 - Keep skill descriptions short (skill list is injected into the prompt).
 - Prefer smaller models for verbose, exploratory work.
 
-See [Skills](/tools/skills) for the exact skill list overhead formula.
-
-# Onboarding Wizard Reference
+See [Skills](/datzi/tools/skills) for the exact skill list overhead formula.

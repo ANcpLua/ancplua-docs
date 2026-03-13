@@ -24,9 +24,9 @@ tags:
 
 A **node** is a companion device (macOS/iOS/Android/headless) that connects to the Gateway **WebSocket** (same port as
 operators) with `role: "node"` and exposes a command surface (e.g. `canvas.*`, `camera.*`, `system.*`) via`node.invoke`.
-Protocol details: [Gateway protocol](/gateway/protocol).
+Protocol details: Gateway protocol.
 
-Legacy transport: [Bridge protocol](/gateway/bridge-protocol) (TCP JSONL; deprecated/removed for current nodes).
+Legacy transport: Bridge protocol (TCP JSONL; deprecated/removed for current nodes).
 
 macOS can also run in **node mode**: the menubar app connects to the Gateway's WS server and exposes its local
 canvas/camera commands as a node (so `datzi nodes …` works against this Mac).
@@ -35,7 +35,7 @@ Notes:
 
 - Nodes are **peripherals**, not gateways. They don't run the gateway service.
 - Telegram/WhatsApp/etc. messages land on the **gateway**, not on nodes.
-- Troubleshooting runbook: [/nodes/troubleshooting](/nodes/troubleshooting)
+- Troubleshooting runbook: [/nodes/troubleshooting](/datzi/nodes/troubleshooting)
 
 ## Pairing + status
 
@@ -154,9 +154,9 @@ node allowlist/approvals).
 
 Related:
 
-- [Node host CLI](/cli/node)
-- [Exec tool](/tools/exec)
-- [Exec approvals](/tools/exec-approvals)
+- Node host CLI
+- [Exec tool](/datzi/tools/exec)
+- [Exec](/datzi/tools/exec)
 
 ## Invoking commands
 
@@ -351,7 +351,7 @@ Notes:
 - Pairing is still required (the Gateway will show a node approval prompt).
 - The node host stores its node id, token, display name, and gateway connection info in `~/.datzi/node.json`.
 - Exec approvals are enforced locally via `~/.datzi/exec-approvals.json`
-  (see [Exec approvals](/tools/exec-approvals)).
+  (see [Exec](/datzi/tools/exec)).
 - On macOS, the headless node host prefers the companion app exec host when reachable and falls
   back to local execution if the app is unavailable. Set `DATZI_NODE_EXEC_HOST=app` to require
   the app, or `DATZI_NODE_EXEC_FALLBACK=0` to disable fallback.

@@ -18,11 +18,11 @@ If the file is missing, Datzi uses safe defaults. Common reasons to add a config
 - Set models, tools, sandboxing, or automation (cron, hooks)
 - Tune sessions, media, networking, or UI
 
-See the [full reference](/gateway/configuration-reference) for every available field.
+See the [full reference](/datzi/gateway/configuration-reference) for every available field.
 
 <Tip>
   **New to configuration?** Start with `datzi onboard` for interactive setup, or
-  check out the [Configuration Examples](/gateway/configuration-examples) guide
+  check out the [Configuration Examples](/datzi/gateway/configuration-examples) guide
   for complete copy-paste configs.
 </Tip>
 
@@ -93,15 +93,11 @@ When validation fails:
   <Accordion title="Set up a channel (WhatsApp, Telegram, Discord, etc.)">
     Each channel has its own config section under `channels.<provider>`. See the dedicated channel page for setup steps:
 
-    * [WhatsApp](/channels/whatsapp) — `channels.whatsapp`
-    * [Telegram](/channels/telegram) — `channels.telegram`
-    * [Discord](/channels/discord) — `channels.discord`
-    * [Slack](/channels/slack) — `channels.slack`
-    * [Signal](/channels/signal) — `channels.signal`
-    * [iMessage](/channels/imessage) — `channels.imessage`
-    * [Google Chat](/channels/googlechat) — `channels.googlechat`
-    * [Mattermost](/channels/mattermost) — `channels.mattermost`
-    * [MS Teams](/channels/msteams) — `channels.msteams`
+    * [WhatsApp](/datzi/channels/whatsapp) — `channels.whatsapp`
+    * [Telegram](/datzi/channels/telegram) — `channels.telegram`
+    * [Discord](/datzi/channels/discord) — `channels.discord`
+    * [Slack](/datzi/channels/slack) — `channels.slack`
+    * [iMessage](/datzi/channels/imessage) — `channels.imessage`
 
     All channels share the same DM policy pattern:
 
@@ -143,8 +139,8 @@ When validation fails:
     * `agents.defaults.models` defines the model catalog and acts as the allowlist for `/model`.
     * Model refs use `provider/model` format (e.g. `ollama/qwen3-coder:32b`).
     * `agents.defaults.imageMaxDimensionPx` controls transcript/tool image downscaling (default `1200`); lower values usually reduce vision-token usage on screenshot-heavy runs.
-    * See [Models CLI](/concepts/models) for switching models in chat and [Model Failover](/concepts/model-failover) for auth rotation and fallback behavior.
-    * For custom/self-hosted providers, see [Custom providers](/gateway/configuration-reference#custom-providers-and-base-urls) in the reference.
+    * See [Models CLI](/datzi/concepts/models) for switching models in chat and [Model Failover](/datzi/concepts/model-failover) for auth rotation and fallback behavior.
+    * For custom/self-hosted providers, see [Custom providers](/datzi/gateway/configuration-reference#custom-providers-and-base-urls) in the reference.
 
 </Accordion>
 
@@ -158,7 +154,7 @@ When validation fails:
 
     For groups, use `groupPolicy` + `groupAllowFrom` or channel-specific allowlists.
 
-    See the [full reference](/gateway/configuration-reference#dm-and-group-access) for per-channel details.
+    See the [full reference](/datzi/gateway/configuration-reference#dm-and-group-access) for per-channel details.
 
 </Accordion>
 
@@ -187,7 +183,7 @@ When validation fails:
 
     * **Metadata mentions**: native @-mentions (WhatsApp tap-to-mention, Telegram @bot, etc.)
     * **Text patterns**: regex patterns in `mentionPatterns`
-    * See [full reference](/gateway/configuration-reference#group-chat-mention-gating) for per-channel overrides and self-chat mode.
+    * See [full reference](/datzi/gateway/configuration-reference#group-chat-mention-gating) for per-channel overrides and self-chat mode.
 
 </Accordion>
 
@@ -213,8 +209,8 @@ When validation fails:
 
     * `dmScope`: `main` (shared) | `per-peer` | `per-channel-peer` | `per-account-channel-peer`
     * `threadBindings`: global defaults for thread-bound session routing (Discord supports `/focus`, `/unfocus`, `/agents`, and `/session ttl`).
-    * See [Session Management](/concepts/session) for scoping, identity links, and send policy.
-    * See [full reference](/gateway/configuration-reference#session) for all fields.
+    * See [Session Management](/datzi/concepts/session) for scoping, identity links, and send policy.
+    * See [full reference](/datzi/gateway/configuration-reference#session) for all fields.
 
 </Accordion>
 
@@ -236,7 +232,7 @@ When validation fails:
 
     Build the image first: `scripts/sandbox-setup.sh`
 
-    See [Sandboxing](/gateway/sandboxing) for the full guide and [full reference](/gateway/configuration-reference#sandbox) for all options.
+    See [Sandboxing](/datzi/gateway/sandboxing) for the full guide and [full reference](/datzi/gateway/configuration-reference#sandbox) for all options.
 
 </Accordion>
 
@@ -256,7 +252,7 @@ When validation fails:
 
     * `every`: duration string (`30m`, `2h`). Set `0m` to disable.
     * `target`: `last` | `whatsapp` | `telegram` | `discord` | `none`
-    * See [Heartbeat](/gateway/heartbeat) for the full guide.
+    * See [Heartbeat](/datzi/gateway/heartbeat) for the full guide.
 
 </Accordion>
 
@@ -271,7 +267,7 @@ When validation fails:
     }
     ```
 
-    See [Cron jobs](/automation/cron-jobs) for the feature overview and CLI examples.
+    See [Cron jobs](/datzi/automation/cron-jobs) for the feature overview and CLI examples.
 
 </Accordion>
 
@@ -299,7 +295,7 @@ When validation fails:
     }
     ```
 
-    See [full reference](/gateway/configuration-reference#hooks) for all mapping options and Gmail integration.
+    See [full reference](/datzi/gateway/configuration-reference#hooks) for all mapping options and Gmail integration.
 
 </Accordion>
 
@@ -321,7 +317,7 @@ When validation fails:
     }
     ```
 
-    See [Multi-Agent](/concepts/multi-agent) and [full reference](/gateway/configuration-reference#multi-agent-routing) for binding rules and per-agent access profiles.
+    See [Multi-Agent](/datzi/concepts/multi-agent) and [full reference](/datzi/gateway/configuration-reference#multi-agent-routing) for binding rules and per-agent access profiles.
 
 </Accordion>
 
@@ -520,14 +516,12 @@ Rules:
 - Inline substitution: `"${BASE}/v1"` → `"https://api.example.com/v1"`
 </Accordion>
 
-See [Environment](/help/environment) for full precedence and sources.
+See [Environment](/datzi/help/environment) for full precedence and sources.
 
 ## Full reference
 
-For the complete field-by-field reference, see **[Configuration Reference](/gateway/configuration-reference)**.
+For the complete field-by-field reference, see **[Configuration Reference](/datzi/gateway/configuration-reference)**.
 
 ---
 
-_Related: [Configuration Examples](/gateway/configuration-examples) · [Configuration Reference](/gateway/configuration-reference) · [Doctor](/gateway/doctor)_
-
-# Configuration Examples
+_Related: [Configuration Examples](/datzi/gateway/configuration-examples) · [Configuration Reference](/datzi/gateway/configuration-reference) · [Doctor](/datzi/gateway/troubleshooting)_

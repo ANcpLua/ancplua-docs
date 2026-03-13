@@ -10,7 +10,7 @@ tags: ['concepts', 'model', 'providers']
 # Model providers
 
 This page covers **LLM/model providers** (not chat channels like WhatsApp/Telegram).
-For model selection rules, see [/concepts/models](/concepts/models).
+For model selection rules, see [/concepts/models](/datzi/concepts/models).
 
 ## Quick rules
 
@@ -55,7 +55,7 @@ ollama pull qwen3-coder:14b
 ```
 
 Ollama is automatically detected when running locally at `http://127.0.0.1:11434/v1`.
-See [/providers/ollama](/providers/ollama) for model recommendations and custom configuration.
+See [Local models](/datzi/gateway/local-models) for model recommendations and custom configuration.
 
 ### vLLM
 
@@ -85,7 +85,7 @@ Then set a model (replace with one of the IDs returned by `/v1/models`):
 }
 ```
 
-See [/providers/vllm](/providers/vllm) for details.
+See [Local models](/datzi/gateway/local-models) for details on local proxy configuration.
 
 ### Local proxies (LM Studio, vLLM, LiteLLM, etc.)
 
@@ -152,6 +152,4 @@ datzi models set ollama/qwen3-coder:32b
 datzi models list
 ```
 
-See also: [/gateway/configuration](/gateway/configuration) for full configuration examples.
-
-# Models CLI
+See also: [/gateway/configuration](/datzi/gateway/configuration) for full configuration examples.

@@ -19,8 +19,6 @@ tags:
 
 # Hooks
 
-# Hooks
-
 Hooks provide an extensible event-driven system for automating actions in response to agent commands and events. Hooks
 are automatically discovered from directories and can be managed via CLI commands, similar to how skills work in Datzi.
 
@@ -31,9 +29,9 @@ Hooks are small scripts that run when something happens. There are two kinds:
 - **Hooks** (this page): run inside the Gateway when agent events fire, like `/new`, `/reset`, `/stop`, or lifecycle
   events.
 - **Webhooks**: external HTTP webhooks that let other systems trigger work in Datzi.
-  See [Webhook Hooks](/automation/webhook) or use `datzi webhooks` for Gmail helper commands.
+  See [Webhook Hooks](/datzi/automation/webhook) or use `datzi webhooks` for Gmail helper commands.
 
-Hooks can also be bundled inside plugins; see [Plugins](/tools/plugin#plugin-hooks).
+Hooks can also be bundled inside plugins; see [Plugins](/datzi/tools/skills).
 
 Common uses:
 
@@ -379,7 +377,7 @@ them.
 
 - **`tool_result_persist`**: transform tool results before they are written to the session transcript. Must be
   synchronous; return the updated tool result payload or `undefined` to keep it as-is.
-  See [Agent Loop](/concepts/agent-loop).
+  See [Agent Loop](/datzi/concepts/agent-loop).
 
 ### Future Events
 
@@ -1058,7 +1056,7 @@ node -e "import('./path/to/handler.ts').then(console.log)"
 
 ## See Also
 
-- [CLI Reference: hooks](/cli/hooks)
-- [Bundled Hooks README](https://github.com/datzi/datzi/tree/main/src/hooks/bundled)
-- [Webhook Hooks](/automation/webhook)
-- [Configuration](/gateway/configuration#hooks)
+- CLI Reference: hooks
+- [Bundled Hooks README](https://github.com/datzi/tree/main/src/hooks/bundled)
+- [Webhook Hooks](/datzi/automation/webhook)
+- [Configuration](/datzi/gateway/configuration#hooks)

@@ -10,8 +10,8 @@ tags: ['faq', 'frequently-asked-questions', 'help']
 # FAQ
 
 Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS, multi-agent, OAuth/API keys, model
-failover). For runtime diagnostics, see [Troubleshooting](/gateway/troubleshooting). For the full config reference,
-see [Configuration](/gateway/configuration).
+failover). For runtime diagnostics, see [Troubleshooting](/datzi/gateway/troubleshooting). For the full config reference,
+see [Configuration](/datzi/gateway/configuration).
 
 ## Table of contents
 
@@ -235,7 +235,7 @@ see [Configuration](/gateway/configuration).
    datzi status --deep
    ```
 
-   Runs gateway health checks + provider probes (requires a reachable gateway). See [Health](/gateway/health).
+   Runs gateway health checks + provider probes (requires a reachable gateway). See [Health](/datzi/gateway/health).
 
 5. **Tail the latest log**
 
@@ -249,7 +249,7 @@ see [Configuration](/gateway/configuration).
    tail -f "$(ls -t /tmp/datzi/datzi-*.log | head -1)"
    ```
 
-   File logs are separate from service logs; see [Logging](/logging) and [Troubleshooting](/gateway/troubleshooting).
+   File logs are separate from service logs; see Logging and [Troubleshooting](/datzi/gateway/troubleshooting).
 
 6. **Run the doctor (repairs)**
 
@@ -257,7 +257,7 @@ see [Configuration](/gateway/configuration).
    datzi doctor
    ```
 
-   Repairs/migrates config/state + runs health checks. See [Doctor](/gateway/doctor).
+   Repairs/migrates config/state + runs health checks. See [Doctor](/datzi/gateway/troubleshooting).
 
 7. **Gateway snapshot**
 
@@ -266,7 +266,7 @@ see [Configuration](/gateway/configuration).
    datzi health --verbose   # shows the target URL + config path on errors
    ```
 
-   Asks the running gateway for a full snapshot (WS-only). See [Health](/gateway/health).
+   Asks the running gateway for a full snapshot (WS-only). See [Health](/datzi/gateway/health).
 
 ## Quick start and first-run setup
 
@@ -294,8 +294,8 @@ Tip: ask the agent to **plan and supervise** the fix (step-by-step), then execut
 necessary commands. That keeps changes small and easier to audit.
 
 If you discover a real bug or fix, please file a GitHub issue or send a PR:
-[https://github.com/datzi/datzi/issues](https://github.com/datzi/datzi/issues)
-[https://github.com/datzi/datzi/pulls](https://github.com/datzi/datzi/pulls)
+[https://github.com/datzi/issues](https://github.com/datzi/issues)
+[https://github.com/datzi/pulls](https://github.com/datzi/pulls)
 
 Start with these commands (share outputs when asking for help):
 
@@ -315,7 +315,7 @@ Other useful CLI checks: `datzi status --all`, `datzi logs --follow`,
 `datzi gateway status`, `datzi health --verbose`.
 
 Quick debug loop: [First 60 seconds if something's broken](#first-60-seconds-if-somethings-broken).
-Install docs: [Install](/install), [Installer flags](/install/installer), [Updating](/install/updating).
+Install docs: [Install](/datzi/install/index), [Installer flags](/datzi/install/installer), [Updating](/datzi/install/updating).
 
 ### What's the recommended way to install and set up Datzi
 
@@ -365,7 +365,7 @@ in the summary. Keep that tab open; if it didn't launch, copy/paste the printed 
 - **SSH tunnel**: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/` and paste the token in
   Control UI settings.
 
-See [Dashboard](/web/dashboard) and [Web surfaces](/web) for bind modes and auth details.
+See Dashboard and Web surfaces for bind modes and auth details.
 
 ### What runtime do I need
 
@@ -380,7 +380,7 @@ If you want extra headroom (logs, media, other services), **2GB is recommended**
 not a hard minimum.
 
 Tip: a small Pi/VPS can host the Gateway, and you can pair **nodes** on your laptop/phone for
-local screen/camera/canvas or command execution. See [Nodes](/nodes).
+local screen/camera/canvas or command execution. See [Nodes](/datzi/nodes/index).
 
 ### Any tips for Raspberry Pi installs
 
@@ -391,7 +391,7 @@ Short version: it works, but expect rough edges.
 - Start without channels/skills, then add them one by one.
 - If you hit weird binary issues, it is usually an **ARM compatibility** problem.
 
-Docs: [Linux](/platforms/linux), [Install](/install).
+Docs: Linux, [Install](/datzi/install/index).
 
 ### It is stuck on wake up my friend onboarding will not hatch What now
 
@@ -420,7 +420,7 @@ datzi doctor
 ```
 
 If the Gateway is remote, ensure the tunnel/Tailscale connection is up and that the UI
-is pointed at the right Gateway. See [Remote access](/gateway/remote).
+is pointed at the right Gateway. See [Remote access](/datzi/gateway/remote).
 
 ### Can I migrate my setup to a new machine Mac mini without redoing onboarding
 
@@ -440,14 +440,14 @@ remote mode, remember the gateway host owns the session store and workspace.
 up **memory + bootstrap files**, but **not** session history or auth. Those live
 under `~/.datzi/` (for example `~/.datzi/agents/<agentId>/sessions/`).
 
-Related: [Migrating](/install/migrating), [Where things live on disk](/help/faq#where-does-datzi-store-its-data),
-[Agent workspace](/concepts/agent-workspace), [Doctor](/gateway/doctor),
-[Remote mode](/gateway/remote).
+Related: [Migrating](/datzi/install/migrating), [Where things live on disk](/datzi/help/faq#where-does-datzi-store-its-data),
+[Agent workspace](/datzi/concepts/agent-workspace), [Doctor](/datzi/gateway/troubleshooting),
+[Remote mode](/datzi/gateway/remote).
 
 ### Where do I see what is new in the latest version
 
 Check the GitHub changelog:
-[https://github.com/datzi/datzi/blob/main/CHANGELOG.md](https://github.com/datzi/datzi/blob/main/CHANGELOG.md)
+[https://github.com/datzi/blob/main/CHANGELOG.md](https://github.com/datzi/blob/main/CHANGELOG.md)
 
 Newest entries are at the top. If the top section is marked **Unreleased**, the next dated
 section is the latest shipped version. Entries are grouped by **Highlights**, **Changes**, and
@@ -455,12 +455,12 @@ section is the latest shipped version. Entries are grouped by **Highlights**, **
 
 ### I can't access docs.datzi\.ai SSL error What now
 
-detail: [Troubleshooting](/help/troubleshooting#docsdatziai-shows-an-ssl-error-comcastxfinity).
+detail: [Troubleshooting](/datzi/help/troubleshooting#docsdatziai-shows-an-ssl-error-comcastxfinity).
 Please help us unblock it by reporting
 here: [https://spa.xfinity.com/check_url_status](https://spa.xfinity.com/check_url_status).
 
 If you still can't reach the site, the docs are mirrored on GitHub:
-[https://github.com/datzi/datzi/tree/main/docs](https://github.com/datzi/datzi/tree/main/docs)
+[https://github.com/datzi/tree/main/docs](https://github.com/datzi/tree/main/docs)
 
 ### What's the difference between stable and beta
 
@@ -474,7 +474,7 @@ that same version to `latest`**. That's why beta and stable can point at the
 **same version**.
 
 See what changed:
-[https://github.com/datzi/datzi/blob/main/CHANGELOG.md](https://github.com/datzi/datzi/blob/main/CHANGELOG.md)
+[https://github.com/datzi/blob/main/CHANGELOG.md](https://github.com/datzi/blob/main/CHANGELOG.md)
 
 ### How do I install the beta version and what's the difference between beta and dev
 
@@ -494,7 +494,7 @@ curl -fsSL --proto '=https' --tlsv1.2 https://datzi.ai/install.sh | bash -s -- -
 Windows installer (PowerShell):
 [https://datzi.ai/install.ps1](https://datzi.ai/install.ps1)
 
-More detail: [Development channels](/install/development-channels) and [Installer flags](/install/installer).
+More detail: Development channels and [Installer flags](/datzi/install/installer).
 
 ### How long does install and onboarding usually take
 
@@ -503,8 +503,8 @@ Rough guide:
 - **Install:** 2-5 minutes
 - **Onboarding:** 5-15 minutes depending on how many channels/models you configure
 
-If it hangs, use [Installer stuck](/help/faq#installer-stuck-how-do-i-get-more-feedback)
-and the fast debug loop in [Im stuck](/help/faq#im-stuck--whats-the-fastest-way-to-get-unstuck).
+If it hangs, use [Installer stuck](/datzi/help/faq#installer-stuck-how-do-i-get-more-feedback)
+and the fast debug loop in [Im stuck](/datzi/help/faq#im-stuck--whats-the-fastest-way-to-get-unstuck).
 
 ### How do I try the latest bits
 
@@ -535,8 +535,8 @@ pnpm install
 pnpm build
 ```
 
-Docs: [Update](/cli/update), [Development channels](/install/development-channels),
-[Install](/install).
+Docs: Update, Development channels,
+[Install](/datzi/install/index).
 
 ### Installer stuck How do I get more feedback
 
@@ -567,7 +567,7 @@ Set-PSDebug -Trace 1
 Set-PSDebug -Trace 0
 ```
 
-More options: [Installer flags](/install/installer).
+More options: [Installer flags](/datzi/install/installer).
 
 ### Windows install says git not found or datzi not recognized
 
@@ -593,7 +593,7 @@ Two common Windows issues:
 - Close and reopen PowerShell after updating PATH.
 
 If you want the smoothest Windows setup, use **WSL2** instead of native Windows.
-Docs: [Windows](/platforms/windows).
+Docs: Windows.
 
 ### The docs didn't answer my question how do I get a better answer
 
@@ -604,31 +604,31 @@ your bot (or Claude/Codex) _from that folder_ so it can read the repo and answer
 curl -fsSL https://datzi.ai/install.sh | bash -s -- --install-method git
 ```
 
-More detail: [Install](/install) and [Installer flags](/install/installer).
+More detail: [Install](/datzi/install/index) and [Installer flags](/datzi/install/installer).
 
 ### How do I install Datzi on Linux
 
 Short answer: follow the Linux guide, then run the onboarding wizard.
 
-- Linux quick path + service install: [Linux](/platforms/linux).
-- Full walkthrough: [Getting Started](/start/getting-started).
-- Installer + updates: [Install & updates](/install/updating).
+- Linux quick path + service install: Linux.
+- Full walkthrough: [Getting Started](/datzi/start/getting-started).
+- Installer + updates: [Install & updates](/datzi/install/updating).
 
 ### How do I install Datzi on a VPS
 
 Any Linux VPS works. Install on the server, then use SSH/Tailscale to reach the Gateway.
 
-Guides: [exe.dev](/install/exe-dev), [Hetzner](/install/hetzner), [Fly.io](/install/fly).
-Remote access: [Gateway remote](/gateway/remote).
+Guides: exe.dev, Hetzner, Fly.io.
+Remote access: [Gateway remote](/datzi/gateway/remote).
 
 ### Where are the cloudVPS install guides
 
 We keep a **hosting hub** with the common providers. Pick one and follow the guide:
 
-- [VPS hosting](/vps) (all providers in one place)
-- [Fly.io](/install/fly)
-- [Hetzner](/install/hetzner)
-- [exe.dev](/install/exe-dev)
+- VPS hosting (all providers in one place)
+- Fly.io
+- Hetzner
+- exe.dev
 
 How it works in the cloud: the **Gateway runs on the server**, and you access it
 from your laptop/phone via the Control UI (or Tailscale/SSH). Your state + workspace
@@ -638,8 +638,8 @@ You can pair **nodes** (Mac/iOS/Android/headless) to that cloud Gateway to acces
 local screen/camera/canvas or run commands on your laptop while keeping the
 Gateway in the cloud.
 
-Hub: [Platforms](/platforms). Remote access: [Gateway remote](/gateway/remote).
-Nodes: [Nodes](/nodes), [Nodes CLI](/cli/nodes).
+Hub: Platforms. Remote access: [Gateway remote](/datzi/gateway/remote).
+Nodes: [Nodes](/datzi/nodes/index), Nodes CLI.
 
 ### Can I ask Datzi to update itself
 
@@ -664,7 +664,7 @@ datzi update --yes --no-restart
 datzi gateway restart
 ```
 
-Docs: [Update](/cli/update), [Updating](/install/updating).
+Docs: Update, [Updating](/datzi/install/updating).
 
 ### What does the onboarding wizard actually do
 
@@ -683,7 +683,7 @@ It also warns if your configured model is unknown or missing auth.
 
 No. Datzi runs 100% free with **Ollama local models** - no API key or subscription required. Your data stays on your device.
 
-Docs: [Ollama](/providers/ollama), [Local models](/gateway/local-models), [Models](/concepts/models).
+Docs: [Local models](/datzi/gateway/local-models), [Models](/datzi/concepts/models).
 
 ### Is AWS Bedrock supported
 
@@ -699,9 +699,9 @@ Codex OAuth is supported for paid OpenAI subscriptions. For free local inference
 
 ### Is a local model OK for casual chats
 
-Yes, with a sufficiently large local model. Datzi works well with Ollama models like `qwen3-coder:32b` or `deepseek-r1:32b`. Use the largest model your hardware supports. See [Security](/gateway/security).
+Yes, with a sufficiently large local model. Datzi works well with Ollama models like `qwen3-coder:32b` or `deepseek-r1:32b`. Use the largest model your hardware supports. See [Security](/datzi/gateway/authentication).
 
-More context: [Models](/concepts/models).
+More context: [Models](/datzi/concepts/models).
 
 ### Can I use selfhosted models llamacpp vLLM Ollama
 
@@ -712,9 +712,9 @@ Security note: smaller or heavily quantized models are more vulnerable to prompt
 injection. We strongly recommend **large models** for any bot that can use tools.
 If you still want small models, enable sandboxing and strict tool allowlists.
 
-Docs: [Ollama](/providers/ollama), [Local models](/gateway/local-models),
-[Model providers](/concepts/model-providers), [Security](/gateway/security),
-[Sandboxing](/gateway/sandboxing).
+Docs: [Local models](/datzi/gateway/local-models),
+[Model providers](/datzi/concepts/model-providers), [Security](/datzi/gateway/authentication),
+[Sandboxing](/datzi/gateway/sandboxing).
 
 ### How do I switch models without wiping my config
 
@@ -730,12 +730,12 @@ Safe options:
 Avoid `config.apply` with a partial object unless you intend to replace the whole config.
 If you did overwrite config, restore from backup or re-run `datzi doctor` to repair.
 
-Docs: [Models](/concepts/models), [Configure](/cli/configure), [Config](/cli/config), [Doctor](/gateway/doctor).
+Docs: [Models](/datzi/concepts/models), Configure, Config, [Doctor](/datzi/gateway/troubleshooting).
 
 ### What do Datzi, Flawd, and Krill use for models
 
-- **Datzi + Flawd:** Ollama (`ollama/qwen3-coder:32b`) - see [Ollama](/providers/ollama).
-- **Krill:** MiniMax M2.1 (`minimax/MiniMax-M2.1`) - see [MiniMax](/providers/minimax).
+- **Datzi + Flawd:** Ollama (`ollama/qwen3-coder:32b`) - see [Local models](/datzi/gateway/local-models).
+- **Krill:** MiniMax M2.1 (`minimax/MiniMax-M2.1`) - see [Local models](/datzi/gateway/local-models).
 
 ### How do I switch models on the fly without restarting
 
@@ -785,7 +785,7 @@ Yes. Set one as default and switch as needed:
   `ollama/qwen3-coder:32b` when coding (or the other way around).
 - **Sub-agents:** route coding tasks to sub-agents with a different default model.
 
-See [Models](/concepts/models) and [Slash commands](/tools/slash-commands).
+See [Models](/datzi/concepts/models) and [Slash commands](/datzi/tools/slash-commands).
 
 ### Why do I see Model is not allowed and then no reply
 
@@ -820,7 +820,7 @@ Fix checklist:
 
    and pick from the list (or `/model list` in chat).
 
-See [MiniMax](/providers/minimax) and [Models](/concepts/models).
+See [Local models](/datzi/gateway/local-models) and [Models](/datzi/concepts/models).
 
 ### Can I use MiniMax as my default and OpenAI for complex tasks
 
@@ -861,7 +861,7 @@ Then:
 - Agent B default: OpenAI
 - Route by agent or use `/agent` to switch
 
-Docs: [Models](/concepts/models), [Multi-Agent Routing](/concepts/multi-agent), [MiniMax](/providers/minimax), [OpenAI](/providers/openai).
+Docs: [Models](/datzi/concepts/models), [Multi-Agent Routing](/datzi/concepts/multi-agent), [Model providers](/datzi/concepts/model-providers).
 
 ### Are opus sonnet gpt builtin shortcuts
 
@@ -974,7 +974,7 @@ Fix: Datzi now strips unsigned thinking blocks for Google Antigravity Claude. If
 
 ## Auth profiles: what they are and how to manage them
 
-Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-account patterns)
+Related: /concepts/oauth (OAuth flows, token storage, multi-account patterns)
 
 ### What is an auth profile
 
@@ -1112,8 +1112,8 @@ Fix:
 - If remote, tunnel first: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/`.
 - Set `gateway.auth.token` (or `DATZI_GATEWAY_TOKEN`) on the gateway host.
 - In the Control UI settings, paste the same token.
-- Still stuck? Run `datzi status --all` and follow [Troubleshooting](/gateway/troubleshooting).
-  See [Dashboard](/web/dashboard) for auth details.
+- Still stuck? Run `datzi status --all` and follow [Troubleshooting](/datzi/gateway/troubleshooting).
+  See Dashboard for auth details.
 
 ### I set gatewaybind tailnet but it can't bind nothing listens
 
@@ -1147,7 +1147,7 @@ Quick setup (recommended):
 
 Profiles also suffix service names (`bot.molt.<profile>`; legacy `com.datzi.*`, `datzi-gateway-<profile>.service`,
 `Datzi Gateway (<profile>)`).
-Full guide: [Multiple gateways](/gateway/multiple-gateways).
+Full guide: Multiple gateways.
 
 ### What does invalid handshake code 1008 mean
 
@@ -1173,7 +1173,7 @@ If you're using the CLI or TUI, the URL should look like:
 datzi tui --url ws://<host>:18789 --token <token>
 ```
 
-Protocol details: [Gateway protocol](/gateway/protocol).
+Protocol details: Gateway protocol.
 
 ## Logging and debugging
 
@@ -1201,7 +1201,7 @@ Service/supervisor logs (when the gateway runs via launchd/systemd):
 - Linux: `journalctl --user -u datzi-gateway[-<profile>].service -n 200 --no-pager`
 - Windows: `schtasks /Query /TN "Datzi Gateway (<profile>)" /V /FO LIST`
 
-See [Troubleshooting](/gateway/troubleshooting#log-locations) for more.
+See [Troubleshooting](/datzi/gateway/troubleshooting#log-locations) for more.
 
 ### How do I start/stop/restart the Gateway service
 
@@ -1212,7 +1212,7 @@ datzi gateway status
 datzi gateway restart
 ```
 
-If you run the gateway manually, `datzi gateway --force` can reclaim the port. See [Gateway](/gateway).
+If you run the gateway manually, `datzi gateway --force` can reclaim the port. See [Gateway](/datzi/gateway/index).
 
 ### I closed my terminal on Windows how do I restart Datzi
 
@@ -1249,7 +1249,7 @@ If you run it manually (no service), use:
 datzi gateway run
 ```
 
-Docs: [Windows (WSL2)](/platforms/windows), [Gateway service runbook](/gateway).
+Docs: Windows (WSL2), [Gateway service runbook](/datzi/gateway/index).
 
 ### The Gateway is up but replies never arrive What should I check
 
@@ -1271,7 +1271,7 @@ Common causes:
 If you are remote, confirm the tunnel/Tailscale connection is up and that the
 Gateway WebSocket is reachable.
 
-Docs: [Channels](/channels), [Troubleshooting](/gateway/troubleshooting), [Remote access](/gateway/remote).
+Docs: [Channels](/datzi/channels/index), [Troubleshooting](/datzi/gateway/troubleshooting), [Remote access](/datzi/gateway/remote).
 
 ### Disconnected from gateway no reason what now
 
@@ -1288,7 +1288,7 @@ Then tail logs:
 datzi logs --follow
 ```
 
-Docs: [Dashboard](/web/dashboard), [Remote access](/gateway/remote), [Troubleshooting](/gateway/troubleshooting).
+Docs: Dashboard, [Remote access](/datzi/gateway/remote), [Troubleshooting](/datzi/gateway/troubleshooting).
 
 ### Telegram setMyCommands fails with network errors What should I check
 
@@ -1302,7 +1302,7 @@ datzi channels logs --channel telegram
 If you are on a VPS or behind a proxy, confirm outbound HTTPS is allowed and DNS works.
 If the Gateway is remote, make sure you are looking at logs on the Gateway host.
 
-Docs: [Telegram](/channels/telegram), [Channel troubleshooting](/channels/troubleshooting).
+Docs: [Telegram](/datzi/channels/telegram), [Channel troubleshooting](/datzi/channels/troubleshooting).
 
 ### TUI shows no output What should I check
 
@@ -1317,7 +1317,7 @@ datzi logs --follow
 In the TUI, use `/status` to see the current state. If you expect replies in a chat
 channel, make sure delivery is enabled (`/deliver on`).
 
-Docs: [TUI](/web/tui), [Slash commands](/tools/slash-commands).
+Docs: TUI, [Slash commands](/datzi/tools/slash-commands).
 
 ### How do I completely stop then start the Gateway
 
@@ -1337,7 +1337,7 @@ If you're running in the foreground, stop with Ctrl-C, then:
 datzi gateway run
 ```
 
-Docs: [Gateway service runbook](/gateway).
+Docs: [Gateway service runbook](/datzi/gateway/index).
 
 ### ELI5 datzi gateway restart vs datzi gateway
 
@@ -1357,7 +1357,7 @@ routing, and RPC errors.
 ### My skill generated an imagePDF but nothing was sent
 
 Outbound attachments from the agent must include a `MEDIA:<path-or-url>` line (on its own line).
-See [Datzi assistant setup](/start/datzi) and [Agent send](/tools/agent-send).
+See [Datzi assistant setup](/datzi/start/getting-started) and [Agent send](/datzi/tools/subagents).
 
 CLI sending:
 
@@ -1370,7 +1370,7 @@ Also check:
 - The target channel supports outbound media and isn't blocked by allowlists.
 - The file is within the provider's size limits (images are resized to max 2048px).
 
-See [Images](/nodes/images).
+See [Images](/datzi/nodes/index).
 
 ## Security and access control
 
@@ -1400,7 +1400,7 @@ exfiltrating context or calling tools on your behalf. Reduce the blast radius by
 - keeping `web_search` / `web_fetch` / `browser` off for tool-enabled agents
 - sandboxing and strict tool allowlists
 
-Details: [Security](/gateway/security).
+Details: [Security](/datzi/gateway/authentication).
 
 ### Should my bot have its own email GitHub account or phone number
 
@@ -1411,7 +1411,7 @@ credentials or revoke access without impacting your personal accounts.
 Start small. Give access only to the tools and accounts you actually need, and expand
 later if required.
 
-Docs: [Security](/gateway/security), [Pairing](/channels/pairing).
+Docs: [Security](/datzi/gateway/authentication), [Pairing](/datzi/channels/pairing).
 
 ### Can I give it autonomy over my text messages and is that safe
 
@@ -1422,14 +1422,14 @@ We do **not** recommend full autonomy over your personal messages. The safest pa
 - Let it draft, then **approve before sending**.
 
 If you want to experiment, do it on a dedicated account and keep it isolated. See
-[Security](/gateway/security).
+[Security](/datzi/gateway/authentication).
 
 ### Can I use cheaper models for personal assistant tasks
 
 Yes, **if** the agent is chat-only and the input is trusted. Smaller tiers are
 more susceptible to instruction hijacking, so avoid them for tool-enabled agents
 or when reading untrusted content. If you must use a smaller model, lock down
-tools and run inside a sandbox. See [Security](/gateway/security).
+tools and run inside a sandbox. See [Security](/datzi/gateway/authentication).
 
 ### I ran start in Telegram but didn't get a pairing code
 
@@ -1483,7 +1483,7 @@ If it is still noisy, check the session settings in the Control UI and set verbo
 to **inherit**. Also confirm you are not using a bot profile with `verboseDefault` set
 to `on` in config.
 
-Docs: [Thinking and verbose](/tools/thinking), [Security](/gateway/security#reasoning--verbose-output-in-groups).
+Docs: [Thinking and verbose](/datzi/tools/thinking), [Security]((/datzi/gateway/authentication).
 
 ### How do I stopcancel a running task
 
@@ -1506,7 +1506,7 @@ For background processes (from the exec tool), you can ask the agent to run:
 process action:kill sessionId:XXX
 ```
 
-Slash commands overview: see [Slash commands](/tools/slash-commands).
+Slash commands overview: see [Slash commands](/datzi/tools/slash-commands).
 
 Most commands must be sent as a **standalone** message that starts with `/`, but a few shortcuts (like `/status`) also
 work inline for allowlisted senders.
@@ -1562,6 +1562,4 @@ You can add options like `debounce:2s cap:25 drop:summarize` for followup modes.
 ---
 
 Still stuck? Ask in [Discord](https://discord.com/invite/clawd) or open
-a [GitHub discussion](https://github.com/datzi/datzi/discussions).
-
-# Help
+a [GitHub discussion](https://github.com/datzi/discussions).

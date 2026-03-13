@@ -9,12 +9,12 @@ tags: [install, npm, pnpm, script, onboarding, node, macos, linux, windows, wsl]
 
 # Install
 
-Already followed [Getting Started](/start/getting-started)? You're all set — this page is for alternative install
+Already followed [Getting Started](/datzi/start/getting-started)? You're all set — this page is for alternative install
 methods, platform-specific instructions, and maintenance.
 
 ## System requirements
 
-- **[Node 22+](/install/node)** (the [installer script](#install-methods) will install it if missing)
+- **[Node 22+](/datzi/install/index)** (the [installer script](#install-methods) will install it if missing)
 - macOS, Linux, or Windows
 - `pnpm` only if you build from source
 
@@ -72,7 +72,7 @@ methods, platform-specific instructions, and maintenance.
       </Tab>
     </Tabs>
 
-    For all flags, env vars, and CI/automation options, see [Installer internals](/install/installer).
+    For all flags, env vars, and CI/automation options, see [Installer internals](/datzi/install/installer).
 
   </Accordion>
 
@@ -145,7 +145,7 @@ methods, platform-specific instructions, and maintenance.
       </Step>
     </Steps>
 
-    For deeper development workflows, see [Setup](/start/setup).
+    For deeper development workflows, see [Setup](/datzi/start/getting-started).
 
   </Accordion>
 </AccordionGroup>
@@ -153,23 +153,23 @@ methods, platform-specific instructions, and maintenance.
 ## Other install methods
 
 <CardGroup>
-  <Card title="Docker" href="/install/docker" icon="container">
+  <Card title="Docker"  icon="container">
     Containerized or headless deployments.
   </Card>
 
-<Card title="Podman" href="/install/podman" icon="container">
+<Card title="Podman" icon="container">
   Rootless container: run `setup-podman.sh` once, then the launch script.
 </Card>
 
-<Card title="Nix" href="/install/nix" icon="snowflake">
+<Card title="Nix" icon="snowflake">
   Declarative install via Nix.
 </Card>
 
-<Card title="Ansible" href="/install/ansible" icon="server">
+<Card title="Ansible" icon="server">
   Automated fleet provisioning.
 </Card>
 
-  <Card title="Bun" href="/install/bun" icon="zap">
+  <Card title="Bun" icon="zap">
     CLI-only usage via the Bun runtime.
   </Card>
 </CardGroup>
@@ -190,7 +190,7 @@ If you need custom runtime paths, use:
 - `DATZI_STATE_DIR` for mutable state location
 - `DATZI_CONFIG_PATH` for config file location
 
-See [Environment vars](/help/environment) for precedence and full details.
+See [Environment vars](/datzi/help/environment) for precedence and full details.
 
 ## Troubleshooting: `datzi` not found
 
@@ -222,15 +222,15 @@ Then open a new terminal (or `rehash` in zsh / `hash -r` in bash).
 ## Update / uninstall
 
 <CardGroup>
-  <Card title="Updating" href="/install/updating" icon="refresh-cw">
+  <Card title="Updating" href="/datzi/install/updating" icon="refresh-cw">
     Keep Datzi up to date.
   </Card>
 
-<Card title="Migrating" href="/install/migrating" icon="arrow-right">
+<Card title="Migrating" href="/datzi/install/migrating" icon="arrow-right">
   Move to a new machine.
 </Card>
 
-  <Card title="Uninstall" href="/install/uninstall" icon="trash-2">
+  <Card title="Uninstall" href="/datzi/install/uninstall" icon="trash-2">
     Remove Datzi completely.
   </Card>
 </CardGroup>

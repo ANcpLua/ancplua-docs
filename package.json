@@ -7,10 +7,13 @@
     "dev": "mint dev",
     "format": "prettier --write \"**/*.{mdx,md,json,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{mdx,md,json,yaml,yml}\"",
-    "lint": "npm run lint:links && npm run lint:a11y && npm run lint:openapi",
+    "lint": "npm run lint:nav && npm run lint:links && npm run lint:a11y && npm run lint:openapi",
+    "lint:nav": "node scripts/validate-nav.mjs",
     "lint:links": "mint broken-links",
     "lint:a11y": "mint a11y",
     "lint:openapi": "mint openapi-check api-reference/openapi.yaml",
+    "validate": "npm run lint && npm run format:check",
+    "validate:quick": "npm run lint:links",
     "prepare": "husky"
   },
   "devDependencies": {
