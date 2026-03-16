@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "lint-staged": "^16.3.2",
-    "mint": "^4.2.417",
+    "lint-staged": "^16.4.0",
+    "mint": "^4.2.434",
     "prettier": "^3.8.1"
   },
   "lint-staged": {
