@@ -1,25 +1,33 @@
 ---
 title: 'Analyzers'
 sidebarTitle: 'Overview'
-description: 'Roslyn analyzers for code quality and bug prevention.'
+description: 'Roslyn analyzers for modern C# patterns, OpenTelemetry, AOT safety, and ecosystem conventions.'
 icon: 'shield-check'
 ---
 
 ANcpLua.Analyzers enforces code quality and prevents common bugs. Included automatically with [ANcpLua.NET.Sdk](/sdk/overview).
 
+- **106 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
+- **42 automatic code fixes** for high-confidence transformations.
+- **CI-friendly enforcement** through `.editorconfig` severity configuration.
+
 ## Categories
 
-| Category          | Rules | Examples                                                         |
-| ----------------- | ----- | ---------------------------------------------------------------- |
-| Design            | 4     | Primary constructor patterns, type partialness                   |
-| Usage             | 17    | Span comparisons, IXmlSerializable, static lambdas, Roslyn utils |
-| Style             | 3     | Pattern matching, null-guard normalization                       |
-| ASP.NET Core      | 5     | Form binding, parameter validation                               |
-| OpenTelemetry     | 2     | Semantic conventions, schema URLs                                |
-| Threading         | 1     | Lock statement best practices                                    |
-| Reliability       | 3     | Division by zero, trim/AOT safety                                |
-| VersionManagement | 2     | Hardcoded version, Version.props import                          |
-| AOT/Trim Safety   | 4     | AotTest return codes, TrimSafe/AotSafe violations                |
+| Category          | Rules | Examples                                                              |
+| ----------------- | ----: | --------------------------------------------------------------------- |
+| Roslyn Utilities  |    20 | Guard helpers, symbol comparison, collection extensions               |
+| OpenTelemetry     |    23 | Semantic conventions, ActivitySource, attribute validation, OTLP      |
+| AOT Testing       |    10 | AotTest/TrimTest return codes, AotSafe/AotUnsafe, dynamic, reflection |
+| ASP.NET Core      |     9 | Form binding, resilience, health checks, service discovery            |
+| Usage             |     8 | Span comparisons, IXmlSerializable, static lambdas, banned APIs       |
+| VersionManagement |     6 | Hardcoded versions, Version.props, diagnostics alignment              |
+| Threading         |     6 | Lock patterns, async void, blocking calls in async                    |
+| Configuration     |     5 | ServiceDefaults, endpoints, EventSource, connection strings           |
+| Design            |     5 | Primary constructors, type partialness, closed hierarchies            |
+| Metrics           |     5 | Meter registration, naming, high cardinality, source generation       |
+| GenAI             |     4 | Required attributes, operation names, token histograms                |
+| Style             |     3 | Pattern matching, null-guard normalization                            |
+| Reliability       |     2 | Division by zero, await using                                         |
 
 ## Rules
 
@@ -34,7 +42,7 @@ ANcpLua.Analyzers enforces code quality and prevents common bugs. Included autom
 | [AL0007](/analyzers/rules/AL0007) | Usage             | GetSchema should be explicitly implemented              |  Error   |  -  |
 | [AL0008](/analyzers/rules/AL0008) | Usage             | GetSchema must return null                              |  Error   | Yes |
 | [AL0009](/analyzers/rules/AL0009) | Usage             | Don't call IXmlSerializable.GetSchema                   |  Error   |  -  |
-| [AL0010](/analyzers/rules/AL0010) | Design            | Type should be partial                                  |   Info   | Yes |
+| [AL0010](/analyzers/rules/AL0010) | Design            | Type should be partial                                  | Disabled | Yes |
 | [AL0011](/analyzers/rules/AL0011) | Threading         | Avoid lock on non-Lock types                            | Warning  | Yes |
 | [AL0012](/analyzers/rules/AL0012) | OpenTelemetry     | Deprecated semantic convention                          | Warning  | Yes |
 | [AL0013](/analyzers/rules/AL0013) | OpenTelemetry     | Missing telemetry schema URL                            |   Info   |  -  |
@@ -43,31 +51,96 @@ ANcpLua.Analyzers enforces code quality and prevents common bugs. Included autom
 | [AL0016](/analyzers/rules/AL0016) | Style             | Combine declaration with null-check                     |   Info   | Yes |
 | [AL0017](/analyzers/rules/AL0017) | VersionManagement | Hardcoded package version                               | Warning  |  -  |
 | [AL0018](/analyzers/rules/AL0018) | VersionManagement | Version.props not imported                              | Warning  |  -  |
+| [AL0019](/analyzers/rules/AL0019) | VersionManagement | Undefined version variable                              | Warning  |  -  |
 | [AL0020](/analyzers/rules/AL0020) | ASP.NET Core      | IFormCollection requires explicit attribute             |  Error   |  -  |
 | [AL0021](/analyzers/rules/AL0021) | ASP.NET Core      | Multiple structured form sources                        |  Error   |  -  |
 | [AL0022](/analyzers/rules/AL0022) | ASP.NET Core      | Mixed form collection and DTO                           |  Error   |  -  |
 | [AL0023](/analyzers/rules/AL0023) | ASP.NET Core      | Unsupported form type                                   |  Error   |  -  |
 | [AL0024](/analyzers/rules/AL0024) | ASP.NET Core      | Form and body conflict                                  |  Error   |  -  |
 | [AL0025](/analyzers/rules/AL0025) | Usage             | Anonymous function can be static                        | Warning  | Yes |
-| [AL0026](/analyzers/rules/AL0026) | Usage             | Avoid DateTime.Now/UtcNow, use TimeProvider             | Warning  |  -  |
-| [AL0027](/analyzers/rules/AL0027) | Usage             | Avoid Newtonsoft.Json, use System.Text.Json             | Warning  |  -  |
-| [AL0028](/analyzers/rules/AL0028) | Usage             | Use IsEqualTo() for symbol comparison                   |   Info   |  -  |
-| [AL0029](/analyzers/rules/AL0029) | Usage             | Use HasAttribute() for attribute checks                 |   Info   |  -  |
-| [AL0030](/analyzers/rules/AL0030) | Usage             | Use type hierarchy extensions                           |   Info   |  -  |
-| [AL0031](/analyzers/rules/AL0031) | Usage             | Use operation extensions                                |   Info   |  -  |
-| [AL0032](/analyzers/rules/AL0032) | Usage             | Use OrEmpty() extension                                 |   Info   |  -  |
-| [AL0033](/analyzers/rules/AL0033) | Usage             | Use ToImmutableArrayOrEmpty() extension                 |   Info   |  -  |
-| [AL0034](/analyzers/rules/AL0034) | Usage             | Use WhereNotNull() extension                            |   Info   |  -  |
-| [AL0035](/analyzers/rules/AL0035) | Usage             | Use GetFullyQualifiedName/GetMetadataName()             |   Info   |  -  |
-| [AL0036](/analyzers/rules/AL0036) | Usage             | Use Guard.NotNull() extension                           | Warning  |  -  |
-| [AL0037](/analyzers/rules/AL0037) | Usage             | Use TryParse extensions                                 | Warning  |  -  |
-| [AL0038](/analyzers/rules/AL0038) | Usage             | Use GetOrNull/GetOrDefault extensions                   | Warning  |  -  |
-| [AL0039](/analyzers/rules/AL0039) | Usage             | Use StringComparison extensions                         | Warning  |  -  |
-| [AL0040](/analyzers/rules/AL0040) | Usage             | Use attribute argument extensions                       | Warning  |  -  |
-| [AL0041](/analyzers/rules/AL0041) | AOT/Trim          | [AotTest]/[TrimTest] must return int                    |  Error   |  -  |
-| [AL0042](/analyzers/rules/AL0042) | AOT/Trim          | [AotTest]/[TrimTest] should return 100                  | Warning  |  -  |
-| [AL0043](/analyzers/rules/AL0043) | Reliability       | [TrimSafe] violates trim safety                         | Warning  |  -  |
-| [AL0044](/analyzers/rules/AL0044) | Reliability       | [AotSafe] violates AOT safety                           | Warning  |  -  |
+| [AL0026](/analyzers/rules/AL0026) | Usage             | Prefer TimeProvider over legacy date/time APIs          | Warning  | Yes |
+| [AL0027](/analyzers/rules/AL0027) | Usage             | Prefer System.Text.Json over Newtonsoft                 | Warning  | Yes |
+| [AL0028](/analyzers/rules/AL0028) | Roslyn Utilities  | Use IsEqualTo() for symbol comparison                   |   Info   | Yes |
+| [AL0029](/analyzers/rules/AL0029) | Roslyn Utilities  | Use HasAttribute() for attribute checks                 |   Info   | Yes |
+| [AL0030](/analyzers/rules/AL0030) | Roslyn Utilities  | Use type hierarchy extensions                           |   Info   | Yes |
+| [AL0031](/analyzers/rules/AL0031) | Roslyn Utilities  | Use operation extensions                                |   Info   | Yes |
+| [AL0032](/analyzers/rules/AL0032) | Roslyn Utilities  | Use OrEmpty() extension                                 |   Info   | Yes |
+| [AL0033](/analyzers/rules/AL0033) | Roslyn Utilities  | Use ToImmutableArrayOrEmpty() extension                 |   Info   | Yes |
+| [AL0034](/analyzers/rules/AL0034) | Roslyn Utilities  | Use WhereNotNull() extension                            |   Info   | Yes |
+| [AL0035](/analyzers/rules/AL0035) | Roslyn Utilities  | Use GetFullyQualifiedName/GetMetadataName()             |   Info   | Yes |
+| [AL0036](/analyzers/rules/AL0036) | Roslyn Utilities  | Use Guard.NotNull()                                     | Warning  | Yes |
+| [AL0037](/analyzers/rules/AL0037) | Roslyn Utilities  | Use TryParse extensions                                 | Warning  | Yes |
+| [AL0038](/analyzers/rules/AL0038) | Roslyn Utilities  | Use GetOrNull/GetOrDefault extensions                   | Warning  | Yes |
+| [AL0039](/analyzers/rules/AL0039) | Roslyn Utilities  | Use StringComparison extensions                         | Warning  | Yes |
+| [AL0040](/analyzers/rules/AL0040) | Roslyn Utilities  | Use attribute argument extensions                       | Warning  | Yes |
+| [AL0041](/analyzers/rules/AL0041) | AOT Testing       | [AotTest]/[TrimTest] must return int                    |  Error   |  -  |
+| [AL0042](/analyzers/rules/AL0042) | AOT Testing       | [AotTest]/[TrimTest] should return 100                  | Warning  |  -  |
+| [AL0043](/analyzers/rules/AL0043) | AOT Testing       | [TrimSafe] violates trim safety                         | Warning  |  -  |
+| [AL0044](/analyzers/rules/AL0044) | AOT Testing       | [AotSafe] violates AOT safety                           | Warning  |  -  |
+| [AL0045](/analyzers/rules/AL0045) | Roslyn Utilities  | Use Guard.NotNullOrEmpty()                              | Warning  | Yes |
+| [AL0046](/analyzers/rules/AL0046) | Roslyn Utilities  | Use Guard.NotNullOrWhiteSpace()                         | Warning  | Yes |
+| [AL0047](/analyzers/rules/AL0047) | Roslyn Utilities  | Use Guard.NotZero()                                     | Warning  | Yes |
+| [AL0048](/analyzers/rules/AL0048) | Roslyn Utilities  | Use Guard.NotNegative()                                 | Warning  | Yes |
+| [AL0049](/analyzers/rules/AL0049) | Roslyn Utilities  | Use Guard.Positive()                                    | Warning  | Yes |
+| [AL0050](/analyzers/rules/AL0050) | Roslyn Utilities  | Use Guard.NotEmptyGuid()                                | Warning  | Yes |
+| [AL0051](/analyzers/rules/AL0051) | Roslyn Utilities  | Use Guard.DefinedEnum()                                 | Warning  | Yes |
+| [AL0052](/analyzers/rules/AL0052) | AOT Testing       | [AotSafe] must not call [AotUnsafe]                     |  Error   |  -  |
+| [AL0053](/analyzers/rules/AL0053) | AOT Testing       | Unnecessary [AotUnsafe] attribute                       | Warning  |  -  |
+| [AL0054](/analyzers/rules/AL0054) | VersionManagement | Diagnostic missing from documentation                   | Warning  |  -  |
+| [AL0055](/analyzers/rules/AL0055) | VersionManagement | Diagnostic missing from release notes                   | Warning  |  -  |
+| [AL0056](/analyzers/rules/AL0056) | VersionManagement | Diagnostic documentation mismatch                       | Warning  |  -  |
+| [AL0057](/analyzers/rules/AL0057) | Threading         | Avoid async void methods                                | Warning  |  -  |
+| [AL0058](/analyzers/rules/AL0058) | Threading         | Avoid lock on this                                      | Warning  |  -  |
+| [AL0059](/analyzers/rules/AL0059) | Threading         | Avoid lock on typeof(T)                                 | Warning  |  -  |
+| [AL0060](/analyzers/rules/AL0060) | Threading         | Avoid lock on string                                    | Warning  |  -  |
+| [AL0061](/analyzers/rules/AL0061) | OpenTelemetry     | Activity missing semconv attributes                     | Warning  |  -  |
+| [AL0062](/analyzers/rules/AL0062) | OpenTelemetry     | Deprecated semantic convention                          | Warning  |  -  |
+| [AL0063](/analyzers/rules/AL0063) | OpenTelemetry     | Unregistered ActivitySource                             | Warning  |  -  |
+| [AL0064](/analyzers/rules/AL0064) | GenAI             | GenAI span missing required attributes                  | Warning  |  -  |
+| [AL0065](/analyzers/rules/AL0065) | GenAI             | Use token usage histogram                               | Warning  |  -  |
+| [AL0066](/analyzers/rules/AL0066) | GenAI             | Invalid GenAI operation name                            | Warning  |  -  |
+| [AL0067](/analyzers/rules/AL0067) | Metrics           | Unregistered Meter                                      | Warning  |  -  |
+| [AL0068](/analyzers/rules/AL0068) | Metrics           | Invalid metric name                                     | Warning  |  -  |
+| [AL0069](/analyzers/rules/AL0069) | Configuration     | Incomplete ServiceDefaults                              | Warning  |  -  |
+| [AL0070](/analyzers/rules/AL0070) | Configuration     | Non-OTLP collector endpoint                             | Warning  |  -  |
+| [AL0071](/analyzers/rules/AL0071) | Metrics           | Meter class must be partial static                      |  Error   | Yes |
+| [AL0072](/analyzers/rules/AL0072) | Metrics           | Metric method must be partial                           |  Error   | Yes |
+| [AL0073](/analyzers/rules/AL0073) | OpenTelemetry     | [Traced] requires non-empty ActivitySourceName          |  Error   | Yes |
+| [AL0074](/analyzers/rules/AL0074) | GenAI             | Deprecated GenAI attribute                              | Warning  | Yes |
+| [AL0075](/analyzers/rules/AL0075) | Metrics           | High-cardinality metric tag                             | Warning  |  -  |
+| [AL0076](/analyzers/rules/AL0076) | OpenTelemetry     | Missing OTel configuration                              | Warning  |  -  |
+| [AL0077](/analyzers/rules/AL0077) | OpenTelemetry     | Duplicate instrumentation                               | Warning  |  -  |
+| [AL0078](/analyzers/rules/AL0078) | OpenTelemetry     | Invalid ActivitySource name                             |  Error   |  -  |
+| [AL0079](/analyzers/rules/AL0079) | OpenTelemetry     | Manual span recommended                                 |   Info   |  -  |
+| [AL0080](/analyzers/rules/AL0080) | ASP.NET Core      | Missing resilience configuration                        | Warning  |  -  |
+| [AL0081](/analyzers/rules/AL0081) | ASP.NET Core      | Missing health checks                                   | Warning  |  -  |
+| [AL0082](/analyzers/rules/AL0082) | Configuration     | Consider connection string configuration                |   Info   |  -  |
+| [AL0083](/analyzers/rules/AL0083) | Configuration     | Insecure endpoint                                       | Warning  |  -  |
+| [AL0084](/analyzers/rules/AL0084) | ASP.NET Core      | Missing service discovery                               | Warning  |  -  |
+| [AL0085](/analyzers/rules/AL0085) | OpenTelemetry     | Invalid attribute value                                 |  Error   |  -  |
+| [AL0086](/analyzers/rules/AL0086) | OpenTelemetry     | Incorrect attribute type                                | Warning  |  -  |
+| [AL0087](/analyzers/rules/AL0087) | OpenTelemetry     | Prefer constant attribute                               |   Info   |  -  |
+| [AL0088](/analyzers/rules/AL0088) | OpenTelemetry     | Sensitive data in attribute                             | Warning  |  -  |
+| [AL0089](/analyzers/rules/AL0089) | OpenTelemetry     | Missing OTLP configuration                              | Warning  |  -  |
+| [AL0090](/analyzers/rules/AL0090) | OpenTelemetry     | Uncompressed OTLP export                                | Warning  |  -  |
+| [AL0091](/analyzers/rules/AL0091) | OpenTelemetry     | Batch export disabled                                   | Warning  |  -  |
+| [AL0092](/analyzers/rules/AL0092) | OpenTelemetry     | Consider sampling                                       |   Info   |  -  |
+| [AL0093](/analyzers/rules/AL0093) | OpenTelemetry     | Missing resource attributes                             | Warning  |  -  |
+| [AL0094](/analyzers/rules/AL0094) | AOT Testing       | Avoid dynamic keyword                                   | Warning  |  -  |
+| [AL0095](/analyzers/rules/AL0095) | AOT Testing       | Avoid Expression.Compile()                              | Warning  |  -  |
+| [AL0096](/analyzers/rules/AL0096) | Configuration     | Enable EventSource support for AOT                      | Warning  |  -  |
+| [AL0101](/analyzers/rules/AL0101) | AOT Testing       | Avoid Activator.CreateInstance                          | Warning  |  -  |
+| [AL0102](/analyzers/rules/AL0102) | AOT Testing       | Avoid Type.GetType                                      | Warning  |  -  |
+| [AL0103](/analyzers/rules/AL0103) | Design            | Closed type hierarchy switch exhaustiveness             | Warning  | Yes |
+| [AL0104](/analyzers/rules/AL0104) | Reliability       | Prefer await using for IAsyncDisposable                 | Warning  |  -  |
+| [AL0105](/analyzers/rules/AL0105) | Threading         | Avoid blocking calls in async methods                   | Warning  |  -  |
+| [AL0106](/analyzers/rules/AL0106) | ASP.NET Core      | Avoid Task.Run in ASP.NET Core                          | Warning  |  -  |
+| [AL0107](/analyzers/rules/AL0107) | OpenTelemetry     | Orphaned [TracedTag] attribute                          | Warning  | Yes |
+| [AL0108](/analyzers/rules/AL0108) | OpenTelemetry     | Redundant [NoTrace] attribute                           |   Info   | Yes |
+| [AL0109](/analyzers/rules/AL0109) | OpenTelemetry     | Non-interceptable [Traced] method                       | Warning  | Yes |
+| [AL0110](/analyzers/rules/AL0110) | OpenTelemetry     | [TracedTag] on out/ref parameter                        |  Error   | Yes |
+
+**Legend:** `Error` = build error, `Warning` = build warning, `Info` = IDE suggestion, `Disabled` = off by default.
 
 ## Refactorings
 

@@ -1,0 +1,198 @@
+---
+title: 'MCP Server Generator'
+sidebarTitle: 'Generator'
+description: 'Source generator producing MCP dispatch, JSON Schema, OTel instrumentation, and SKILL.md at compile time.'
+icon: 'gear'
+---
+
+The `Qyl.Agents.Generator` package is an incremental source generator that transforms `[McpServer]` classes into fully functional MCP servers at build time.
+
+## How It Works
+
+1. **Extraction** — scans for `[McpServer]` classes and `[Tool]` methods
+2. **Modeling** — builds value-equatable models (incremental generator cache-friendly)
+3. **Generation** — emits a single `.g.cs` file per server with all dispatch, schema, OTel, and metadata code
+
+## Server Declaration
+
+```csharp
+using Qyl.Agents;
+
+/// <summary>A document search server</summary>
+[McpServer]
+public partial class DocTools
+{
+    /// <summary>Search documents by query</summary>
+    [Tool]
+    public string Search(
+        [Description("Query text")] string query,
+        int limit = 10) => query;
+}
+```
+
+<Note>
+  The class must be `partial` — the generator adds the `IMcpServer`
+  implementation.
+</Note>
+
+### McpServer Attribute
+
+| Property      | Type      | Default                 | Description                 |
+| ------------- | --------- | ----------------------- | --------------------------- |
+| `Name`        | `string?` | Class name, kebab-cased | Server name in MCP protocol |
+| `Description` | `string?` | XML doc summary         | Server description          |
+| `Version`     | `string?` | Assembly version        | Semantic version            |
+
+### Tool Attribute
+
+| Property      | Type       | Default                  | Description                                |
+| ------------- | ---------- | ------------------------ | ------------------------------------------ |
+| `Name`        | `string?`  | Method name, kebab-cased | Tool name in MCP protocol                  |
+| `Description` | `string?`  | XML doc summary          | Tool description                           |
+| `ReadOnly`    | `ToolHint` | `Unset`                  | Hint: tool does not modify state           |
+| `Idempotent`  | `ToolHint` | `Unset`                  | Hint: repeated calls have same effect      |
+| `Destructive` | `ToolHint` | `Unset`                  | Hint: tool may delete or destroy data      |
+| `OpenWorld`   | `ToolHint` | `Unset`                  | Hint: tool interacts with external systems |
+
+Safety hints are emitted in `tools/list` only when non-`Unset`. `ToolHint` has three values: `Unset` (omitted), `True`, `False`.
+
+```csharp
+[Tool(ReadOnly = ToolHint.True, Idempotent = ToolHint.True)]
+public string Search([Description("Query")] string query) => query;
+```
+
+## Generated Output
+
+For each `[McpServer]` class, the generator produces a single `.g.cs` file containing:
+
+### Tool Dispatch
+
+A `DispatchToolCallAsync` method that routes by tool name using a switch expression:
+
+```csharp
+public async Task<string> DispatchToolCallAsync(
+    string toolName,
+    JsonElement arguments,
+    CancellationToken cancellationToken = default)
+{
+    return toolName switch
+    {
+        "search" => await ExecuteTool_SearchAsync(arguments, cancellationToken),
+        _ => throw new ArgumentException($"Unknown tool: {toolName}")
+    };
+}
+```
+
+### Parameter Deserialization
+
+Primitives use direct `JsonElement` accessors (AOT-safe). Complex types fall back to `JsonSerializer`.
+
+| Type                     | Accessor                          | AOT-safe |
+| ------------------------ | --------------------------------- | -------- |
+| `string`                 | `GetString()`                     | Yes      |
+| `int`                    | `GetInt32()`                      | Yes      |
+| `bool`                   | `GetBoolean()`                    | Yes      |
+| `DateTimeOffset`         | `GetDateTimeOffset()`             | Yes      |
+| `Guid`                   | `GetGuid()`                       | Yes      |
+| `Uri`                    | `new Uri(GetString())`            | Yes      |
+| Enums                    | `Enum.Parse<T>(GetString())`      | Yes      |
+| `string[]`, custom types | `JsonSerializer.Deserialize<T>()` | No       |
+
+### JSON Schema
+
+Each tool gets a static `s_schema_{MethodName}` byte array with the JSON Schema for its input parameters, including types, formats, required fields, descriptions, and enum values.
+
+### OpenTelemetry Instrumentation
+
+Every tool call emits:
+
+- An `ActivitySource("Qyl.Agents")` span with `gen_ai.*` semantic conventions
+- A `gen_ai.client.operation.duration` histogram for latency tracking
+- Error status and `error.type` tag on exceptions
+
+### SKILL.md
+
+A `SkillMd` static property with the full SKILL.md content including YAML frontmatter, tool descriptions, and parameter documentation.
+
+### LLMS.txt
+
+A `LlmsTxt` static property with a summary of the server's capabilities, including tools, resources, and prompts sections.
+
+## Resources
+
+Expose read-only data via `[Resource]`:
+
+```csharp
+[McpServer]
+public partial class ConfigServer
+{
+    [Resource("config://app-settings")]
+    public Task<string> GetAppSettings(CancellationToken ct) =>
+        File.ReadAllTextAsync("appsettings.json", ct);
+}
+```
+
+### Resource Attribute
+
+| Property      | Type      | Default         | Description                   |
+| ------------- | --------- | --------------- | ----------------------------- |
+| `Uri`         | `string`  | (required)      | Resource URI for MCP protocol |
+| `Name`        | `string?` | Method name     | Display name                  |
+| `Description` | `string?` | XML doc summary | Resource description          |
+| `MimeType`    | `string?` | `null`          | Content MIME type             |
+
+The generator emits `DispatchResourceReadAsync` for URI-based dispatch and `GetResourceInfos` for `resources/list`. Resource methods must return `string`, `Task<string>`, or `ValueTask<string>`.
+
+## Prompts
+
+Expose reusable prompt templates via `[Prompt]`:
+
+```csharp
+[McpServer]
+public partial class MyServer
+{
+    /// <summary>Summarize a document</summary>
+    [Prompt]
+    public string Summarize([Description("Text to summarize")] string text) =>
+        $"Please summarize the following:\n\n{text}";
+
+    /// <summary>Code review with structured messages</summary>
+    [Prompt]
+    public PromptResult Review([Description("Code to review")] string code) =>
+        new()
+        {
+            Messages =
+            [
+                new() { Role = "user", Content = $"Review this code:\n\n{code}" }
+            ]
+        };
+}
+```
+
+- `string` return → wrapped as a single user-role message
+- `PromptResult` return → structured messages passed through directly
+
+The generator emits `DispatchPromptAsync` and `GetPromptInfos` for `prompts/list` and `prompts/get`. Prompt methods must return `string`, `Task<string>`, `PromptResult`, or `Task<PromptResult>`.
+
+## Supported Parameter Types
+
+| Category   | Types                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| Primitives | `string`, `bool`, `int`, `long`, `double`, `float`, `decimal`, `byte`, `sbyte`, `short`, `ushort`, `uint`, `ulong` |
+| Special    | `DateTimeOffset`, `DateTime`, `Guid`, `Uri`                                                                        |
+| Enums      | Any enum type (schema includes allowed values)                                                                     |
+| Nullable   | `T?` for all above                                                                                                 |
+| Complex    | Arrays, custom objects (requires `JsonSerializer`)                                                                 |
+| Control    | `CancellationToken` (passed through, not in schema)                                                                |
+
+## Supported Return Types
+
+| Type                       | Serialization                   |
+| -------------------------- | ------------------------------- |
+| `void`                     | Returns `"null"`                |
+| `string`                   | Direct passthrough              |
+| `bool`                     | `"true"` / `"false"`            |
+| Numeric types              | `ToString(InvariantCulture)`    |
+| `Task` / `ValueTask`       | Returns `"null"`                |
+| `Task<T>` / `ValueTask<T>` | Same rules as sync `T`          |
+| Complex types              | `JsonSerializer.Serialize<T>()` |

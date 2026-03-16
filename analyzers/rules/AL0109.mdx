@@ -1,0 +1,46 @@
+---
+title: 'AL0109 - Non-interceptable [Traced] method'
+sidebarTitle: 'AL0109'
+description: '[Traced] on abstract, extern, or partial definition methods cannot be intercepted'
+icon: 'shield-check'
+---
+
+Source: [Al0109NonInterceptableTracedAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0109NonInterceptableTracedAnalyzer.cs)
+
+## Description
+
+The source generator that implements `[Traced]` instrumentation works by intercepting method calls. Abstract methods, extern methods, and partial definition methods cannot be intercepted, so `[Traced]` on them has no effect.
+
+## Bad Code
+
+```csharp
+public abstract class BaseService
+{
+    [Traced("MyApp")]
+    public abstract void ProcessAsync();  // Cannot be intercepted
+}
+```
+
+## Good Code
+
+```csharp
+// Apply [Traced] at class level instead — concrete overrides get traced
+[Traced("MyApp")]
+public abstract class BaseService
+{
+    public abstract void ProcessAsync();
+}
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0109.severity = warning
+```

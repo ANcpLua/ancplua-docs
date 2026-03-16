@@ -1,0 +1,45 @@
+---
+title: 'AL0107 - Orphaned [TracedTag] attribute'
+sidebarTitle: 'AL0107'
+description: '[TracedTag] on a parameter has no effect without [Traced] on the method or class'
+icon: 'shield-check'
+---
+
+Source: [Al0107OrphanedTracedTagAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0107OrphanedTracedTagAnalyzer.cs)
+
+## Description
+
+`[TracedTag]` marks a parameter to be recorded as a span tag during instrumentation. Without `[Traced]` on the method or its declaring class, no span is created and the tag is silently ignored.
+
+## Bad Code
+
+```csharp
+public class OrderService
+{
+    // No [Traced] on method or class — tag is orphaned
+    public void Process([TracedTag] string orderId) { }
+}
+```
+
+## Good Code
+
+```csharp
+[Traced("MyApp")]
+public class OrderService
+{
+    public void Process([TracedTag] string orderId) { }
+}
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0107.severity = warning
+```

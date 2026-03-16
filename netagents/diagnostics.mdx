@@ -1,0 +1,111 @@
+---
+title: 'Diagnostics'
+sidebarTitle: 'Diagnostics'
+description: 'Generator diagnostics for MCP server validation.'
+icon: 'circle-exclamation'
+---
+
+The generator reports diagnostics at build time for invalid MCP server declarations.
+
+## Rules
+
+| Id     | Severity | Description                                        |
+| ------ | :------: | -------------------------------------------------- |
+| QA0001 |  Error   | `[McpServer]` class must be `partial`              |
+| QA0002 |  Error   | `[McpServer]` class must not be `static`           |
+| QA0003 |  Error   | `[McpServer]` class must not be generic            |
+| QA0004 |  Error   | `[Tool]` method must be inside `[McpServer]` class |
+| QA0005 |  Error   | `[Tool]` method must not be `static`               |
+| QA0006 |  Error   | `[Tool]` method must not be generic                |
+| QA0007 |  Error   | `[Tool]` method has unsupported return type        |
+| QA0008 |  Error   | `[Tool]` parameter has unsupported type            |
+| QA0009 | Warning  | `[Tool]` parameter missing `[Description]`         |
+| QA0010 | Warning  | `[McpServer]` class has no `[Tool]` methods        |
+| QA0011 |  Error   | Duplicate tool name in same server                 |
+| QA0012 | Warning  | All tool safety hints are `Unset`                  |
+| QA0013 |  Error   | `[Resource]` method has invalid return type        |
+| QA0014 |  Error   | Duplicate resource URI in same server              |
+| QA0015 |  Error   | `[Prompt]` method has invalid return type          |
+| QA0016 |  Error   | Duplicate prompt name in same server               |
+
+## Examples
+
+### QA0001 — Class must be partial
+
+```csharp
+// Bad: not partial
+[McpServer]
+public class MyServer { }
+
+// Good: partial
+[McpServer]
+public partial class MyServer { }
+```
+
+### QA0004 — Orphaned tool
+
+```csharp
+// Bad: no [McpServer] on containing class
+public partial class NotAServer
+{
+    [Tool]
+    public string Echo(string input) => input;
+}
+```
+
+### QA0009 — Missing description
+
+```csharp
+[McpServer]
+public partial class MyServer
+{
+    [Tool]
+    public string Echo(string input) => input;
+    //                  ^ QA0009: parameter 'input' has no [Description]
+}
+```
+
+Add `[Description]` to suppress:
+
+```csharp
+[Tool]
+public string Echo([Description("Text to echo")] string input) => input;
+```
+
+### QA0012 — All safety hints Unset
+
+Only fires when all four hints are **explicitly** set to `ToolHint.Unset`:
+
+```csharp
+// Triggers QA0012
+[Tool(ReadOnly = ToolHint.Unset, Idempotent = ToolHint.Unset,
+      Destructive = ToolHint.Unset, OpenWorld = ToolHint.Unset)]
+public string Echo(string input) => input;
+
+// No diagnostic — hints left at defaults
+[Tool]
+public string Echo(string input) => input;
+```
+
+### QA0013 — Resource invalid return type
+
+`[Resource]` methods must return `string`, `Task<string>`, or `ValueTask<string>`.
+
+### QA0014 — Duplicate resource URI
+
+Two methods in the same server cannot share a `[Resource]` URI.
+
+### QA0015 — Prompt invalid return type
+
+`[Prompt]` methods must return `string`, `Task<string>`, `PromptResult`, or `Task<PromptResult>`.
+
+### QA0016 — Duplicate prompt name
+
+Two methods in the same server cannot share a `[Prompt]` name.
+
+## Configuration
+
+```editorconfig
+[*.cs]
+dotnet_diagnostic.QA0009.severity = none
+```

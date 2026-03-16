@@ -1,0 +1,47 @@
+---
+title: 'AL0108 - Redundant [NoTrace] attribute'
+sidebarTitle: 'AL0108'
+description: '[NoTrace] has no effect when the declaring type has no [Traced] attribute'
+icon: 'shield-check'
+---
+
+Source: [Al0108RedundantNoTraceAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0108RedundantNoTraceAnalyzer.cs)
+
+## Description
+
+`[NoTrace]` excludes a method from automatic span creation when the class has `[Traced]`. Without `[Traced]` on the class or any base class, `[NoTrace]` is redundant.
+
+## Bad Code
+
+```csharp
+// No [Traced] on class — [NoTrace] is redundant
+public class OrderService
+{
+    [NoTrace]
+    public void HelperMethod() { }
+}
+```
+
+## Good Code
+
+```csharp
+[Traced("MyApp")]
+public class OrderService
+{
+    [NoTrace]  // Meaningful: excludes this method from tracing
+    public void HelperMethod() { }
+}
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0108.severity = suggestion
+```

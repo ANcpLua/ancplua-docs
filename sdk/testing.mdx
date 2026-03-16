@@ -87,46 +87,46 @@ xUnit v3 replaces constructor-injected `ITestOutputHelper` with ambient `TestCon
 ### Migration Example
 
 <CodeGroup>
-    ```csharp xUnit v2 (before)
-    public class MyApiTests : IntegrationTestBase<Program>
-    {
-        private readonly ITestOutputHelper _output;
-        private readonly MyFixture _fixture;
+```csharp xUnit v2 (before)
+public class MyApiTests : IntegrationTestBase<Program>
+{
+    private readonly ITestOutputHelper _output;
+    private readonly MyFixture _fixture;
 
-        public MyApiTests(MyFixture fixture, ITestOutputHelper output)
+    public MyApiTests(MyFixture fixture, ITestOutputHelper output)
     {
         _fixture = fixture;
         _output = output;
     }
 
-        [Fact]
-        public async Task Get_ReturnsSuccess()
+    [Fact]
+    public async Task Get_ReturnsSuccess()
     {
         _output.WriteLine("Starting test...");
         var response = await Client.GetAsync("/api/items");
         response.EnsureSuccessStatusCode();
     }
 
-    }
+}
 
-    ````
+````
 
-    ```csharp xUnit v3 (after)
-    public class MyApiTests : IntegrationTestBase<Program>
-    {
-        private readonly MyFixture _fixture;
+```csharp xUnit v3 (after)
+public class MyApiTests : IntegrationTestBase<Program>
+{
+    private readonly MyFixture _fixture;
 
-        public MyApiTests(MyFixture fixture) => _fixture = fixture;
+    public MyApiTests(MyFixture fixture) => _fixture = fixture;
 
-        [Fact]
-        public async Task Get_ReturnsSuccess()
+    [Fact]
+    public async Task Get_ReturnsSuccess()
     {
         TestContext.Current.TestOutputHelper.WriteLine("Starting test...");
         var response = await Client.GetAsync("/api/items");
         response.EnsureSuccessStatusCode();
     }
-    }
-    ````
+}
+````
 
 </CodeGroup>
 
@@ -140,39 +140,39 @@ xUnit v3 replaces constructor-injected `ITestOutputHelper` with ambient `TestCon
 
 In-memory TestServer for fast API testing.
 
-````csharp
+```csharp
 public class MyApiTests : IntegrationTestBase<Program>
-    {
-        [Fact]
-        public async Task Get_ReturnsSuccess()
+{
+    [Fact]
+    public async Task Get_ReturnsSuccess()
     {
         var response = await Client.GetAsync("/api/items");
         response.EnsureSuccessStatusCode();
     }
-    }
-    ```
+}
+```
 
-    Uses `WebApplicationFactory<TProgram>` internally.
+Uses `WebApplicationFactory<TProgram>` internally.
 
-    ## KestrelTestBase
+## KestrelTestBase
 
-    Real Kestrel server for HTTP/2, WebSockets, SSE, or Playwright.
+Real Kestrel server for HTTP/2, WebSockets, SSE, or Playwright.
 
-    ```csharp
-    public class WebSocketTests : KestrelTestBase<Program>
-    {
-        [Fact]
-        public async Task WebSocket_ConnectsSuccessfully()
+```csharp
+public class WebSocketTests : KestrelTestBase<Program>
+{
+    [Fact]
+    public async Task WebSocket_ConnectsSuccessfully()
     {
         var ws = new ClientWebSocket();
         await ws.ConnectAsync(new Uri($"{BaseAddress}/ws"), CancellationToken.None);
     }
-    }
-    ```
+}
+```
 
-    Starts on random port via `UseKestrel(0)`.
+Starts on random port via `UseKestrel(0)`.
 
-    ## FakeLogger
+## FakeLogger
 
 See [Extensions](/sdk/extensions) for `FakeLogCollector` test helpers.
 
@@ -238,6 +238,7 @@ public class MyAotTests
     )]
     public static int MyAotTest() => 100;
     ```
+
   </Accordion>
 
   <Accordion title="[TrimTest]">
@@ -251,6 +252,7 @@ public class MyAotTests
     )]
     public static int MyTrimTest() => 100;
     ```
+
   </Accordion>
 
   <Accordion title="[TrimSafe] / [AotSafe]">
@@ -263,6 +265,24 @@ public class MyAotTests
     [AotSafe]   // Analyzer verifies no RequiresDynamicCode calls
     public void CreateService() { }
     ```
+
+  </Accordion>
+
+  <Accordion title="[AotUnsafe]">
+    Marks code that intentionally uses AOT-incompatible patterns. [AL0052](/analyzers/rules/AL0052) prevents `[AotSafe]` code from calling `[AotUnsafe]` code, and [AL0053](/analyzers/rules/AL0053) flags unnecessary `[AotUnsafe]` attributes.
+
+    ```csharp
+    [AotUnsafe("Uses reflection for plugin loading")]
+    public void LoadPlugin(string typeName) { }
+
+    [AotSafe]
+    public void Process()
+    {
+        // AL0052: [AotSafe] code must not call [AotUnsafe] code
+        // LoadPlugin("MyPlugin");
+    }
+    ```
+
   </Accordion>
 </AccordionGroup>
 
@@ -305,17 +325,17 @@ Disable runtime features during tests:
 public static int TestWithoutReflection() => 100;
 ```
 
-| Constant | Feature Switch |
-|----------|----------------|
-| `JsonReflection` | `System.Text.Json.JsonSerializer.IsReflectionEnabledByDefault` |
-| `DebuggerSupport` | `System.Diagnostics.Debugger.IsSupported` |
-| `EventSourceSupport` | `System.Diagnostics.Tracing.EventSource.IsSupported` |
-| `MetricsSupport` | `System.Diagnostics.Metrics.Meter.IsSupported` |
-| `XmlSerialization` | `System.Xml.XmlSerializer.IsEnabled` |
-| `BinaryFormatter` | `System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization` |
-| `InvariantGlobalization` | `System.Globalization.Invariant` |
-| `HttpActivityPropagation` | `System.Net.Http.EnableActivityPropagation` |
-| `StartupHooks` | `System.StartupHookProvider.IsSupported` |
+| Constant                  | Feature Switch                                                          |
+| ------------------------- | ----------------------------------------------------------------------- |
+| `JsonReflection`          | `System.Text.Json.JsonSerializer.IsReflectionEnabledByDefault`          |
+| `DebuggerSupport`         | `System.Diagnostics.Debugger.IsSupported`                               |
+| `EventSourceSupport`      | `System.Diagnostics.Tracing.EventSource.IsSupported`                    |
+| `MetricsSupport`          | `System.Diagnostics.Metrics.Meter.IsSupported`                          |
+| `XmlSerialization`        | `System.Xml.XmlSerializer.IsEnabled`                                    |
+| `BinaryFormatter`         | `System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization` |
+| `InvariantGlobalization`  | `System.Globalization.Invariant`                                        |
+| `HttpActivityPropagation` | `System.Net.Http.EnableActivityPropagation`                             |
+| `StartupHooks`            | `System.StartupHookProvider.IsSupported`                                |
 
 ### How It Works
 
@@ -327,19 +347,24 @@ public static int TestWithoutReflection() => 100;
 
 ### Exit Code Convention
 
-| Code | Meaning |
-|------|---------|
-| 100 | Success |
-| 1-99 | Test failure |
-| -1 | `TrimAssert.TypeTrimmed` failed (type exists) |
-| -2 | `TrimAssert.TypePreserved` failed (type missing) |
+| Code | Meaning                                          |
+| ---- | ------------------------------------------------ |
+| 100  | Success                                          |
+| 1-99 | Test failure                                     |
+| -1   | `TrimAssert.TypeTrimmed` failed (type exists)    |
+| -2   | `TrimAssert.TypePreserved` failed (type missing) |
 
 ### Related Analyzers
 
-| Rule | Description |
-|------|-------------|
-| [AL0041](/analyzers/rules/AL0041) | `[AotTest]`/`[TrimTest]` must return `int` |
-| [AL0042](/analyzers/rules/AL0042) | Should return 100 for success |
+| Rule                              | Description                                           |
+| --------------------------------- | ----------------------------------------------------- |
+| [AL0041](/analyzers/rules/AL0041) | `[AotTest]`/`[TrimTest]` must return `int`            |
+| [AL0042](/analyzers/rules/AL0042) | Should return 100 for success                         |
 | [AL0043](/analyzers/rules/AL0043) | `[TrimSafe]` cannot call `[RequiresUnreferencedCode]` |
-| [AL0044](/analyzers/rules/AL0044) | `[AotSafe]` cannot call `[RequiresDynamicCode]` |
-````
+| [AL0044](/analyzers/rules/AL0044) | `[AotSafe]` cannot call `[RequiresDynamicCode]`       |
+| [AL0052](/analyzers/rules/AL0052) | `[AotSafe]` must not call `[AotUnsafe]`               |
+| [AL0053](/analyzers/rules/AL0053) | Unnecessary `[AotUnsafe]` attribute                   |
+| [AL0094](/analyzers/rules/AL0094) | Avoid `dynamic` keyword in AOT                        |
+| [AL0095](/analyzers/rules/AL0095) | Avoid `Expression.Compile()` in AOT                   |
+| [AL0101](/analyzers/rules/AL0101) | Avoid `Activator.CreateInstance` in AOT               |
+| [AL0102](/analyzers/rules/AL0102) | Avoid `Type.GetType` with dynamic name                |

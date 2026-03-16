@@ -165,6 +165,10 @@
                   "analyzers/rules/AL0104",
                   "analyzers/rules/AL0105",
                   "analyzers/rules/AL0106",
+                  "analyzers/rules/AL0107",
+                  "analyzers/rules/AL0108",
+                  "analyzers/rules/AL0109",
+                  "analyzers/rules/AL0110",
                   "analyzers/rules/AR0001",
                   "analyzers/rules/AR0002"
                 ]
@@ -196,6 +200,19 @@
               "utilities/msbuild-testing",
               "utilities/testing",
               "utilities/performance"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "netagents",
+        "groups": [
+          {
+            "group": "netagents",
+            "pages": [
+              "netagents/overview",
+              "netagents/generator",
+              "netagents/diagnostics"
             ]
           }
         ]

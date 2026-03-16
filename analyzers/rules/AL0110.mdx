@@ -1,0 +1,47 @@
+---
+title: 'AL0110 - [TracedTag] on out/ref parameter'
+sidebarTitle: 'AL0110'
+description: 'out/ref parameters cannot be captured as span tags because their value is set after the call'
+icon: 'shield-check'
+---
+
+Source: [Al0110TracedTagOnOutRefParameterAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/Al0110TracedTagOnOutRefParameterAnalyzer.cs)
+
+## Description
+
+`[TracedTag]` captures the parameter value as a span attribute at call time. For `out` and `ref` parameters, the value is not available until after the method executes, making the tag capture meaningless or incorrect.
+
+## Bad Code
+
+```csharp
+[Traced("MyApp")]
+public bool TryParse(string input, [TracedTag] out int result)
+{
+    result = 0;
+    return true;
+}
+```
+
+## Good Code
+
+```csharp
+[Traced("MyApp")]
+public bool TryParse([TracedTag] string input, out int result)
+{
+    result = 0;
+    return true;
+}
+```
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0110.severity = error
+```
