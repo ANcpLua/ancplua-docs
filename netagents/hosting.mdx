@@ -1,0 +1,93 @@
+---
+title: 'Hosting'
+sidebarTitle: 'Hosting'
+description: 'Run MCP servers over stdio or HTTP with built-in discovery endpoints.'
+icon: 'server'
+---
+
+The `Qyl.Agents` package provides two transports for serving generated MCP servers.
+
+## Stdio Transport
+
+Primary transport for Claude Code, Cursor, and other CLI-based AI agents. Reads JSON-RPC from stdin, writes responses to stdout.
+
+```csharp
+using Qyl.Agents.Hosting;
+
+var server = new CalcServer();
+await McpHost.RunStdioAsync(server);
+```
+
+Blocks until stdin is closed or cancellation is requested.
+
+## HTTP Transport
+
+For web applications — maps MCP endpoints onto ASP.NET Core routing.
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.MapMcpServer<CalcServer>();
+
+app.Run();
+```
+
+### Endpoints
+
+`MapMcpServer<T>()` registers four endpoints under a configurable pattern (default `/mcp`):
+
+| Method | Path                                   | Description                        |
+| ------ | -------------------------------------- | ---------------------------------- |
+| POST   | `/mcp`                                 | JSON-RPC request handler           |
+| GET    | `/mcp/skill.md`                        | SKILL.md content (`text/markdown`) |
+| GET    | `/mcp/llms.txt`                        | LLMS.txt content (`text/plain`)    |
+| GET    | `/.well-known/skills/default/skill.md` | Well-known discovery endpoint      |
+
+### Custom Pattern
+
+```csharp
+app.MapMcpServer<CalcServer>("/api/agents");
+// Endpoints: POST /api/agents, GET /api/agents/skill.md, etc.
+```
+
+### Dependency Injection
+
+Pass an existing server instance for DI or factory patterns:
+
+```csharp
+var server = app.Services.GetRequiredService<CalcServer>();
+app.MapMcpServer(server);
+```
+
+### JSON-RPC Protocol
+
+The POST endpoint handles standard MCP JSON-RPC:
+
+| Request                 | Response                                    |
+| ----------------------- | ------------------------------------------- |
+| `initialize`            | Server capabilities, name, version          |
+| `tools/list`            | Tool metadata with schemas and safety hints |
+| `tools/call`            | Dispatches to generated tool method         |
+| `resources/list`        | Resource metadata                           |
+| `resources/read`        | Dispatches to generated resource method     |
+| `prompts/list`          | Prompt metadata                             |
+| `prompts/get`           | Dispatches to generated prompt method       |
+| `ping`                  | Empty response                              |
+| Notifications (no `id`) | 204 No Content                              |
+
+Parse errors return JSON-RPC error code `-32700`. Unknown methods return `-32601`.
+
+## Writing SKILL.md to Disk
+
+For dotagents distribution, emit the generated SKILL.md as a build artifact:
+
+```csharp
+await McpHost.WriteSkillMdAsync<CalcServer>("SKILL.md");
+```
+
+Similarly for LLMS.txt:
+
+```csharp
+await McpHost.WriteLlmsTxtAsync<CalcServer>("llms.txt");
+```
