@@ -852,9 +852,9 @@ await collector.ShouldEventuallySatisfy(
 
 ## Web Testing
 
-ASP.NET Core integration test base classes with fake logging support.
+ASP.NET Core integration test base classes with fake logging support. Available for **xUnit**, **NUnit**, **TUnit**, and **bUnit**.
 
-### IntegrationTestBase
+### IntegrationTestBase (xUnit)
 
 Fast integration test base using in-memory `TestServer` for API tests that don't require real network I/O.
 
@@ -883,18 +883,68 @@ public class MyApiTests : IntegrationTestBase<Program>
 }
 ```
 
-### KestrelTestBase
-
-Real Kestrel test base for HTTP/2, WebSockets, SSE, and Playwright testing with real network I/O.
+### IntegrationTestBase (NUnit)
 
 ```csharp
+using ANcpLua.Roslyn.Utilities.Testing.WebTesting.NUnit;
+
+public class MyApiTests : IntegrationTestBase<Program>
+{
+    [Test]
+    public async Task GetEndpoint_ReturnsOk()
+    {
+        var response = await Client.GetAsync("/api/items");
+        response.EnsureSuccessStatusCode();
+    }
+}
+```
+
+<Note>
+  NUnit version uses `[OneTimeSetUp]` for factory creation (shared across tests)
+  and `[SetUp]`/`[TearDown]` for per-test client lifecycle.
+</Note>
+
+### IntegrationTestBase (TUnit)
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing.WebTesting.TUnit;
+
+public class MyApiTests : IntegrationTestBase<Program>
+{
+    [Test]
+    public async Task GetEndpoint_ReturnsOk()
+    {
+        var response = await Client.GetAsync("/api/items");
+        response.EnsureSuccessStatusCode();
+    }
+}
+```
+
+<Note>
+  TUnit version uses `[Before(HookType.Test)]` / `[After(HookType.Test)]` hooks.
+  A fresh factory and client are created per test.
+</Note>
+
+### KestrelTestBase
+
+Real Kestrel test base for HTTP/2, WebSockets, SSE, and Playwright testing with real network I/O. Available for xUnit, NUnit, and TUnit.
+
+```csharp
+// xUnit
 using ANcpLua.Roslyn.Utilities.Testing.WebTesting;
+
+// NUnit
+using ANcpLua.Roslyn.Utilities.Testing.WebTesting.NUnit;
+
+// TUnit
+using ANcpLua.Roslyn.Utilities.Testing.WebTesting.TUnit;
 
 public class WebSocketTests : KestrelTestBase<Program>
 {
+    // xUnit only: constructor injection
     public WebSocketTests(WebApplicationFactory<Program> factory) : base(factory) { }
 
-    [Fact]
+    [Fact] // or [Test] for NUnit/TUnit
     public async Task WebSocket_Connects()
     {
         using var ws = new ClientWebSocket();
@@ -904,12 +954,50 @@ public class WebSocketTests : KestrelTestBase<Program>
 }
 ```
 
+### BunitTestBase
+
+Base class for bUnit Blazor component tests with integrated fake logging.
+
+```csharp
+using ANcpLua.Roslyn.Utilities.Testing.WebTesting.Bunit;
+
+public class MyComponentTests : BunitTestBase
+{
+    [Fact]
+    public void Counter_Increments()
+    {
+        var cut = Render<Counter>();
+        cut.Find("button").Click();
+        cut.Find("p").MarkupMatches("<p>Count: 1</p>");
+
+        // Assert on fake logs
+        Logs.ShouldContain("Counter incremented");
+    }
+}
+```
+
+<Note>
+  `BunitTestBase` extends `BunitContext` and pre-configures `FakeLogCollector`.
+  Works with any test framework (xUnit, NUnit, TUnit).
+</Note>
+
+### Web Testing Properties
+
 | Property      | Description                                |
 | ------------- | ------------------------------------------ |
 | `Client`      | HttpClient configured for the test server  |
 | `Logs`        | FakeLogCollector for asserting log output  |
 | `Factory`     | Configured WebApplicationFactory           |
 | `BaseAddress` | Server base address (KestrelTestBase only) |
+
+### Web Testing Namespaces
+
+| Framework | Namespace                                           |
+| --------- | --------------------------------------------------- |
+| xUnit     | `ANcpLua.Roslyn.Utilities.Testing.WebTesting`       |
+| NUnit     | `ANcpLua.Roslyn.Utilities.Testing.WebTesting.NUnit` |
+| TUnit     | `ANcpLua.Roslyn.Utilities.Testing.WebTesting.TUnit` |
+| bUnit     | `ANcpLua.Roslyn.Utilities.Testing.WebTesting.Bunit` |
 
 ## Analyzer Infrastructure
 
