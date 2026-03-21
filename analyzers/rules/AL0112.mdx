@@ -1,0 +1,76 @@
+---
+title: 'AL0112 - Fire-and-forget task discard'
+sidebarTitle: 'AL0112'
+description: 'Discarded tasks from async methods will silently swallow exceptions; await the task or add explicit error handling'
+icon: 'shield-check'
+---
+
+Source: [AL0112FireAndForgetTaskAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0112FireAndForgetTaskAnalyzer.cs)
+
+## Description
+
+Discarding a `Task` with `_ = SomeAsyncMethod()` causes fire-and-forget behavior where exceptions thrown by the asynchronous operation are silently lost. This makes failures invisible and can lead to data corruption, resource leaks, or cascading issues that are extremely difficult to diagnose in production.
+
+The analyzer detects assignments where the target is a discard (`_`) and the value is an invocation returning `Task`, `Task<T>`, `ValueTask`, or `ValueTask<T>`.
+
+## Bad Code
+
+```csharp
+public void M()
+{
+    _ = DoWorkAsync(); // Exception silently swallowed
+}
+
+// In a property setter (common pattern)
+public Guid? SelectedTourId
+{
+    get => _selectedTourId;
+    set
+    {
+        if (SetProperty(ref _selectedTourId, value))
+            _ = HandleTourSelection(); // AL0112
+    }
+}
+```
+
+## Good Code
+
+```csharp
+// Option 1: Await the task
+public async Task M()
+{
+    await DoWorkAsync();
+}
+
+// Option 2: Explicit error handling for fire-and-forget in sync contexts
+public void M()
+{
+    DoWorkAsync().ContinueWith(
+        t => logger.LogError(t.Exception, "Background work failed"),
+        TaskContinuationOptions.OnlyOnFaulted);
+}
+
+// Option 3: Use a dedicated async command handler (MVVM pattern)
+public Guid? SelectedTourId
+{
+    get => _selectedTourId;
+    set
+    {
+        if (SetProperty(ref _selectedTourId, value))
+            HandleTourSelectionCommand.Execute(null);
+    }
+}
+```
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0112.severity = warning
+```

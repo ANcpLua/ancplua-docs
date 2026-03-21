@@ -169,6 +169,8 @@
                   "analyzers/rules/AL0108",
                   "analyzers/rules/AL0109",
                   "analyzers/rules/AL0110",
+                  "analyzers/rules/AL0111",
+                  "analyzers/rules/AL0112",
                   "analyzers/rules/AR0001",
                   "analyzers/rules/AR0002"
                 ]

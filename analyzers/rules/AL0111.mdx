@@ -1,0 +1,38 @@
+---
+title: 'AL0111 - SQL interpolation in CommandText'
+sidebarTitle: 'AL0111'
+description: 'Interpolated strings assigned to CommandText are a SQL injection vector; use parameterized queries instead'
+icon: 'shield-check'
+---
+
+Source: [AL0111SqlInterpolationInCommandTextAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0111SqlInterpolationInCommandTextAnalyzer.cs)
+
+## Description
+
+Assigning an interpolated string (`$"..."` or `$"""..."""`) to a property named `CommandText` is a SQL injection vector. Values should be passed via parameterized queries (`@param`, `$1`) instead of being interpolated directly into the command string.
+
+## Bad Code
+
+```csharp
+command.CommandText = $"SELECT * FROM Users WHERE Id = {userId}";
+```
+
+## Good Code
+
+```csharp
+command.CommandText = "SELECT * FROM Users WHERE Id = @id";
+command.Parameters.AddWithValue("@id", userId);
+```
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0111.severity = warning
+```
