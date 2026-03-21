@@ -48,3 +48,13 @@ config
 frontend
 backend
 README
+Datzi
+DATZI
+OAuth
+cron
+Cron
+iMessage
+imsg
+RPC
+allowlists
+gog

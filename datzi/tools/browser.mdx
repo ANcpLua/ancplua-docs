@@ -213,8 +213,6 @@ All control endpoints accept `?profile=<name>`; the CLI uses `--browser-profile`
 Datzi can also drive **your existing Chrome tabs** (no separate "datzi" Chrome instance) via a local CDP relay + a
 Chrome extension.
 
-Full guide: [Chrome extension](/datzi/tools/browser)
-
 Flow:
 
 - The Gateway runs locally (same machine) or a node host runs on the browser machine.
@@ -556,7 +554,7 @@ These are useful for "make the site behave like X" workflows:
 - `browser act kind=evaluate` / `datzi browser evaluate` and `wait --fn`
   execute arbitrary JavaScript in the page context. Prompt injection can steer
   this. Disable it with `browser.evaluateEnabled=false` if you do not need it.
-- For logins and anti-bot notes (X/Twitter, etc.), see [Browser login + X/Twitter posting](/datzi/tools/browser).
+- For logins and anti-bot notes (X/Twitter, etc.), use a dedicated browser profile with saved cookies.
 - Keep the Gateway/node host private (loopback or tailnet-only).
 - Remote CDP endpoints are powerful; tunnel and protect them.
 
