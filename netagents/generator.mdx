@@ -37,28 +37,41 @@ public partial class DocTools
 
 ### McpServer Attribute
 
-| Property      | Type      | Default                 | Description                 |
-| ------------- | --------- | ----------------------- | --------------------------- |
-| `Name`        | `string?` | Class name, kebab-cased | Server name in MCP protocol |
-| `Description` | `string?` | XML doc summary         | Server description          |
-| `Version`     | `string?` | Assembly version        | Semantic version            |
+| Property      | Type      | Default                        | Description                 |
+| ------------- | --------- | ------------------------------ | --------------------------- |
+| `Name`        | `string?` | Class name, kebab-cased        | Server name in MCP protocol |
+| `Description` | `string?` | XML doc summary                | Server description          |
+| `Version`     | `string?` | Assembly informational version | Semantic version            |
 
 ### Tool Attribute
 
-| Property      | Type       | Default                  | Description                                |
-| ------------- | ---------- | ------------------------ | ------------------------------------------ |
-| `Name`        | `string?`  | Method name, kebab-cased | Tool name in MCP protocol                  |
-| `Description` | `string?`  | XML doc summary          | Tool description                           |
-| `ReadOnly`    | `ToolHint` | `Unset`                  | Hint: tool does not modify state           |
-| `Idempotent`  | `ToolHint` | `Unset`                  | Hint: repeated calls have same effect      |
-| `Destructive` | `ToolHint` | `Unset`                  | Hint: tool may delete or destroy data      |
-| `OpenWorld`   | `ToolHint` | `Unset`                  | Hint: tool interacts with external systems |
+| Property      | Type              | Default                  | Description                                  |
+| ------------- | ----------------- | ------------------------ | -------------------------------------------- |
+| `Name`        | `string?`         | Method name, kebab-cased | Tool name in MCP protocol                    |
+| `Description` | `string?`         | XML doc summary          | Tool description                             |
+| `ReadOnly`    | `ToolHint`        | `Unset`                  | Hint: tool does not modify state             |
+| `Idempotent`  | `ToolHint`        | `Unset`                  | Hint: repeated calls have same effect        |
+| `Destructive` | `ToolHint`        | `Unset`                  | Hint: tool may delete or destroy data        |
+| `OpenWorld`   | `ToolHint`        | `Unset`                  | Hint: tool interacts with external systems   |
+| `TaskSupport` | `ToolTaskSupport` | `Unset`                  | Declares long-running task execution support |
 
 Safety hints are emitted in `tools/list` only when non-`Unset`. `ToolHint` has three values: `Unset` (omitted), `True`, `False`.
+
+`ToolTaskSupport` controls whether a tool can return an MCP task instead of an immediate result:
+
+| Value       | Wire behavior                                   |
+| ----------- | ----------------------------------------------- |
+| `Unset`     | Omitted from `tools/list`                       |
+| `Forbidden` | Task execution is forbidden for this tool       |
+| `Optional`  | Server may return a task or an immediate result |
+| `Required`  | Server always returns a task                    |
 
 ```csharp
 [Tool(ReadOnly = ToolHint.True, Idempotent = ToolHint.True)]
 public string Search([Description("Query")] string query) => query;
+
+[Tool(TaskSupport = ToolTaskSupport.Optional)]
+public Task<string> LongRunningAnalysis([Description("Input")] string data) => /* ... */;
 ```
 
 ## Generated Output
@@ -137,40 +150,47 @@ public partial class ConfigServer
 | Property      | Type      | Default         | Description                   |
 | ------------- | --------- | --------------- | ----------------------------- |
 | `Uri`         | `string`  | (required)      | Resource URI for MCP protocol |
-| `Name`        | `string?` | Method name     | Display name                  |
+| `Name`        | `string?` | `null`          | Display name for the resource |
 | `Description` | `string?` | XML doc summary | Resource description          |
 | `MimeType`    | `string?` | `null`          | Content MIME type             |
 
-The generator emits `DispatchResourceReadAsync` for URI-based dispatch and `GetResourceInfos` for `resources/list`. Resource methods must return `string`, `Task<string>`, or `ValueTask<string>`.
+The generator emits `DispatchResourceReadAsync` for URI-based dispatch and `GetResourceInfos` for `resources/list`.
+
+Supported return types for resource methods:
+
+| Return type         | Content encoding |
+| ------------------- | ---------------- |
+| `string`            | Plain text       |
+| `Task<string>`      | Plain text       |
+| `ValueTask<string>` | Plain text       |
+| `byte[]`            | Base64-encoded   |
+| `Task<byte[]>`      | Base64-encoded   |
+| `ValueTask<byte[]>` | Base64-encoded   |
 
 ## Prompts
 
-Expose reusable prompt templates via `[Prompt]`:
+Expose reusable prompt templates via `[Prompt("name")]`:
 
 ```csharp
 [McpServer]
 public partial class MyServer
 {
     /// <summary>Summarize a document</summary>
-    [Prompt]
+    [Prompt("summarize")]
     public string Summarize([Description("Text to summarize")] string text) =>
         $"Please summarize the following:\n\n{text}";
 
     /// <summary>Code review with structured messages</summary>
-    [Prompt]
+    [Prompt("review")]
     public PromptResult Review([Description("Code to review")] string code) =>
-        new()
-        {
-            Messages =
-            [
-                new() { Role = "user", Content = $"Review this code:\n\n{code}" }
-            ]
-        };
+        new([new(PromptRole.User, $"Review this code:\n\n{code}")]);
 }
 ```
 
 - `string` return → wrapped as a single user-role message
 - `PromptResult` return → structured messages passed through directly
+
+`PromptMessage` takes `(string role, string content)` via constructor. Use the `PromptRole` constants (`User`, `Assistant`, `System`) for type-safe role values.
 
 The generator emits `DispatchPromptAsync` and `GetPromptInfos` for `prompts/list` and `prompts/get`. Prompt methods must return `string`, `Task<string>`, `PromptResult`, or `Task<PromptResult>`.
 
