@@ -41,6 +41,11 @@
             "pages": ["index", "quickstart"]
           },
           {
+            "group": "Demos",
+            "icon": "wand-magic-sparkles",
+            "pages": ["demos/sauron"]
+          },
+          {
             "group": "ANcpLua.NET.Sdk",
             "pages": [
               "sdk/overview",
