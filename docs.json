@@ -10,7 +10,8 @@
   "favicon": "/favicon.svg",
   "logo": {
     "light": "/logo/schnitzel-cat.png",
-    "dark": "/logo/schnitzel-cat.png"
+    "dark": "/logo/schnitzel-cat.png",
+    "href": "https://ancplua.github.io/ancplua-docs/"
   },
   "metadata": {
     "og:site_name": "ANcpLua Framework Documentation",
