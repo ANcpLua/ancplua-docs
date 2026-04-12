@@ -11,7 +11,7 @@
   "logo": {
     "light": "/logo/schnitzel-cat.png",
     "dark": "/logo/schnitzel-cat.png",
-    "href": "https://ancplua.github.io/ancplua-docs/"
+    "href": "https://ancplua.github.io/sauron/"
   },
   "metadata": {
     "og:site_name": "ANcpLua Framework Documentation",
