@@ -7,27 +7,27 @@ icon: 'shield-check'
 
 ANcpLua.Analyzers enforces code quality and prevents common bugs. Included automatically with [ANcpLua.NET.Sdk](/sdk/overview).
 
-- **106 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
-- **42 automatic code fixes** for high-confidence transformations.
+- **127 diagnostics** spanning design, reliability, performance, OpenTelemetry, ASP.NET Core, AOT, and version management.
+- **46 automatic code fixes** for high-confidence transformations.
 - **CI-friendly enforcement** through `.editorconfig` severity configuration.
 
 ## Categories
 
 | Category          | Rules | Examples                                                              |
 | ----------------- | ----: | --------------------------------------------------------------------- |
-| Roslyn Utilities  |    20 | Guard helpers, symbol comparison, collection extensions               |
-| OpenTelemetry     |    23 | Semantic conventions, ActivitySource, attribute validation, OTLP      |
+| OpenTelemetry     |    24 | Semantic conventions, ActivitySource, attribute validation, OTLP      |
+| Roslyn Utilities  |    24 | Guard helpers, symbol comparison, collection extensions               |
 | AOT Testing       |    10 | AotTest/TrimTest return codes, AotSafe/AotUnsafe, dynamic, reflection |
 | ASP.NET Core      |     9 | Form binding, resilience, health checks, service discovery            |
-| Usage             |     8 | Span comparisons, IXmlSerializable, static lambdas, banned APIs       |
-| VersionManagement |     6 | Hardcoded versions, Version.props, diagnostics alignment              |
+| GenAI             |     9 | Required attributes, operation names, tool capability, SDK usage      |
+| Reliability       |     9 | Division by zero, await using, fire-and-forget, exception handling    |
+| Usage             |     9 | Span comparisons, IXmlSerializable, static lambdas, banned APIs       |
+| Design            |     7 | Primary constructors, type partialness, closed hierarchies            |
+| VersionManagement |     7 | Hardcoded versions, Version.props, diagnostics alignment              |
 | Threading         |     6 | Lock patterns, async void, blocking calls in async                    |
 | Configuration     |     5 | ServiceDefaults, endpoints, EventSource, connection strings           |
-| Design            |     5 | Primary constructors, type partialness, closed hierarchies            |
 | Metrics           |     5 | Meter registration, naming, high cardinality, source generation       |
-| GenAI             |     4 | Required attributes, operation names, token histograms                |
 | Style             |     3 | Pattern matching, null-guard normalization                            |
-| Reliability       |     2 | Division by zero, await using                                         |
 
 ## Rules
 
@@ -139,6 +139,27 @@ ANcpLua.Analyzers enforces code quality and prevents common bugs. Included autom
 | [AL0108](/analyzers/rules/AL0108) | OpenTelemetry     | Redundant [NoTrace] attribute                           |   Info   | Yes |
 | [AL0109](/analyzers/rules/AL0109) | OpenTelemetry     | Non-interceptable [Traced] method                       | Warning  | Yes |
 | [AL0110](/analyzers/rules/AL0110) | OpenTelemetry     | [TracedTag] on out/ref parameter                        |  Error   | Yes |
+| [AL0111](/analyzers/rules/AL0111) | Reliability       | SQL string interpolation in CommandText                 | Warning  |  -  |
+| [AL0112](/analyzers/rules/AL0112) | Reliability       | Fire-and-forget Task                                    | Warning  |  -  |
+| [AL0113](/analyzers/rules/AL0113) | OpenTelemetry     | Missing exception recording on Activity                 | Warning  |  -  |
+| [AL0114](/analyzers/rules/AL0114) | Reliability       | Prefer TryParse over Parse                              | Warning  |  -  |
+| [AL0115](/analyzers/rules/AL0115) | Reliability       | Empty catch block                                       | Warning  |  -  |
+| [AL0116](/analyzers/rules/AL0116) | Reliability       | Exception leaked in HTTP response                       | Warning  |  -  |
+| [AL0117](/analyzers/rules/AL0117) | Usage             | Unnecessary LINQ materialization                        |   Info   |  -  |
+| [AL0118](/analyzers/rules/AL0118) | Reliability       | Read-modify-write without transaction                   | Warning  |  -  |
+| [AL0119](/analyzers/rules/AL0119) | Roslyn Utilities  | ISymbol stored in incremental model                     | Warning  |  -  |
+| [AL0120](/analyzers/rules/AL0120) | Roslyn Utilities  | Use IIncrementalGenerator over ISourceGenerator         | Warning  |  -  |
+| [AL0121](/analyzers/rules/AL0121) | Roslyn Utilities  | Avoid SyntaxFactory.NormalizeWhitespace()               | Warning  | Yes |
+| [AL0122](/analyzers/rules/AL0122) | Design            | DuckDB table must be partial                            |  Error   | Yes |
+| [AL0123](/analyzers/rules/AL0123) | Design            | DuckDB column ordinal conflict                          | Warning  |  -  |
+| [AL0124](/analyzers/rules/AL0124) | GenAI             | Non-interceptable [AgentTraced] method                  | Warning  | Yes |
+| [AL0125](/analyzers/rules/AL0125) | Roslyn Utilities  | Use StringComparison .Any extensions                    |   Info   |  -  |
+| [AL0126](/analyzers/rules/AL0126) | Reliability       | CancellationToken not propagated                        |   Info   | Yes |
+| [AL0127](/analyzers/rules/AL0127) | VersionManagement | Outdated MAF package version                            | Warning  |  -  |
+| [AL0128](/analyzers/rules/AL0128) | GenAI             | Destructive tool must require approval                  | Warning  |  -  |
+| [AL0129](/analyzers/rules/AL0129) | GenAI             | Tool must declare side effect                           |   Info   |  -  |
+| [AL0130](/analyzers/rules/AL0130) | GenAI             | Tool must declare capability                            |   Info   |  -  |
+| [AL0131](/analyzers/rules/AL0131) | GenAI             | Direct GenAI SDK usage bypassing IChatClient            | Warning  |  -  |
 
 **Legend:** `Error` = build error, `Warning` = build warning, `Info` = IDE suggestion, `Disabled` = off by default.
 
