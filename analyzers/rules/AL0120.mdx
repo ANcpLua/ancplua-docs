@@ -1,0 +1,25 @@
+---
+title: 'AL0120 - Use IIncrementalGenerator instead of ISourceGenerator'
+sidebarTitle: 'AL0120'
+description: 'ISourceGenerator (v1 API) runs on every keystroke without caching'
+icon: 'shield-check'
+---
+
+Source: [AL0120UseIncrementalGeneratorAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0120UseIncrementalGeneratorAnalyzer.cs)
+
+## Description
+
+ISourceGenerator (v1 API) runs on every keystroke without caching. IIncrementalGenerator provides an incremental pipeline with automatic caching, significantly improving IDE responsiveness.
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0120.severity = warning
+```

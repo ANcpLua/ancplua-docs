@@ -1,0 +1,25 @@
+---
+title: 'AL0131 - Direct GenAI SDK call bypasses automatic OTel instrumentation'
+sidebarTitle: 'AL0131'
+description: 'Calling a GenAI SDK type directly prevents automatic OpenTelemetry span emission'
+icon: 'shield-check'
+---
+
+Source: [AL0131DirectGenAiSdkUsageAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0131DirectGenAiSdkUsageAnalyzer.cs)
+
+## Description
+
+Calling a GenAI SDK type directly prevents automatic OpenTelemetry span emission. Wrap the provider client through Microsoft.Extensions.AI.IChatClient so all LLM calls are traced without changes to call sites.
+
+## Properties
+
+- **Category**: GenAI
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0131.severity = warning
+```

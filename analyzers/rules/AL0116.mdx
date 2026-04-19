@@ -1,0 +1,25 @@
+---
+title: 'AL0116 - Exception details leaked in HTTP response'
+sidebarTitle: 'AL0116'
+description: 'Returning exception messages, stack traces, or ToString() output in HTTP responses can expose sensitive implementation details'
+icon: 'shield-check'
+---
+
+Source: [AL0116ExceptionLeakedInResponseAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0116ExceptionLeakedInResponseAnalyzer.cs)
+
+## Description
+
+Returning exception messages, stack traces, or ToString() output in HTTP responses can expose sensitive implementation details. Return a generic error message and log the exception server-side.
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0116.severity = warning
+```

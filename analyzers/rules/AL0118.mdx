@@ -1,0 +1,25 @@
+---
+title: 'AL0118 - Read-modify-write without transaction'
+sidebarTitle: 'AL0118'
+description: 'A method that reads data and then writes based on that data without a transaction is vulnerable to race conditions'
+icon: 'shield-check'
+---
+
+Source: [AL0118ReadModifyWriteWithoutTransactionAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0118ReadModifyWriteWithoutTransactionAnalyzer.cs)
+
+## Description
+
+A method that reads data and then writes based on that data without a transaction is vulnerable to race conditions. Another connection could modify the data between the read and write. Use BeginTransaction/BeginTransactionAsync to ensure isolation.
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0118.severity = warning
+```

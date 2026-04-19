@@ -1,0 +1,25 @@
+---
+title: 'AL0114 - Prefer TryParse over Parse'
+sidebarTitle: 'AL0114'
+description: 'Parse methods throw FormatException on invalid input'
+icon: 'shield-check'
+---
+
+Source: [AL0114PreferTryParseAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0114PreferTryParseAnalyzer.cs)
+
+## Description
+
+Parse methods throw FormatException on invalid input. Use TryParse to safely handle invalid input without exceptions, especially when processing user input or external data.
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0114.severity = warning
+```

@@ -1,0 +1,25 @@
+---
+title: 'AL0119 - Avoid storing ISymbol in source generator models'
+sidebarTitle: 'AL0119'
+description: 'ISymbol types do not implement value equality'
+icon: 'shield-check'
+---
+
+Source: [AL0119SymbolStoredInModelAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0119SymbolStoredInModelAnalyzer.cs)
+
+## Description
+
+ISymbol types do not implement value equality. Storing them in source generator models causes the incremental generator cache to be invalidated on every keystroke, defeating the purpose of incremental generation. Extract the needed data as strings or primitive values instead.
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0119.severity = warning
+```

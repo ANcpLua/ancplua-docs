@@ -1,0 +1,25 @@
+---
+title: 'AL0113 - Missing exception recording on Activity error status'
+sidebarTitle: 'AL0113'
+description: 'When setting an Activity status to Error in a catch block, the exception should be recorded as an event on the span for proper observability'
+icon: 'shield-check'
+---
+
+Source: [AL0113MissingExceptionRecordingOnActivityAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0113MissingExceptionRecordingOnActivityAnalyzer.cs)
+
+## Description
+
+When setting an Activity status to Error in a catch block, the exception should be recorded as an event on the span for proper observability. Use activity.AddEvent with exception details or a RecordException helper.
+
+## Properties
+
+- **Category**: OpenTelemetry
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0113.severity = warning
+```

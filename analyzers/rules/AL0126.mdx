@@ -1,0 +1,25 @@
+---
+title: 'AL0126 - Forward CancellationToken to invocations that support it'
+sidebarTitle: 'AL0126'
+description: 'When a CancellationToken is available in scope and the invoked method has an overload accepting one, forward it to enable cooperative cancellation'
+icon: 'shield-check'
+---
+
+Source: [AL0126CancellationTokenPropagationAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0126CancellationTokenPropagationAnalyzer.cs)
+
+## Description
+
+When a CancellationToken is available in scope and the invoked method has an overload accepting one, forward it to enable cooperative cancellation.
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0126.severity = info
+```

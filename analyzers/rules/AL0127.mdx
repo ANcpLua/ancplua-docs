@@ -1,0 +1,25 @@
+---
+title: 'AL0127 - Outdated MAF ecosystem package version'
+sidebarTitle: 'AL0127'
+description: 'Detects outdated Microsoft Agent Framework and related package versions'
+icon: 'shield-check'
+---
+
+Source: [AL0127OutdatedMafPackageVersionAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0127OutdatedMafPackageVersionAnalyzer.cs)
+
+## Description
+
+Detects outdated Microsoft Agent Framework and related package versions. Update to the minimum required version to ensure compatibility with GA APIs and AIFunctionFactoryOptions.
+
+## Properties
+
+- **Category**: VersionManagement
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0127.severity = warning
+```

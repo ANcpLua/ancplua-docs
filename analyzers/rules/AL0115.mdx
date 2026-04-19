@@ -1,0 +1,25 @@
+---
+title: 'AL0115 - Empty catch block swallows exceptions'
+sidebarTitle: 'AL0115'
+description: 'Empty catch blocks silently swallow exceptions, making bugs invisible'
+icon: 'shield-check'
+---
+
+Source: [AL0115EmptyCatchBlockAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0115EmptyCatchBlockAnalyzer.cs)
+
+## Description
+
+Empty catch blocks silently swallow exceptions, making bugs invisible. At minimum, log the exception. If the exception is truly expected, add a comment explaining why it is safe to ignore.
+
+## Properties
+
+- **Category**: Reliability
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0115.severity = warning
+```

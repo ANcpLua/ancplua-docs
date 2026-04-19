@@ -1,0 +1,25 @@
+---
+title: 'AL0123 - Conflicting [DuckDbColumn] ordinal values'
+sidebarTitle: 'AL0123'
+description: 'Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute'
+icon: 'shield-check'
+---
+
+Source: [AL0123DuckDbColumnConflictingOrdinalAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0123DuckDbColumnConflictingOrdinalAnalyzer.cs)
+
+## Description
+
+Multiple properties in a [DuckDbTable] type have the same Ordinal value in their [DuckDbColumn] attribute. Each column must have a unique ordinal to ensure deterministic column ordering in generated SQL.
+
+## Properties
+
+- **Category**: Design
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0123.severity = warning
+```

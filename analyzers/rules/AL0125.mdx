@@ -1,0 +1,25 @@
+---
+title: 'AL0125 - Use *Any* string comparison extension'
+sidebarTitle: 'AL0125'
+description: 'Chained string equality comparisons (s == "a" || s == "b") can be collapsed into a single EqualsAnyOrdinal/EqualsAnyIgnoreCase call'
+icon: 'shield-check'
+---
+
+Source: [AL0125UseStringComparisonAnyExtensionsAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0125UseStringComparisonAnyExtensionsAnalyzer.cs)
+
+## Description
+
+Chained string equality comparisons (s == "a" || s == "b") can be collapsed into a single EqualsAnyOrdinal/EqualsAnyIgnoreCase call.
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0125.severity = info
+```

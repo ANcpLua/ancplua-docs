@@ -1,0 +1,25 @@
+---
+title: 'AL0128 - Destructive Loom tool must require approval'
+sidebarTitle: 'AL0128'
+description: 'Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution'
+icon: 'shield-check'
+---
+
+Source: [AL0128DestructiveToolMustRequireApprovalAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0128DestructiveToolMustRequireApprovalAnalyzer.cs)
+
+## Description
+
+Loom tools with destructive side effects (WritesExternalState, MutatesCode, Deploys, ClosesIssue) must declare [RequiresApproval] to ensure governance gates are in place before execution.
+
+## Properties
+
+- **Category**: GenAI
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0128.severity = warning
+```

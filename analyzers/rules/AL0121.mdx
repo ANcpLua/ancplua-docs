@@ -1,0 +1,25 @@
+---
+title: 'AL0121 - Avoid NormalizeWhitespace in source generators'
+sidebarTitle: 'AL0121'
+description: 'SyntaxFactory.NormalizeWhitespace() traverses the entire syntax tree to rewrite whitespace, which is expensive in source generators that run frequently'
+icon: 'shield-check'
+---
+
+Source: [AL0121NormalizeWhitespaceAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0121NormalizeWhitespaceAnalyzer.cs)
+
+## Description
+
+SyntaxFactory.NormalizeWhitespace() traverses the entire syntax tree to rewrite whitespace, which is expensive in source generators that run frequently. Use raw string literals or manual formatting instead.
+
+## Properties
+
+- **Category**: Roslyn Utilities
+- **Severity**: Warning
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0121.severity = warning
+```

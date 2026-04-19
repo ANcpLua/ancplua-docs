@@ -1,0 +1,25 @@
+---
+title: 'AL0130 - Loom tool should declare required capabilities'
+sidebarTitle: 'AL0130'
+description: 'Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control'
+icon: 'shield-check'
+---
+
+Source: [AL0130ToolMustDeclareCapabilityAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0130ToolMustDeclareCapabilityAnalyzer.cs)
+
+## Description
+
+Every Loom tool should declare its required capabilities via [RequiresCapability] on the method or containing type to enable fine-grained access control.
+
+## Properties
+
+- **Category**: GenAI
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0130.severity = info
+```

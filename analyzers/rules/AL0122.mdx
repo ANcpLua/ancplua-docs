@@ -1,0 +1,25 @@
+---
+title: 'AL0122 - [DuckDbTable] type must be partial'
+sidebarTitle: 'AL0122'
+description: 'The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]'
+icon: 'shield-check'
+---
+
+Source: [AL0122DuckDbTableMustBePartialAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0122DuckDbTableMustBePartialAnalyzer.cs)
+
+## Description
+
+The DuckDbInsertGenerator source generator creates additional methods (AddParameters, MapFromReader, BuildMultiRowInsertSql) on types marked with [DuckDbTable]. The type must be partial so the generator can add these members.
+
+## Properties
+
+- **Category**: Design
+- **Severity**: Error
+- **Enabled by default**: True
+- **Code fix available**: True
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0122.severity = error
+```

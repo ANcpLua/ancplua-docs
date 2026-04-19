@@ -1,0 +1,25 @@
+---
+title: 'AL0117 - Unnecessary LINQ materialization'
+sidebarTitle: 'AL0117'
+description: 'Calling ToList() or ToArray() immediately after Where(), Select(), or other LINQ operators forces eager evaluation'
+icon: 'shield-check'
+---
+
+Source: [AL0117UnnecessaryLinqMaterializationAnalyzer.cs](https://github.com/ANcpLua/ANcpLua.Analyzers/blob/main/src/ANcpLua.Analyzers/Analyzers/AL0117UnnecessaryLinqMaterializationAnalyzer.cs)
+
+## Description
+
+Calling ToList() or ToArray() immediately after Where(), Select(), or other LINQ operators forces eager evaluation. If the result is only enumerated once, deferred execution avoids allocating an intermediate collection.
+
+## Properties
+
+- **Category**: Usage
+- **Severity**: Info
+- **Enabled by default**: True
+- **Code fix available**: False
+
+## Configuration
+
+```editorconfig
+dotnet_diagnostic.AL0117.severity = info
+```
