@@ -72,7 +72,7 @@ jobs:
 
       - name: Report issues on PR
         if: always() && github.event_name == 'pull_request' && (steps.nav-sync.outcome == 'failure' || steps.broken-links.outcome == 'failure' || steps.a11y.outcome == 'failure' || steps.openapi.outcome == 'failure')
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
