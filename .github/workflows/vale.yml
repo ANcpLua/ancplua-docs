@@ -13,9 +13,9 @@ jobs:
     name: Lint documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: errata-ai/vale-action@v2
+      - uses: errata-ai/vale-action@d89dee975228ae261d22c15adcd03578634d429c # v2
         with:
           reporter: github-pr-review
           filter_mode: added
