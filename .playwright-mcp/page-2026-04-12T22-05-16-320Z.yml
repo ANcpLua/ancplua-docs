@@ -1,0 +1,9 @@
+- generic [ref=e3]:
+  - generic:
+    - paragraph:
+      - text: Ash nazg durbatuluk, ash nazg gimbatul,
+      - text: ash nazg thrakatuluk, agh burzum-ishi krimpatul.
+    - paragraph:
+      - text: Ein Ring, sie zu knechten, sie alle zu finden,
+      - text: ins Dunkel zu treiben und ewig zu binden.
+  - generic: Built by Claude in 2 minutes · React Bits Evil Eye
