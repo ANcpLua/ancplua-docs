@@ -19,8 +19,8 @@
   "devDependencies": {
     "husky": "9.1.7",
     "lint-staged": "17.0.8",
-    "mint": "4.2.679",
-    "prettier": "3.9.4"
+    "mint": "4.2.687",
+    "prettier": "3.9.5"
   },
   "lint-staged": {
     "*.{mdx,md,json,yaml,yml}": [
