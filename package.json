@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "husky": "9.1.7",
-    "lint-staged": "17.3.0",
-    "mint": "4.2.824",
+    "lint-staged": "17.4.1",
+    "mint": "4.2.841",
     "prettier": "3.9.6"
   },
   "lint-staged": {
